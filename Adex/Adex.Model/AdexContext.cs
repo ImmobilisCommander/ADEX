@@ -20,7 +20,13 @@ namespace Adex.Model
         }
     }
 
-    public class Entity
+    public interface IEntity
+    {
+        int Id { get; set; }
+        string ExternalId { get; set; }
+    }
+
+    public class Entity : IEntity
     {
         /// <summary>
         /// 
@@ -42,6 +48,11 @@ namespace Adex.Model
         /// </summary>
         [MaxLength(200)]
         public string Designation { get; set; }
+
+        public override string ToString()
+        {
+            return $"{ExternalId} {Designation}";
+        }
     }
 
     public class Beneficiary : Entity
@@ -58,5 +69,10 @@ namespace Adex.Model
         /// </summary>
         [MaxLength(200)]
         public string FirstName { get; set; }
+
+        public override string ToString()
+        {
+            return $"{ExternalId} {LastName} {FirstName}";
+        }
     }
 }

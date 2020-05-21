@@ -1,43 +1,70 @@
-﻿using Adex.Model;
+﻿using Adex.Library;
+using Adex.Model;
+using log4net;
+using log4net.Config;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
+using System.Reflection;
 
 namespace Adex.App
 {
     class Program
     {
-        static void Main(string[] args)
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(Program));
+
+        static Program()
         {
-            using (var db = new AdexContext())
-            {
-                db.Companies.Add(new Company() { Designation = "test" });
-                db.SaveChanges();
-            }
+            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
         }
 
-        private static void GenerateSmallDataSample()
+        static void Main(string[] args)
         {
-            var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
-            var sb = new StringBuilder();
+            _logger.Info("Starting ********************************");
+            //CsvLoader.ReWriteToUTF8(100);
 
-            foreach (var f in files)
+            var companies = new List<Company>();
+            var beneficiaries = new Dictionary<string, Beneficiary>();
+            var loader = new CsvLoader();
+            loader.OnMessage += Loader_OnError;
+
+            loader.Load(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv", companies);
+            loader.Load(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv", beneficiaries);
+            loader.Load(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv", beneficiaries);
+            loader.Load(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv", beneficiaries);
+
+            using (var w = new StreamWriter(@"E:\Git\ImmobilisCommander\ADEX\Data\DistinctBeneficiariesId.csv", false, System.Text.Encoding.UTF8))
             {
-                using (var r = new StreamReader(f, true))
+                w.Write("ExternalId\n");
+                foreach (var b in beneficiaries.Select(x => x.Value.ExternalId).Distinct())
                 {
-                    for (int i = 0; i < 10; i++)
-                    {
-                        sb.Append($"{r.ReadLine()}\n");
-                    }
+                    w.Write($"{b}\n");
                 }
-
-                var newFile = Path.Combine(@"E:\Git\ImmobilisCommander\ADEX\Data", Path.GetFileName(f));
-                if (File.Exists(newFile))
-                {
-                    File.Delete(newFile);
-                }
-                File.WriteAllText(newFile, sb.ToString(), Encoding.UTF8);
-                sb.Clear();
             }
+
+            using (var w = new StreamWriter(@"E:\Git\ImmobilisCommander\ADEX\Data\Beneficiaries.csv", false, System.Text.Encoding.UTF8))
+            {
+                w.Write("ExternalId;LastName;FirstName\n");
+                foreach (var b in beneficiaries)
+                {
+                    w.Write($"{b.Value.ExternalId};{b.Value.LastName};{b.Value.FirstName}\n");
+                }
+            }
+
+            //using (var db = new AdexContext())
+            //{
+            //    db.Companies.Add(new Company() { Designation = "test" });
+            //    db.SaveChanges();
+            //}
+
+            _logger.Info("Ending");
+        }
+
+        private static void Loader_OnError(object sender, MessageEventArgs e)
+        {
+            _logger.Error(e.Message);
+            System.Console.WriteLine(e.Message);
         }
     }
 }
