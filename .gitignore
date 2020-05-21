@@ -1,0 +1,5 @@
+﻿exports-etalab
+Adex/.vs
+Adex/Adex.*/bin
+Adex/Adex.*/obj
+Adex/obj
