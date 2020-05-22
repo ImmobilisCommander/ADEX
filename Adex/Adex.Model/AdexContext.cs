@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Adex.Model
 {
     public class AdexContext : DbContext
     {
-        public DbSet<Company> Companies { get; set; }
+        public DbSet<Entity> Entities { get; set; }
+
+        public DbSet<InterestBond> InterestBonds { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -17,62 +16,6 @@ namespace Adex.Model
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-        }
-    }
-
-    public interface IEntity
-    {
-        int Id { get; set; }
-        string ExternalId { get; set; }
-    }
-
-    public class Entity : IEntity
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        [Key]
-        public int Id { get; set; }
-
-        /// <summary>
-        /// External identifier
-        /// </summary>
-        [MaxLength(200)]
-        public string ExternalId { get; set; }
-    }
-
-    public class Company : Entity
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        [MaxLength(200)]
-        public string Designation { get; set; }
-
-        public override string ToString()
-        {
-            return $"{ExternalId} {Designation}";
-        }
-    }
-
-    public class Beneficiary : Entity
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        [MaxLength(200)]
-        public string LastName { get; set; }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        [MaxLength(200)]
-        public string FirstName { get; set; }
-
-        public override string ToString()
-        {
-            return $"{ExternalId} {LastName} {FirstName}";
         }
     }
 }

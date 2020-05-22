@@ -5,16 +5,22 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
+using System.Timers;
 
 namespace Adex.Library
 {
-    public class CsvLoader
+    public class CsvLoader : IDisposable
     {
-        public event EventHandler<MessageEventArgs> OnMessage;
+        private readonly CsvConfiguration _configuration = null;
+        private readonly CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
 
-        readonly CsvConfiguration _configuration = null;
+        private bool disposedValue = false;
+        private Timer _timer = null;
+        private int _mainCounter = 0;
+
+
+        public event EventHandler<MessageEventArgs> OnMessage;
 
         public CsvLoader()
         {
@@ -30,9 +36,22 @@ namespace Adex.Library
                 HasHeaderRecord = true,
                 Encoding = Encoding.UTF8
             };
+
+            _timer = new Timer(10000);
+            _timer.Elapsed += delegate (object sender, ElapsedEventArgs e)
+            {
+                OnMessage?.Invoke(this, new MessageEventArgs { Message = _mainCounter.ToString().PadLeft(10, '0') });
+            };
+            _timer.Enabled = true;
+            _timer.Start();
         }
 
-        public void Load(string path, List<Company> entities)
+        ~CsvLoader()
+        {
+            Dispose(false);
+        }
+
+        public void LoadProviders(string path, Dictionary<string, Entity> entities)
         {
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing \"{path}\" file" });
 
@@ -46,9 +65,10 @@ namespace Adex.Library
 
                     while (csv.Read())
                     {
-                        entities.Add(new Company()
+                        var externalId = csv.GetField("identifiant");
+                        entities.Add(externalId, new Company()
                         {
-                            ExternalId = csv.GetField("identifiant"),
+                            ExternalId = externalId,
                             Designation = csv.GetField("denomination_sociale")
                         });
                         counter++;
@@ -60,10 +80,15 @@ namespace Adex.Library
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {entities.Count} elements" });
         }
 
-        public void Load(string path, Dictionary<string, Beneficiary> entities)
+        public void LoadInterestBonds(string path, Dictionary<string, Entity> companies, Dictionary<string, Entity> beneficiaries, Dictionary<string, InterestBond> bonds)
         {
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing \"{path}\" file" });
-            int counter = 0;
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing file \"{path}\"" });
+
+            int records = 0;
+            int counterCompanies = 0;
+            int counterBenef = 0;
+            int counterBonds = 0;
+
             using (var sr = new StreamReader(path, true))
             {
                 using (var csv = new CustomCsvReader(sr, _configuration))
@@ -72,33 +97,109 @@ namespace Adex.Library
                     csv.Read();
                     csv.ReadHeader();
 
+                    var idx_entreprise_identifiant = csv.GetFieldIndex("entreprise_identifiant");
+                    var idx_denomination_sociale = csv.GetFieldIndex("denomination_sociale");
+
                     var idx_benef_identifiant_valeur = csv.GetFieldIndex("benef_identifiant_valeur");
                     var idx_benef_nom = csv.GetFieldIndex("benef_nom");
                     var idx_benef_prenom = csv.GetFieldIndex("benef_prenom");
 
+                    var idx_ligne_identifiant = csv.GetFieldIndex("ligne_identifiant");
+
                     while (csv.Read())
                     {
-                        var externalId = csv.GetField(idx_benef_identifiant_valeur).Trim();
-                        var lastName = csv.GetField(idx_benef_nom).Trim();
-                        var firstName = csv.GetField(idx_benef_prenom).Trim();
-
-                        var key = $"{externalId}{lastName}{firstName}";
-                        if (!entities.ContainsKey(key))
+                        try
                         {
-                            entities.Add(key, new Beneficiary()
+                            var date = csv.GetField(new string[] { "avant_date_signature", "conv_date_signature", "remu_date" })?.Trim();
+
+                            var dateSignature = Convert.ToDateTime(date, _cultureFr);
+
+                            if (dateSignature.Year == 2019)
                             {
-                                ExternalId = externalId,
-                                LastName = lastName,
-                                FirstName = firstName
-                            });
-                            counter++;
+                                Entity company = null;
+                                Entity benef = null;
+                                InterestBond bond = null;
+
+                                var externalId = csv.GetField(idx_entreprise_identifiant);
+                                if (!companies.ContainsKey(externalId))
+                                {
+                                    company = new Entity()
+                                    {
+                                        ExternalId = externalId,
+                                        Designation = csv.GetField(idx_denomination_sociale)
+                                    };
+                                    companies.Add(company.ExternalId, company);
+                                    counterCompanies++;
+                                }
+                                else
+                                {
+                                    company = companies[externalId];
+                                }
+
+                                externalId = csv.GetField(idx_benef_identifiant_valeur)?.Trim();
+                                if (!beneficiaries.ContainsKey(externalId))
+                                {
+                                    var lastName = csv.GetField(idx_benef_nom)?.Trim();
+                                    var firstName = csv.GetField(idx_benef_prenom)?.Trim();
+
+                                    benef = new Entity()
+                                    {
+                                        ExternalId = externalId,
+                                        Designation = $"{lastName} {firstName}"
+                                    };
+                                    beneficiaries.Add(benef.ExternalId, benef);
+                                    counterBenef++;
+                                }
+                                else
+                                {
+                                    benef = beneficiaries[externalId];
+                                }
+
+                                externalId = csv.GetField(idx_ligne_identifiant).Trim();
+                                if (!bonds.ContainsKey(externalId))
+                                {
+                                    // remu_convention_liee
+
+                                    var amount = csv.GetField(new string[] { "avant_montant_ttc", "conv_montant_ttc", "remu_montant_ttc" })?.Trim();
+                                    var kind = csv.GetField(new string[] { "avant_nature", "conv_objet" })?.Trim();
+
+                                    bond = new InterestBond
+                                    {
+                                        ExternalId = externalId,
+                                        Amount = Convert.ToDecimal(amount, _cultureFr),
+                                        Kind = kind,
+                                        DateSignature = Convert.ToDateTime(date, _cultureFr),
+                                        Designation = $"{date:yyyyMMdd}-{kind}-{amount}-{company.Designation}-{benef.Designation}",
+                                        Provider = company,
+                                        ProviderId = company.Id,
+                                        Beneficiary = benef,
+                                        BeneficiaryId = benef.Id
+                                    };
+                                    bonds.Add(bond.ExternalId, bond);
+                                    counterBonds++;
+                                }
+                            }
                         }
+                        catch (Exception e)
+                        {
+                            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"\"{path}\" {e.Message}: {csv.Context.RawRecord}" });
+                        }
+
+                        _mainCounter++;
+                        records++;
                     }
                 }
             }
 
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Added {counter} elements" });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {entities.Count} elements" });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Read {records} records" });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Added {counterCompanies} companies, {counterBenef} beneficiaries, {counterBonds} insterest bonds" });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {companies.Count} companies, {beneficiaries.Count} beneficiaries, {bonds.Count} insterest bonds" });
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public static void ReWriteToUTF8(int? loops = null)
@@ -121,7 +222,7 @@ namespace Adex.Library
                             while (!r.EndOfStream)
                             {
                                 w.Write($"{r.ReadLine()}\n");
-                            } 
+                            }
                         }
                         else
                         {
@@ -132,6 +233,22 @@ namespace Adex.Library
                         }
                     }
                 }
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: supprimer l'état managé (objets managés).
+                }
+
+                // TODO: libérer les ressources non managées (objets non managés) et remplacer un finaliseur ci-dessous.
+                // TODO: définir les champs de grande taille avec la valeur Null.
+
+                disposedValue = true;
             }
         }
     }

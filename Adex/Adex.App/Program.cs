@@ -22,46 +22,52 @@ namespace Adex.App
         static void Main(string[] args)
         {
             _logger.Info("Starting ********************************");
-            //CsvLoader.ReWriteToUTF8(100);
+            CsvLoader.ReWriteToUTF8(1000);
 
-            var companies = new List<Company>();
-            var beneficiaries = new Dictionary<string, Beneficiary>();
-            var loader = new CsvLoader();
-            loader.OnMessage += Loader_OnError;
+            var companies = new Dictionary<string, Entity>();
+            var beneficiaries = new Dictionary<string, Entity>();
+            var bonds = new Dictionary<string, InterestBond>();
 
-            loader.Load(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv", companies);
-            loader.Load(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv", beneficiaries);
-            loader.Load(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv", beneficiaries);
-            loader.Load(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv", beneficiaries);
-
-            using (var w = new StreamWriter(@"E:\Git\ImmobilisCommander\ADEX\Data\DistinctBeneficiariesId.csv", false, System.Text.Encoding.UTF8))
+            using (var loader = new CsvLoader())
             {
-                w.Write("ExternalId\n");
-                foreach (var b in beneficiaries.Select(x => x.Value.ExternalId).Distinct())
-                {
-                    w.Write($"{b}\n");
-                }
-            }
+                loader.OnMessage += Loader_OnMessage;
 
-            using (var w = new StreamWriter(@"E:\Git\ImmobilisCommander\ADEX\Data\Beneficiaries.csv", false, System.Text.Encoding.UTF8))
-            {
-                w.Write("ExternalId;LastName;FirstName\n");
-                foreach (var b in beneficiaries)
-                {
-                    w.Write($"{b.Value.ExternalId};{b.Value.LastName};{b.Value.FirstName}\n");
-                }
-            }
+                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv", companies);
+                loader.LoadInterestBonds(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
+                loader.LoadInterestBonds(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
+                loader.LoadInterestBonds(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
 
-            //using (var db = new AdexContext())
-            //{
-            //    db.Companies.Add(new Company() { Designation = "test" });
-            //    db.SaveChanges();
-            //}
+                //using (var w = new StreamWriter(@"E:\Git\ImmobilisCommander\ADEX\Data\DistinctBeneficiariesId.csv", false, System.Text.Encoding.UTF8))
+                //{
+                //    w.Write("ExternalId\n");
+                //    foreach (var b in beneficiaries.Select(x => x.Value.ExternalId).Distinct())
+                //    {
+                //        w.Write($"{b}\n");
+                //    }
+                //}
+
+                //using (var w = new StreamWriter(@"E:\Git\ImmobilisCommander\ADEX\Data\Beneficiaries.csv", false, System.Text.Encoding.UTF8))
+                //{
+                //    w.Write("ExternalId;Designation\n");
+                //    foreach (var b in beneficiaries)
+                //    {
+                //        w.Write($"{b.Value.ExternalId};{b.Value.Designation}\n");
+                //    }
+                //}
+
+                //using (var db = new AdexContext())
+                //{
+                //    db.Companies.Add(new Company() { Designation = "test" });
+                //    db.SaveChanges();
+                //}
+
+                loader.OnMessage -= Loader_OnMessage;
+            }
 
             _logger.Info("Ending");
         }
 
-        private static void Loader_OnError(object sender, MessageEventArgs e)
+        private static void Loader_OnMessage(object sender, MessageEventArgs e)
         {
             _logger.Error(e.Message);
             System.Console.WriteLine(e.Message);
