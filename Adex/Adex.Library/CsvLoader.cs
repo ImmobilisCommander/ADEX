@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Timers;
 
@@ -18,7 +19,6 @@ namespace Adex.Library
         private bool disposedValue = false;
         private Timer _timer = null;
         private int _mainCounter = 0;
-
 
         public event EventHandler<MessageEventArgs> OnMessage;
 
@@ -80,7 +80,25 @@ namespace Adex.Library
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {entities.Count} elements" });
         }
 
-        public void LoadInterestBonds(string path, Dictionary<string, Entity> companies, Dictionary<string, Entity> beneficiaries, Dictionary<string, InterestBond> bonds)
+        public string BondsToJson(Dictionary<string, Model.Link> bonds)
+        {
+            var all = bonds.Select(x => new { id = x.Value.From.ExternalId, name = x.Value.From.Designation }).Distinct().ToList();
+            all.AddRange(bonds.Select(x => new { id = x.Value.To.ExternalId, name = x.Value.To.Designation }).Distinct());
+
+            var links = new List<Link>();
+
+            foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)))
+            {
+                var temp = bonds.Where(x => x.Value.From.ExternalId == item.id).Where(x => !string.IsNullOrEmpty(x.Value.To.ExternalId)).Select(x => x.Value.To.ExternalId);
+                links.Add(new Link { name = item.id, size = temp.Distinct().Count(), imports = temp.Distinct().ToList() });
+            }
+
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(links.OrderBy(x => x.name), Newtonsoft.Json.Formatting.Indented);
+
+            return json;
+        }
+
+        public void LoadInterestBonds(string path, Dictionary<string, Entity> companies, Dictionary<string, Entity> beneficiaries, Dictionary<string, Model.Link> bonds)
         {
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing file \"{path}\"" });
 
@@ -118,7 +136,7 @@ namespace Adex.Library
                             {
                                 Entity company = null;
                                 Entity benef = null;
-                                InterestBond bond = null;
+                                Model.Link bond = null;
 
                                 var externalId = csv.GetField(idx_entreprise_identifiant);
                                 if (!companies.ContainsKey(externalId))
@@ -163,17 +181,17 @@ namespace Adex.Library
                                     var amount = csv.GetField(new string[] { "avant_montant_ttc", "conv_montant_ttc", "remu_montant_ttc" })?.Trim();
                                     var kind = csv.GetField(new string[] { "avant_nature", "conv_objet" })?.Trim();
 
-                                    bond = new InterestBond
+                                    bond = new Model.Link
                                     {
                                         ExternalId = externalId,
-                                        Amount = Convert.ToDecimal(amount, _cultureFr),
-                                        Kind = kind,
-                                        DateSignature = Convert.ToDateTime(date, _cultureFr),
+                                        //Amount = Convert.ToDecimal(amount, _cultureFr),
+                                        //Kind = kind,
+                                        //DateSignature = Convert.ToDateTime(date, _cultureFr),
                                         Designation = $"{date:yyyyMMdd}-{kind}-{amount}-{company.Designation}-{benef.Designation}",
-                                        Provider = company,
-                                        ProviderId = company.Id,
-                                        Beneficiary = benef,
-                                        BeneficiaryId = benef.Id
+                                        From = company,
+                                        FromId = company.Id,
+                                        To = benef,
+                                        ToId = benef.Id
                                     };
                                     bonds.Add(bond.ExternalId, bond);
                                     counterBonds++;
@@ -245,10 +263,23 @@ namespace Adex.Library
                     // TODO: supprimer l'état managé (objets managés).
                 }
 
-                // TODO: libérer les ressources non managées (objets non managés) et remplacer un finaliseur ci-dessous.
-                // TODO: définir les champs de grande taille avec la valeur Null.
+                _timer?.Dispose();
 
                 disposedValue = true;
+            }
+        }
+
+        private class Link
+        {
+            public string name { get; set; }
+
+            public int size { get; set; }
+
+            public List<string> imports { get; set; }
+
+            public override string ToString()
+            {
+                return name;
             }
         }
     }

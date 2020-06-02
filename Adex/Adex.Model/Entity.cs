@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Adex.Model
 {
+    [Table("Entities")]
     public class Entity : IEntity
     {
         /// <summary>
@@ -20,6 +22,6 @@ namespace Adex.Model
         /// Functional designation of the record
         /// </summary>
         [MaxLength(200)]
-        public string Designation { get; set; }
+        public virtual string Designation { get; set; }
     }
 }

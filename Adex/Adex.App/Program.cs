@@ -1,8 +1,9 @@
 ﻿using Adex.Library;
+using Adex.MetaModel;
 using Adex.Model;
 using log4net;
 using log4net.Config;
-using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,55 +23,81 @@ namespace Adex.App
         static void Main(string[] args)
         {
             _logger.Info("Starting ********************************");
-            CsvLoader.ReWriteToUTF8(1000);
 
-            var companies = new Dictionary<string, Entity>();
-            var beneficiaries = new Dictionary<string, Entity>();
-            var bonds = new Dictionary<string, InterestBond>();
-
-            using (var loader = new CsvLoader())
+            using (var db = new AdexMetaContext())
             {
-                loader.OnMessage += Loader_OnMessage;
+                //var members = new string[] { "identifiant", "pays_code", "pays", "secteur_activite_code", "secteur", "denomination_sociale", "adresse_1", "adresse_2", "adresse_3", "adresse_4", "code_postal", "ville" };
 
-                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv", companies);
-                loader.LoadInterestBonds(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
-                loader.LoadInterestBonds(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
-                loader.LoadInterestBonds(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
-
-                //using (var w = new StreamWriter(@"E:\Git\ImmobilisCommander\ADEX\Data\DistinctBeneficiariesId.csv", false, System.Text.Encoding.UTF8))
+                //foreach (var m in members)
                 //{
-                //    w.Write("ExternalId\n");
-                //    foreach (var b in beneficiaries.Select(x => x.Value.ExternalId).Distinct())
-                //    {
-                //        w.Write($"{b}\n");
-                //    }
+                //    db.Members.Add(new Member { Name = m });
                 //}
 
-                //using (var w = new StreamWriter(@"E:\Git\ImmobilisCommander\ADEX\Data\Beneficiaries.csv", false, System.Text.Encoding.UTF8))
-                //{
-                //    w.Write("ExternalId;Designation\n");
-                //    foreach (var b in beneficiaries)
-                //    {
-                //        w.Write($"{b.Value.ExternalId};{b.Value.Designation}\n");
-                //    }
-                //}
+                //db.SaveChanges();
 
-                //using (var db = new AdexContext())
-                //{
-                //    db.Companies.Add(new Company() { Designation = "test" });
-                //    db.SaveChanges();
-                //}
+                //AddMember(db, members, new string[] { "QBSTAWWV", "[FR]", "FRANCE", "[PA]", "Prestataires associés", "IP Santé domicile", "16 Rue de Montbrillant", "Buroparc Rive Gauche", "", "", "69003", "LYON" });
+                //AddMember(db, members, new string[] { "MQKQLNIC", "[FR]", "FRANCE", "[DM]", "Dispositifs médicaux", "SIGVARIS", "ZI SUD D'ANDREZIEUX", "RUE B. THIMONNIER", "", "", "42173", "SAINT-JUST SAINT-RAMBERT CEDEX" });
+                //AddMember(db, members, new string[] { "OETEUQSP", "[FR]", "FRANCE", "[AUT]", "Autres", "HEALTHCARE COMPLIANCE CONSULTING FRANCE SAS", "47 BOULEVARD CHARLES V", "", "", "", "14600", "HONFLEUR" });
 
-                loader.OnMessage -= Loader_OnMessage;
+                //db.SaveChanges();
+
+                db.Links.Add(new MetaModel.Link { From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC") });
+                db.Links.Add(new MetaModel.Link { From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") });
+                db.Links.Add(new MetaModel.Link { From = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") });
+
+                db.SaveChanges();
             }
+
+            //using (var db = new AdexContext())
+            //{
+            //    var c = new Company { ExternalId = "MyID", Designation = "TEST SA" };
+            //    db.Companies.Add(c);
+            //    var p = new Person { ExternalId = "DRAOULT", Designation = "DIDIER_RAOULT", FirstName = "Didier", LastName = "RAOULT" };
+            //    db.Persons.Add(p);
+            //    db.Links.Add(new Link { ExternalId = "MyID_DRAOULT", Designation = "XXXYYY", From = c, To = p, FromId = c.Id, ToId = p.Id });
+            //    db.SaveChanges();
+            //}
+
+            //var mgr = new LinkManager();
+            //mgr.OnMessage += Loader_OnMessage;
+
+            //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", mgr.LoadSample(15000));
 
             _logger.Info("Ending");
         }
 
+        private static void AddMember(AdexMetaContext db, string[] members, string[] a)
+        {
+            var e = new MetaModel.Entity() { Reference = a[0] };
+            db.Entities.Add(e);
+            for (int i = 0; i < members.Length; i++)
+            {
+                var mName = members[i];
+                var value = a[i];
+                db.Metadatas.Add(new Metadata { Entity = e, Member = db.Members.FirstOrDefault(x => x.Name == mName), Value =  value});
+            }
+        }
+
         private static void Loader_OnMessage(object sender, MessageEventArgs e)
         {
-            _logger.Error(e.Message);
-            System.Console.WriteLine(e.Message);
+            switch (e.Level)
+            {
+                case Level.Debug:
+                    _logger.Debug(e.Message);
+                    break;
+                case Level.Info:
+                    _logger.Info(e.Message);
+                    break;
+                case Level.Warn:
+                    _logger.Warn(e.Message);
+                    break;
+                case Level.Error:
+                    _logger.Error(e.Message);
+                    break;
+                default:
+                    break;
+            }
+            Console.WriteLine(e.Message);
         }
     }
 }
