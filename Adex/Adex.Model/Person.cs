@@ -20,7 +20,7 @@ namespace Adex.Model
 
         public override string ToString()
         {
-            return $"{ExternalId} {LastName} {FirstName}";
+            return $"{Reference} {LastName} {FirstName}";
         }
     }
 }

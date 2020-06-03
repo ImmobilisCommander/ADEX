@@ -1,47 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram MajorVersion="1" MinorVersion="1">
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Class Name="Adex.Model.AdexContext">
-    <Position X="0.5" Y="0.5" Width="2" />
+    <Position X="0.5" Y="0.5" Width="2.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAEAAgAAAACAEAAAEAAAA=</HashCode>
       <FileName>AdexContext.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Adex.Model.Person">
-    <Position X="2.5" Y="4" Width="1.5" />
+    <Position X="4.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
       <FileName>Person.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Adex.Model.Company">
-    <Position X="4.75" Y="4" Width="1.5" />
+    <Position X="6.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
       <FileName>Company.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Adex.Model.Entity">
-    <Position X="4.75" Y="1.25" Width="1.5" />
+    <Position X="6.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAgIAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAACAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Entity.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Adex.Model.Link">
-    <Position X="7" Y="4" Width="1.75" />
+    <Position X="8.75" Y="3.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AgAAAIAAAAAAAAAEAAAAAAAAABAIAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AgAAAAAAAAAAAAAEAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Link.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="Adex.Model.IEntity">
-    <Position X="6.75" Y="1.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAgIAAAAAAAAAAAA=</HashCode>
-      <FileName>IEntity.cs</FileName>
-    </TypeIdentifier>
-  </Interface>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

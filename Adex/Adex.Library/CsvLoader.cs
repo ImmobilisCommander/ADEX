@@ -1,4 +1,5 @@
-﻿using Adex.Model;
+﻿using Adex.Interface;
+using Adex.Model;
 using CsvHelper;
 using CsvHelper.Configuration;
 using System;
@@ -11,13 +12,13 @@ using System.Timers;
 
 namespace Adex.Library
 {
-    public class CsvLoader : IDisposable
+    public class CsvLoader : IDisposable, ICsvLoader
     {
         private readonly CsvConfiguration _configuration = null;
         private readonly CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
+        private readonly Timer _timer = null;
 
         private bool disposedValue = false;
-        private Timer _timer = null;
         private int _mainCounter = 0;
 
         public event EventHandler<MessageEventArgs> OnMessage;
@@ -51,7 +52,7 @@ namespace Adex.Library
             Dispose(false);
         }
 
-        public void LoadProviders(string path, Dictionary<string, Entity> entities)
+        public void LoadProviders(string path, Dictionary<string, IEntity> entities)
         {
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing \"{path}\" file" });
 
@@ -68,7 +69,7 @@ namespace Adex.Library
                         var externalId = csv.GetField("identifiant");
                         entities.Add(externalId, new Company()
                         {
-                            ExternalId = externalId,
+                            Reference = externalId,
                             Designation = csv.GetField("denomination_sociale")
                         });
                         counter++;
@@ -80,25 +81,7 @@ namespace Adex.Library
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {entities.Count} elements" });
         }
 
-        public string BondsToJson(Dictionary<string, Model.Link> bonds)
-        {
-            var all = bonds.Select(x => new { id = x.Value.From.ExternalId, name = x.Value.From.Designation }).Distinct().ToList();
-            all.AddRange(bonds.Select(x => new { id = x.Value.To.ExternalId, name = x.Value.To.Designation }).Distinct());
-
-            var links = new List<Link>();
-
-            foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)))
-            {
-                var temp = bonds.Where(x => x.Value.From.ExternalId == item.id).Where(x => !string.IsNullOrEmpty(x.Value.To.ExternalId)).Select(x => x.Value.To.ExternalId);
-                links.Add(new Link { name = item.id, size = temp.Distinct().Count(), imports = temp.Distinct().ToList() });
-            }
-
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(links.OrderBy(x => x.name), Newtonsoft.Json.Formatting.Indented);
-
-            return json;
-        }
-
-        public void LoadInterestBonds(string path, Dictionary<string, Entity> companies, Dictionary<string, Entity> beneficiaries, Dictionary<string, Model.Link> bonds)
+        public void LoadLinks(string path, Dictionary<string, IEntity> companies, Dictionary<string, IEntity> beneficiaries, Dictionary<string, ILink> links)
         {
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing file \"{path}\"" });
 
@@ -134,24 +117,24 @@ namespace Adex.Library
 
                             if (dateSignature.Year == 2019)
                             {
-                                Entity company = null;
-                                Entity benef = null;
-                                Model.Link bond = null;
+                                Company company = null;
+                                Person benef = null;
+                                Model.Link link = null;
 
                                 var externalId = csv.GetField(idx_entreprise_identifiant);
                                 if (!companies.ContainsKey(externalId))
                                 {
-                                    company = new Entity()
+                                    company = new Company()
                                     {
-                                        ExternalId = externalId,
+                                        Reference = externalId,
                                         Designation = csv.GetField(idx_denomination_sociale)
                                     };
-                                    companies.Add(company.ExternalId, company);
+                                    companies.Add(company.Reference, company);
                                     counterCompanies++;
                                 }
                                 else
                                 {
-                                    company = companies[externalId];
+                                    company = companies[externalId] as Company;
                                 }
 
                                 externalId = csv.GetField(idx_benef_identifiant_valeur)?.Trim();
@@ -160,40 +143,37 @@ namespace Adex.Library
                                     var lastName = csv.GetField(idx_benef_nom)?.Trim();
                                     var firstName = csv.GetField(idx_benef_prenom)?.Trim();
 
-                                    benef = new Entity()
+                                    benef = new Person()
                                     {
-                                        ExternalId = externalId,
-                                        Designation = $"{lastName} {firstName}"
+                                        Reference = externalId
                                     };
-                                    beneficiaries.Add(benef.ExternalId, benef);
+                                    beneficiaries.Add(benef.Reference, benef);
                                     counterBenef++;
                                 }
                                 else
                                 {
-                                    benef = beneficiaries[externalId];
+                                    benef = beneficiaries[externalId] as Person;
                                 }
 
                                 externalId = csv.GetField(idx_ligne_identifiant).Trim();
-                                if (!bonds.ContainsKey(externalId))
+                                if (!links.ContainsKey(externalId))
                                 {
                                     // remu_convention_liee
 
                                     var amount = csv.GetField(new string[] { "avant_montant_ttc", "conv_montant_ttc", "remu_montant_ttc" })?.Trim();
                                     var kind = csv.GetField(new string[] { "avant_nature", "conv_objet" })?.Trim();
 
-                                    bond = new Model.Link
+                                    link = new Model.Link
                                     {
-                                        ExternalId = externalId,
+                                        Reference = externalId,
                                         //Amount = Convert.ToDecimal(amount, _cultureFr),
                                         //Kind = kind,
                                         //DateSignature = Convert.ToDateTime(date, _cultureFr),
-                                        Designation = $"{date:yyyyMMdd}-{kind}-{amount}-{company.Designation}-{benef.Designation}",
+                                        //Designation = $"{date:yyyyMMdd}-{kind}-{amount}-{company.Designation}-{benef.Designation}",
                                         From = company,
-                                        FromId = company.Id,
                                         To = benef,
-                                        ToId = benef.Id
                                     };
-                                    bonds.Add(bond.ExternalId, bond);
+                                    links.Add(link.Reference, link as ILink);
                                     counterBonds++;
                                 }
                             }
@@ -211,7 +191,25 @@ namespace Adex.Library
 
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Read {records} records" });
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Added {counterCompanies} companies, {counterBenef} beneficiaries, {counterBonds} insterest bonds" });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {companies.Count} companies, {beneficiaries.Count} beneficiaries, {bonds.Count} insterest bonds" });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {companies.Count} companies, {beneficiaries.Count} beneficiaries, {links.Count} insterest bonds" });
+        }
+
+        public static string LinksToJson(Dictionary<string, Model.Link> obj)
+        {
+            var all = obj.Select(x => new { id = x.Value.From.Reference, name = x.Value.From.Reference }).Distinct().ToList();
+            all.AddRange(obj.Select(x => new { id = x.Value.To.Reference, name = x.Value.To.Reference }).Distinct());
+
+            var links = new List<Link>();
+
+            foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)))
+            {
+                var temp = obj.Where(x => x.Value.From.Reference == item.id).Where(x => !string.IsNullOrEmpty(x.Value.To.Reference)).Select(x => x.Value.To.Reference);
+                links.Add(new Link { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
+            }
+
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(links.OrderBy(x => x.Name), Newtonsoft.Json.Formatting.Indented);
+
+            return json;
         }
 
         public void Dispose()
@@ -271,15 +269,15 @@ namespace Adex.Library
 
         private class Link
         {
-            public string name { get; set; }
+            public string Name { get; set; }
 
-            public int size { get; set; }
+            public int Size { get; set; }
 
-            public List<string> imports { get; set; }
+            public List<string> Imports { get; set; }
 
             public override string ToString()
             {
-                return name;
+                return Name;
             }
         }
     }

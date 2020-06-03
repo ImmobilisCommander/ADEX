@@ -1,9 +1,11 @@
-﻿using Adex.Library;
+﻿using Adex.Interface;
+using Adex.Library;
 using Adex.MetaModel;
 using Adex.Model;
 using log4net;
 using log4net.Config;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -26,20 +28,18 @@ namespace Adex.App
 
             using (var db = new AdexMetaContext())
             {
-                //var members = new string[] { "identifiant", "pays_code", "pays", "secteur_activite_code", "secteur", "denomination_sociale", "adresse_1", "adresse_2", "adresse_3", "adresse_4", "code_postal", "ville" };
-
+                var members = new string[] { "identifiant", "pays_code", "pays", "secteur_activite_code", "secteur", "denomination_sociale", "adresse_1", "adresse_2", "adresse_3", "adresse_4", "code_postal", "ville" };
                 //foreach (var m in members)
                 //{
                 //    db.Members.Add(new Member { Name = m });
                 //}
-
                 //db.SaveChanges();
 
-                //AddMember(db, members, new string[] { "QBSTAWWV", "[FR]", "FRANCE", "[PA]", "Prestataires associés", "IP Santé domicile", "16 Rue de Montbrillant", "Buroparc Rive Gauche", "", "", "69003", "LYON" });
-                //AddMember(db, members, new string[] { "MQKQLNIC", "[FR]", "FRANCE", "[DM]", "Dispositifs médicaux", "SIGVARIS", "ZI SUD D'ANDREZIEUX", "RUE B. THIMONNIER", "", "", "42173", "SAINT-JUST SAINT-RAMBERT CEDEX" });
-                //AddMember(db, members, new string[] { "OETEUQSP", "[FR]", "FRANCE", "[AUT]", "Autres", "HEALTHCARE COMPLIANCE CONSULTING FRANCE SAS", "47 BOULEVARD CHARLES V", "", "", "", "14600", "HONFLEUR" });
+                AddMetadata(db, members, new string[] { "QBSTAWWV", "[FR]", "FRANCE", "[PA]", "Prestataires associés", "IP Santé domicile", "16 Rue de Montbrillant", "Buroparc Rive Gauche", "", "", "69003", "LYON" });
+                AddMetadata(db, members, new string[] { "MQKQLNIC", "[FR]", "FRANCE", "[DM]", "Dispositifs médicaux", "SIGVARIS", "ZI SUD D'ANDREZIEUX", "RUE B. THIMONNIER", "", "", "42173", "SAINT-JUST SAINT-RAMBERT CEDEX" });
+                AddMetadata(db, members, new string[] { "OETEUQSP", "[FR]", "FRANCE", "[AUT]", "Autres", "HEALTHCARE COMPLIANCE CONSULTING FRANCE SAS", "47 BOULEVARD CHARLES V", "", "", "", "14600", "HONFLEUR" });
 
-                //db.SaveChanges();
+                db.SaveChanges();
 
                 db.Links.Add(new MetaModel.Link { From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC") });
                 db.Links.Add(new MetaModel.Link { From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") });
@@ -58,15 +58,14 @@ namespace Adex.App
             //    db.SaveChanges();
             //}
 
-            //var mgr = new LinkManager();
-            //mgr.OnMessage += Loader_OnMessage;
+            //var companies = new Dictionary<string, IEntity>();
+            //var beneficiaries = new Dictionary<string, IEntity>();
+            //var bonds = new Dictionary<string, Model.Link>();
 
-            //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", mgr.LoadSample(15000));
-
-            _logger.Info("Ending");
+            //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", LoadSample(15000, companies, beneficiaries, bonds));
         }
 
-        private static void AddMember(AdexMetaContext db, string[] members, string[] a)
+        private static void AddMetadata(AdexMetaContext db, string[] members, string[] a)
         {
             var e = new MetaModel.Entity() { Reference = a[0] };
             db.Entities.Add(e);
@@ -76,6 +75,29 @@ namespace Adex.App
                 var value = a[i];
                 db.Metadatas.Add(new Metadata { Entity = e, Member = db.Members.FirstOrDefault(x => x.Name == mName), Value =  value});
             }
+        }
+
+        private static string LoadSample(int size, Dictionary<string, IEntity> companies, Dictionary<string, IEntity> beneficiaries, Dictionary<string, ILink> bonds)
+        {
+            string retour = null;
+
+            CsvLoader.ReWriteToUTF8(size);
+
+            using (var loader = new CsvLoader())
+            {
+                loader.OnMessage += Loader_OnMessage;
+
+                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv", companies);
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
+
+                retour = CsvLoader.LinksToJson(bonds);
+
+                loader.OnMessage -= Loader_OnMessage;
+            }
+
+            return retour;
         }
 
         private static void Loader_OnMessage(object sender, MessageEventArgs e)

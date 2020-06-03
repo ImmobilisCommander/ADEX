@@ -6,9 +6,15 @@ namespace Adex.Model
     [Table("Companies")]
     public class Company : Entity
     {
+        /// <summary>
+        /// Functional designation of the record
+        /// </summary>
+        [MaxLength(200)]
+        public virtual string Designation { get; set; }
+
         public override string ToString()
         {
-            return $"{ExternalId} {Designation}";
+            return $"{Reference} {Designation}";
         }
     }
 }
