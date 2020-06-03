@@ -13,6 +13,8 @@ namespace Adex.Model
 
         public DbSet<Link> Links { get; set; }
 
+        public DbSet<FinancialLink> FinancialLinks { get; set; }
+
         public AdexContext()
             : base("Adex")
         {

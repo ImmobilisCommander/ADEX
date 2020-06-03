@@ -28,6 +28,14 @@ namespace Adex.App
 
             // FillAdexMetaDb();
 
+            // FillAdexDb();
+
+
+            File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", LoadSample(15000));
+        }
+
+        private static void FillAdexDb()
+        {
             using (var db = new AdexContext())
             {
                 var c = new Company { Reference = "MyID", Designation = "TEST SA" };
@@ -37,12 +45,6 @@ namespace Adex.App
                 db.Links.Add(new Model.Link { Reference = "MyID_DRAOULT", From = c, To = p });
                 db.SaveChanges();
             }
-
-            //var companies = new Dictionary<string, IEntity>();
-            //var beneficiaries = new Dictionary<string, IEntity>();
-            //var bonds = new Dictionary<string, Model.Link>();
-
-            //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", LoadSample(15000, companies, beneficiaries, bonds));
         }
 
         private static void FillAdexMetaDb()
@@ -90,22 +92,29 @@ namespace Adex.App
             }
         }
 
-        private static string LoadSample(int size, Dictionary<string, IEntity> companies, Dictionary<string, IEntity> beneficiaries, Dictionary<string, ILink> bonds)
+        private static string LoadSample(int size)
         {
             string retour = null;
 
-            CsvLoader.ReWriteToUTF8(size);
+            //var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
+            //foreach (var f in files)
+            //{
+            //    FileHelper.ReWriteToUTF8(f, @"E:\Git\ImmobilisCommander\ADEX\Data", size);
+            //}
 
             using (var loader = new CsvLoader())
             {
                 loader.OnMessage += Loader_OnMessage;
+                loader.LoadReferences();
 
-                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv", companies);
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv", companies, beneficiaries, bonds);
+                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv");
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv");
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv");
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv");
 
-                retour = CsvLoader.LinksToJson(bonds);
+                loader.Save();
+
+                //retour = CsvLoader.LinksToJson();
 
                 loader.OnMessage -= Loader_OnMessage;
             }
@@ -127,12 +136,14 @@ namespace Adex.App
                     _logger.Warn(e.Message);
                     break;
                 case Level.Error:
+                    Console.ForegroundColor = ConsoleColor.Red;
                     _logger.Error(e.Message);
                     break;
                 default:
                     break;
             }
             Console.WriteLine(e.Message);
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
     }
 }

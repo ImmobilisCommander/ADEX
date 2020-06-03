@@ -2,6 +2,7 @@
 using Adex.Model;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,12 +13,15 @@ using System.Timers;
 
 namespace Adex.Library
 {
-    public class CsvLoader : IDisposable, ICsvLoader
+    public partial class CsvLoader : IDisposable
     {
-        private readonly CsvConfiguration _configuration = null;
-        private readonly CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
-        private readonly Timer _timer = null;
-
+        private CsvConfiguration _configuration = null;
+        private CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
+        private Timer _timer = null;
+        private Dictionary<string, Company> _companies = null;
+        private Dictionary<string, Person> _beneficiaries = null;
+        private Dictionary<string, Link> _links = null;
+        private HashSet<string> _existingReferences = null;
         private bool disposedValue = false;
         private int _mainCounter = 0;
 
@@ -29,10 +33,11 @@ namespace Adex.Library
             {
                 MissingFieldFound = delegate (string[] tab, int count, ReadingContext ctxt)
                 {
+                    OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Missing field found at index {count}: \"{tab[count]}\"", Level = Level.Error });
                 },
                 BadDataFound = delegate (ReadingContext ctxt)
                 {
-                    OnMessage?.Invoke(this, new MessageEventArgs { Message = ctxt.RawRecord });
+                    OnMessage?.Invoke(this, new MessageEventArgs { Message = ctxt.RawRecord, Level = Level.Error });
                 },
                 HasHeaderRecord = true,
                 Encoding = Encoding.UTF8
@@ -45,6 +50,10 @@ namespace Adex.Library
             };
             _timer.Enabled = true;
             _timer.Start();
+
+            _companies = new Dictionary<string, Company>();
+            _beneficiaries = new Dictionary<string, Person>();
+            _links = new Dictionary<string, Link>();
         }
 
         ~CsvLoader()
@@ -52,7 +61,15 @@ namespace Adex.Library
             Dispose(false);
         }
 
-        public void LoadProviders(string path, Dictionary<string, IEntity> entities)
+        public void LoadReferences()
+        { 
+            using (var db = new AdexContext())
+            {
+                _existingReferences = new HashSet<string>(db.Entities.Select(x => x.Reference));
+            }
+        }
+
+        public void LoadProviders(string path)
         {
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing \"{path}\" file" });
 
@@ -67,21 +84,24 @@ namespace Adex.Library
                     while (csv.Read())
                     {
                         var externalId = csv.GetField("identifiant");
-                        entities.Add(externalId, new Company()
+                        if (!_existingReferences.Contains(externalId) && !_companies.ContainsKey(externalId))
                         {
-                            Reference = externalId,
-                            Designation = csv.GetField("denomination_sociale")
-                        });
+                            _companies.Add(externalId, new Company()
+                            {
+                                Reference = externalId,
+                                Designation = csv.GetField("denomination_sociale")
+                            });
+                        }
                         counter++;
                     }
                 }
             }
 
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Added {counter} elements" });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {entities.Count} elements" });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Found {counter} records in file \"{path}\"", Level = Level.Debug });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {_companies.Count} new companies", Level = Level.Debug });
         }
 
-        public void LoadLinks(string path, Dictionary<string, IEntity> companies, Dictionary<string, IEntity> beneficiaries, Dictionary<string, ILink> links)
+        public void LoadLinks(string path)
         {
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing file \"{path}\"" });
 
@@ -119,61 +139,61 @@ namespace Adex.Library
                             {
                                 Company company = null;
                                 Person benef = null;
-                                Model.Link link = null;
+                                Link link = null;
 
                                 var externalId = csv.GetField(idx_entreprise_identifiant);
-                                if (!companies.ContainsKey(externalId))
+                                if (!_companies.ContainsKey(externalId))
                                 {
                                     company = new Company()
                                     {
                                         Reference = externalId,
                                         Designation = csv.GetField(idx_denomination_sociale)
                                     };
-                                    companies.Add(company.Reference, company);
+                                    _companies.Add(company.Reference, company);
                                     counterCompanies++;
                                 }
                                 else
                                 {
-                                    company = companies[externalId] as Company;
+                                    company = _companies[externalId];
                                 }
 
                                 externalId = csv.GetField(idx_benef_identifiant_valeur)?.Trim();
-                                if (!beneficiaries.ContainsKey(externalId))
+                                if (!_beneficiaries.ContainsKey(externalId))
                                 {
                                     var lastName = csv.GetField(idx_benef_nom)?.Trim();
                                     var firstName = csv.GetField(idx_benef_prenom)?.Trim();
 
                                     benef = new Person()
                                     {
-                                        Reference = externalId
+                                        Reference = externalId,
+                                        FirstName = firstName,
+                                        LastName = lastName
                                     };
-                                    beneficiaries.Add(benef.Reference, benef);
+                                    _beneficiaries.Add(benef.Reference, benef);
                                     counterBenef++;
                                 }
                                 else
                                 {
-                                    benef = beneficiaries[externalId] as Person;
+                                    benef = _beneficiaries[externalId];
                                 }
 
                                 externalId = csv.GetField(idx_ligne_identifiant).Trim();
-                                if (!links.ContainsKey(externalId))
+                                if (!_links.ContainsKey(externalId))
                                 {
                                     // remu_convention_liee
-
                                     var amount = csv.GetField(new string[] { "avant_montant_ttc", "conv_montant_ttc", "remu_montant_ttc" })?.Trim();
                                     var kind = csv.GetField(new string[] { "avant_nature", "conv_objet" })?.Trim();
 
-                                    link = new Model.Link
+                                    link = new FinancialLink
                                     {
                                         Reference = externalId,
-                                        //Amount = Convert.ToDecimal(amount, _cultureFr),
-                                        //Kind = kind,
-                                        //DateSignature = Convert.ToDateTime(date, _cultureFr),
-                                        //Designation = $"{date:yyyyMMdd}-{kind}-{amount}-{company.Designation}-{benef.Designation}",
+                                        Amount = Convert.ToDecimal(amount, _cultureFr),
+                                        Kind = kind,
+                                        Date = Convert.ToDateTime(date, _cultureFr),
                                         From = company,
                                         To = benef,
                                     };
-                                    links.Add(link.Reference, link as ILink);
+                                    _links.Add(link.Reference, link);
                                     counterBonds++;
                                 }
                             }
@@ -191,23 +211,54 @@ namespace Adex.Library
 
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Read {records} records" });
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Added {counterCompanies} companies, {counterBenef} beneficiaries, {counterBonds} insterest bonds" });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {companies.Count} companies, {beneficiaries.Count} beneficiaries, {links.Count} insterest bonds" });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {_companies.Count} companies, {_beneficiaries.Count} beneficiaries, {_links.Count} insterest links" });
         }
 
-        public static string LinksToJson(Dictionary<string, ILink> obj)
+        public void Save()
         {
-            var all = obj.Select(x => new { id = (x.Value as Model.Link).From.Reference, name = (x.Value as Model.Link).From.Reference }).Distinct().ToList();
-            all.AddRange(obj.Select(x => new { id = (x.Value as Model.Link).To.Reference, name = (x.Value as Model.Link).To.Reference }).Distinct());
+            using (var db = new AdexContext())
+            {
+                using (var t = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        db.Companies.AddRange(_companies.Select(x => x.Value));
+                        db.Persons.AddRange(_beneficiaries.Select(x => x.Value));
+                        db.Links.AddRange(_links.Select(x => x.Value));
+                        db.SaveChanges();
+                        t.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        OnMessage?.Invoke(this, new MessageEventArgs { Message = e.Message, Level = Level.Error });
+                        t.Rollback();
+                    }
+                }
+            }
 
-            var links = new List<Link>();
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_companies.Count} new companies have been saved", Level = Level.Info });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_beneficiaries.Count} new beneficiaries have been saved", Level = Level.Info });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_links.Count} new links have been saved", Level = Level.Info });
+
+            _companies.Clear();
+            _beneficiaries.Clear();
+            _links.Clear();
+        }
+
+        public string LinksToJson()
+        {
+            var all = _links.Select(x => new { id = x.Value.From.Reference, name = x.Value.From.Reference }).Distinct().ToList();
+            all.AddRange(_links.Select(x => new { id = x.Value.To.Reference, name = x.Value.To.Reference }).Distinct());
+
+            var links = new List<DatavizItem>();
 
             foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)))
             {
-                var temp = obj.Where(x => (x.Value as Model.Link).From.Reference == item.id).Where(x => !string.IsNullOrEmpty((x.Value as Model.Link).To.Reference)).Select(x => (x.Value as Model.Link).To.Reference);
-                links.Add(new Link { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
+                var temp = _links.Where(x => x.Value.From.Reference == item.id).Where(x => !string.IsNullOrEmpty(x.Value.To.Reference)).Select(x => x.Value.To.Reference);
+                links.Add(new DatavizItem { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
             }
 
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(links.OrderBy(x => x.Name), Newtonsoft.Json.Formatting.Indented);
+            var json = JsonConvert.SerializeObject(links.OrderBy(x => x.Name), Formatting.Indented);
 
             return json;
         }
@@ -218,66 +269,26 @@ namespace Adex.Library
             GC.SuppressFinalize(this);
         }
 
-        public static void ReWriteToUTF8(int? loops = null)
-        {
-            var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
-
-            foreach (var f in files)
-            {
-                using (var r = new StreamReader(f, true))
-                {
-                    var newFile = Path.Combine(@"E:\Git\ImmobilisCommander\ADEX\Data", Path.GetFileName(f));
-                    if (File.Exists(newFile))
-                    {
-                        File.Delete(newFile);
-                    }
-                    using (var w = new StreamWriter(newFile, false, Encoding.UTF8))
-                    {
-                        if (loops == null)
-                        {
-                            while (!r.EndOfStream)
-                            {
-                                w.Write($"{r.ReadLine()}\n");
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i < loops; i++)
-                            {
-                                w.Write($"{r.ReadLine()}\n");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    // TODO: supprimer l'état managé (objets managés).
+                    _companies?.Clear();
+                    _beneficiaries?.Clear();
+                    _links?.Clear();
+                    _companies = null;
+                    _beneficiaries = null;
+                    _links = null;
+                    _configuration = null;
+                    _cultureFr = null;
                 }
 
                 _timer?.Dispose();
+                _timer = null;
 
                 disposedValue = true;
-            }
-        }
-
-        private class Link
-        {
-            public string Name { get; set; }
-
-            public int Size { get; set; }
-
-            public List<string> Imports { get; set; }
-
-            public override string ToString()
-            {
-                return Name;
             }
         }
     }

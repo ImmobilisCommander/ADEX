@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Adex.Library;
@@ -24,7 +25,11 @@ namespace Adex.WebApi.Controllers
         [Route("generate/{nbRecords}")]
         public void Generate(int nbRecords)
         {
-            CsvLoader.ReWriteToUTF8(nbRecords);
+            var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
+            foreach (var f in files)
+            {
+                FileHelper.ReWriteToUTF8(f, @"E:\Git\ImmobilisCommander\ADEX\Data", nbRecords);
+            }
         }
 
         [HttpGet]
