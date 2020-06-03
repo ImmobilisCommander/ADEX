@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Adex.Interface\Adex.Interface.csproj" />
+    <ProjectReference Include="..\Adex.Common\Adex.Common.csproj" />
   </ItemGroup>
 
 </Project>

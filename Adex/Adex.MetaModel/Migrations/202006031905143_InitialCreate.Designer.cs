@@ -7,13 +7,13 @@ namespace Adex.MetaModel.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class UsingInterfaces : IMigrationMetadata
+    public sealed partial class InitialCreate : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(UsingInterfaces));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialCreate));
         
         string IMigrationMetadata.Id
         {
-            get { return "202006030901587_UsingInterfaces"; }
+            get { return "202006031905143_InitialCreate"; }
         }
         
         string IMigrationMetadata.Source

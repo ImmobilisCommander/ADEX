@@ -12,8 +12,7 @@
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        ExternalId = c.String(maxLength: 200),
-                        Designation = c.String(maxLength: 200),
+                        Reference = c.String(maxLength: 200),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -22,6 +21,7 @@
                 c => new
                     {
                         Id = c.Int(nullable: false),
+                        Designation = c.String(maxLength: 200),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Entities", t => t.Id)
@@ -32,16 +32,16 @@
                 c => new
                     {
                         Id = c.Int(nullable: false),
-                        FromId = c.Int(nullable: false),
-                        ToId = c.Int(nullable: false),
+                        From_Id = c.Int(),
+                        To_Id = c.Int(),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Entities", t => t.Id)
-                .ForeignKey("dbo.Entities", t => t.FromId)
-                .ForeignKey("dbo.Entities", t => t.ToId)
+                .ForeignKey("dbo.Entities", t => t.From_Id)
+                .ForeignKey("dbo.Entities", t => t.To_Id)
                 .Index(t => t.Id)
-                .Index(t => t.FromId)
-                .Index(t => t.ToId);
+                .Index(t => t.From_Id)
+                .Index(t => t.To_Id);
             
             CreateTable(
                 "dbo.Persons",
@@ -60,13 +60,13 @@
         public override void Down()
         {
             DropForeignKey("dbo.Persons", "Id", "dbo.Entities");
-            DropForeignKey("dbo.Links", "ToId", "dbo.Entities");
-            DropForeignKey("dbo.Links", "FromId", "dbo.Entities");
+            DropForeignKey("dbo.Links", "To_Id", "dbo.Entities");
+            DropForeignKey("dbo.Links", "From_Id", "dbo.Entities");
             DropForeignKey("dbo.Links", "Id", "dbo.Entities");
             DropForeignKey("dbo.Companies", "Id", "dbo.Entities");
             DropIndex("dbo.Persons", new[] { "Id" });
-            DropIndex("dbo.Links", new[] { "ToId" });
-            DropIndex("dbo.Links", new[] { "FromId" });
+            DropIndex("dbo.Links", new[] { "To_Id" });
+            DropIndex("dbo.Links", new[] { "From_Id" });
             DropIndex("dbo.Links", new[] { "Id" });
             DropIndex("dbo.Companies", new[] { "Id" });
             DropTable("dbo.Persons");

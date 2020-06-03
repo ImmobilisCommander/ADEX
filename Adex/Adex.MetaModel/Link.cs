@@ -1,6 +1,4 @@
-﻿using Adex.Interface;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using Adex.Common;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Adex.MetaModel
@@ -8,22 +6,19 @@ namespace Adex.MetaModel
     [Table("Links")]
     public class Link : Entity, ILink
     {
-        [Key]
-        public int Id { get; set; }
-
-        //[Index(IsUnique = true)]
-        //[MaxLength(200)]
-        //[Required]
-        //public string Reference { get; set; }
-
         [NotMapped]
         public int FromId { get { return From.Id; } }
-
-        public Entity From { get; set; }
 
         [NotMapped]
         public int ToId { get { return To.Id; } }
 
+        public Entity From { get; set; }
+
         public Entity To { get; set; }
+
+        public override string ToString()
+        {
+            return Reference;
+        }
     }
 }

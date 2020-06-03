@@ -32,9 +32,14 @@
   <Class Name="Adex.Model.Link">
     <Position X="8.75" Y="3.25" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>AgAAAAAAAAAAAAAEAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AgAAAIAAAAAAAAAEAAAAAAAAABAIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Link.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="From" />
+      <Property Name="To" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
   </Class>
   <Font Name="Segoe UI" Size="9" />
 </ClassDiagram>

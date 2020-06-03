@@ -1,4 +1,4 @@
-﻿using Adex.Interface;
+﻿using Adex.Common;
 using Adex.Library;
 using Adex.MetaModel;
 using Adex.Model;
@@ -26,14 +26,35 @@ namespace Adex.App
         {
             _logger.Info("Starting ********************************");
 
+            // FillAdexMetaDb();
+
+            using (var db = new AdexContext())
+            {
+                var c = new Company { Reference = "MyID", Designation = "TEST SA" };
+                db.Companies.Add(c);
+                var p = new Person { Reference = "DRAOULT", FirstName = "Didier", LastName = "RAOULT" };
+                db.Persons.Add(p);
+                db.Links.Add(new Model.Link { Reference = "MyID_DRAOULT", From = c, To = p });
+                db.SaveChanges();
+            }
+
+            //var companies = new Dictionary<string, IEntity>();
+            //var beneficiaries = new Dictionary<string, IEntity>();
+            //var bonds = new Dictionary<string, Model.Link>();
+
+            //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", LoadSample(15000, companies, beneficiaries, bonds));
+        }
+
+        private static void FillAdexMetaDb()
+        {
             using (var db = new AdexMetaContext())
             {
                 var members = new string[] { "identifiant", "pays_code", "pays", "secteur_activite_code", "secteur", "denomination_sociale", "adresse_1", "adresse_2", "adresse_3", "adresse_4", "code_postal", "ville" };
-                //foreach (var m in members)
-                //{
-                //    db.Members.Add(new Member { Name = m });
-                //}
-                //db.SaveChanges();
+                foreach (var m in members)
+                {
+                    db.Members.Add(new Member { Name = m });
+                }
+                db.SaveChanges();
 
                 AddMetadata(db, members, new string[] { "QBSTAWWV", "[FR]", "FRANCE", "[PA]", "Prestataires associés", "IP Santé domicile", "16 Rue de Montbrillant", "Buroparc Rive Gauche", "", "", "69003", "LYON" });
                 AddMetadata(db, members, new string[] { "MQKQLNIC", "[FR]", "FRANCE", "[DM]", "Dispositifs médicaux", "SIGVARIS", "ZI SUD D'ANDREZIEUX", "RUE B. THIMONNIER", "", "", "42173", "SAINT-JUST SAINT-RAMBERT CEDEX" });
@@ -41,28 +62,20 @@ namespace Adex.App
 
                 db.SaveChanges();
 
-                db.Links.Add(new MetaModel.Link { From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC") });
-                db.Links.Add(new MetaModel.Link { From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") });
-                db.Links.Add(new MetaModel.Link { From = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") });
+                var a = new MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC") };
+                a.Reference = $"{a.From.Reference}-{a.To.Reference}";
+                db.Links.Add(a);
+
+                var b = new MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") };
+                b.Reference = $"{b.From.Reference}-{b.To.Reference}";
+                db.Links.Add(b);
+
+                var c = new MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") };
+                c.Reference = $"{c.From.Reference}-{c.To.Reference}";
+                db.Links.Add(c);
 
                 db.SaveChanges();
             }
-
-            //using (var db = new AdexContext())
-            //{
-            //    var c = new Company { ExternalId = "MyID", Designation = "TEST SA" };
-            //    db.Companies.Add(c);
-            //    var p = new Person { ExternalId = "DRAOULT", Designation = "DIDIER_RAOULT", FirstName = "Didier", LastName = "RAOULT" };
-            //    db.Persons.Add(p);
-            //    db.Links.Add(new Link { ExternalId = "MyID_DRAOULT", Designation = "XXXYYY", From = c, To = p, FromId = c.Id, ToId = p.Id });
-            //    db.SaveChanges();
-            //}
-
-            //var companies = new Dictionary<string, IEntity>();
-            //var beneficiaries = new Dictionary<string, IEntity>();
-            //var bonds = new Dictionary<string, Model.Link>();
-
-            //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", LoadSample(15000, companies, beneficiaries, bonds));
         }
 
         private static void AddMetadata(AdexMetaContext db, string[] members, string[] a)

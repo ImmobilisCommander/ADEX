@@ -1,4 +1,4 @@
-﻿using Adex.Interface;
+﻿using Adex.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

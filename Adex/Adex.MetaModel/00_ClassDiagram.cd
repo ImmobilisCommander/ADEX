@@ -8,9 +8,9 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Adex.MetaModel.Link" BaseTypeListCollapsed="true">
-    <Position X="7.5" Y="2" Width="1.5" />
+    <Position X="5.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AgACAIAAAAAAAAAAAAAAAAAAABAIAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AgAAAIAAAAAAAAAEAAAAAAAAABAIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Link.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -20,7 +20,7 @@
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Adex.MetaModel.Metadata">
-    <Position X="4.75" Y="4.5" Width="1.5" />
+    <Position X="7.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>EAACAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Metadata.cs</FileName>
@@ -31,14 +31,14 @@
     </ShowAsAssociation>
   </Class>
   <Class Name="Adex.MetaModel.Member">
-    <Position X="7.5" Y="4.5" Width="1.5" />
+    <Position X="7.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAIAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Member.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Adex.MetaModel.Entity" BaseTypeListCollapsed="true">
-    <Position X="4.75" Y="2" Width="1.5" />
+    <Position X="4" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Entity.cs</FileName>

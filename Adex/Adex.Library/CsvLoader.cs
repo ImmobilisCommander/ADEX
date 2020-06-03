@@ -1,4 +1,4 @@
-﻿using Adex.Interface;
+﻿using Adex.Common;
 using Adex.Model;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -194,16 +194,16 @@ namespace Adex.Library
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {companies.Count} companies, {beneficiaries.Count} beneficiaries, {links.Count} insterest bonds" });
         }
 
-        public static string LinksToJson(Dictionary<string, Model.Link> obj)
+        public static string LinksToJson(Dictionary<string, ILink> obj)
         {
-            var all = obj.Select(x => new { id = x.Value.From.Reference, name = x.Value.From.Reference }).Distinct().ToList();
-            all.AddRange(obj.Select(x => new { id = x.Value.To.Reference, name = x.Value.To.Reference }).Distinct());
+            var all = obj.Select(x => new { id = (x.Value as Model.Link).From.Reference, name = (x.Value as Model.Link).From.Reference }).Distinct().ToList();
+            all.AddRange(obj.Select(x => new { id = (x.Value as Model.Link).To.Reference, name = (x.Value as Model.Link).To.Reference }).Distinct());
 
             var links = new List<Link>();
 
             foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)))
             {
-                var temp = obj.Where(x => x.Value.From.Reference == item.id).Where(x => !string.IsNullOrEmpty(x.Value.To.Reference)).Select(x => x.Value.To.Reference);
+                var temp = obj.Where(x => (x.Value as Model.Link).From.Reference == item.id).Where(x => !string.IsNullOrEmpty((x.Value as Model.Link).To.Reference)).Select(x => (x.Value as Model.Link).To.Reference);
                 links.Add(new Link { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
             }
 

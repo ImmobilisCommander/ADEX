@@ -13,7 +13,7 @@ namespace Adex.Model.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202006011709431_InitialCreate"; }
+            get { return "202006031910327_InitialCreate"; }
         }
         
         string IMigrationMetadata.Source

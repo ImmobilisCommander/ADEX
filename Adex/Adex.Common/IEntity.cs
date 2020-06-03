@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Adex.Interface
+namespace Adex.Common
 {
     public interface IEntity
     {

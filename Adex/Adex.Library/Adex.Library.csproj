@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Adex.Common\Adex.Common.csproj" />
     <ProjectReference Include="..\Adex.Model\Adex.Model.csproj" />
   </ItemGroup>
 
