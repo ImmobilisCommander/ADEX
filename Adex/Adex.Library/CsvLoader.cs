@@ -1,5 +1,5 @@
 ﻿using Adex.Common;
-using Adex.Model;
+using Adex.Data.Model;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Newtonsoft.Json;

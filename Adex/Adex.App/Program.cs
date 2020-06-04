@@ -1,7 +1,7 @@
 ﻿using Adex.Common;
 using Adex.Library;
-using Adex.MetaModel;
-using Adex.Model;
+using Adex.Data.MetaModel;
+using Adex.Data.Model;
 using log4net;
 using log4net.Config;
 using System;
@@ -42,7 +42,7 @@ namespace Adex.App
                 db.Companies.Add(c);
                 var p = new Person { Reference = "DRAOULT", FirstName = "Didier", LastName = "RAOULT" };
                 db.Persons.Add(p);
-                db.Links.Add(new Model.Link { Reference = "MyID_DRAOULT", From = c, To = p });
+                db.Links.Add(new Data.Model.Link { Reference = "MyID_DRAOULT", From = c, To = p });
                 db.SaveChanges();
             }
         }
@@ -64,15 +64,15 @@ namespace Adex.App
 
                 db.SaveChanges();
 
-                var a = new MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC") };
+                var a = new Data.MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC") };
                 a.Reference = $"{a.From.Reference}-{a.To.Reference}";
                 db.Links.Add(a);
 
-                var b = new MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") };
+                var b = new Data.MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") };
                 b.Reference = $"{b.From.Reference}-{b.To.Reference}";
                 db.Links.Add(b);
 
-                var c = new MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") };
+                var c = new Data.MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") };
                 c.Reference = $"{c.From.Reference}-{c.To.Reference}";
                 db.Links.Add(c);
 
@@ -82,7 +82,7 @@ namespace Adex.App
 
         private static void AddMetadata(AdexMetaContext db, string[] members, string[] a)
         {
-            var e = new MetaModel.Entity() { Reference = a[0] };
+            var e = new Data.MetaModel.Entity() { Reference = a[0] };
             db.Entities.Add(e);
             for (int i = 0; i < members.Length; i++)
             {

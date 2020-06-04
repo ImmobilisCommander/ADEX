@@ -1,12 +1,11 @@
-﻿using Adex.Common;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Adex.MetaModel
+namespace Adex.Data.MetaModel
 {
-    [Table("Entities")]
-    public class Entity : IEntity
+    [Table("Members")]
+    public class Member
     {
         [Key]
         public int Id { get; set; }
@@ -14,6 +13,9 @@ namespace Adex.MetaModel
         [Index(IsUnique = true)]
         [MaxLength(200)]
         [Required]
-        public string Reference { get; set; }
+        public string Name { get; set; }
+
+        [MaxLength(200)]
+        public string Alias { get; set; }
     }
 }

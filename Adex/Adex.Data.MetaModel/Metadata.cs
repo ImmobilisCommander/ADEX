@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Adex.MetaModel
+namespace Adex.Data.MetaModel
 {
     [Table("Metadatas")]
     public class Metadata

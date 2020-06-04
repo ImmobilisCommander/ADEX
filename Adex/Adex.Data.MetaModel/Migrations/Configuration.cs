@@ -1,18 +1,18 @@
-﻿namespace Adex.MetaModel.Migrations
+﻿namespace Adex.Data.MetaModel.Migrations
 {
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<Adex.MetaModel.AdexMetaContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<AdexMetaContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(Adex.MetaModel.AdexMetaContext context)
+        protected override void Seed(AdexMetaContext context)
         {
             //  This method will be called after migrating to the latest version.
 

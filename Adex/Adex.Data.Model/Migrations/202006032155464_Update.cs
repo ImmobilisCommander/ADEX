@@ -1,4 +1,4 @@
-﻿namespace Adex.Model.Migrations
+﻿namespace Adex.Data.Model.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;

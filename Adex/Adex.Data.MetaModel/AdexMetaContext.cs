@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
 
-namespace Adex.MetaModel
+namespace Adex.Data.MetaModel
 {
     public class AdexMetaContext : DbContext
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Adex.Model
+namespace Adex.Data.Model
 {
     [Table("FinancialLinks")]
     public class FinancialLink : Link

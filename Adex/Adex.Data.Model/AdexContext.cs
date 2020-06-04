@@ -1,7 +1,7 @@
 ﻿
 using System.Data.Entity;
 
-namespace Adex.Model
+namespace Adex.Data.Model
 {
     public class AdexContext : DbContext
     {

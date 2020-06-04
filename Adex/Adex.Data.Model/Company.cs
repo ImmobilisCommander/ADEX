@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Adex.Model
+namespace Adex.Data.Model
 {
     [Table("Companies")]
     public class Company : Entity

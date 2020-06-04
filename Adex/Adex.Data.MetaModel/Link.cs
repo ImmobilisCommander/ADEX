@@ -1,7 +1,7 @@
 ﻿using Adex.Common;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Adex.MetaModel
+namespace Adex.Data.MetaModel
 {
     [Table("Links")]
     public class Link : Entity, ILink

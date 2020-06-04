@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Adex.Model
+namespace Adex.Data.Model
 {
     [Table("Links")]
     public class Link : Entity, ILink
