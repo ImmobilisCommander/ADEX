@@ -1,6 +1,5 @@
 ﻿using Adex.Common;
 using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Adex.Data.Model

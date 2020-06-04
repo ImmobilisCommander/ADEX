@@ -8,9 +8,15 @@ namespace Adex.Data.MetaModel
     [Table("Entities")]
     public class Entity : IEntity
     {
+        /// <summary>
+        /// Unique identifier
+        /// </summary>
         [Key]
         public int Id { get; set; }
 
+        /// <summary>
+        /// External identifier
+        /// </summary>
         [Index(IsUnique = true)]
         [MaxLength(200)]
         [Required]

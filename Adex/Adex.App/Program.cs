@@ -64,15 +64,30 @@ namespace Adex.App
 
                 db.SaveChanges();
 
-                var a = new Data.MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC") };
+                var a = new Data.MetaModel.Link
+                {
+                    Reference = "",
+                    From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"),
+                    To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC")
+                };
                 a.Reference = $"{a.From.Reference}-{a.To.Reference}";
                 db.Links.Add(a);
 
-                var b = new Data.MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") };
+                var b = new Data.MetaModel.Link
+                {
+                    Reference = "",
+                    From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"),
+                    To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP")
+                };
                 b.Reference = $"{b.From.Reference}-{b.To.Reference}";
                 db.Links.Add(b);
 
-                var c = new Data.MetaModel.Link { Reference = "", From = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC"), To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP") };
+                var c = new Data.MetaModel.Link
+                {
+                    Reference = "",
+                    From = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC"),
+                    To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP")
+                };
                 c.Reference = $"{c.From.Reference}-{c.To.Reference}";
                 db.Links.Add(c);
 
@@ -88,7 +103,7 @@ namespace Adex.App
             {
                 var mName = members[i];
                 var value = a[i];
-                db.Metadatas.Add(new Metadata { Entity = e, Member = db.Members.FirstOrDefault(x => x.Name == mName), Value =  value});
+                db.Metadatas.Add(new Metadata { Entity = e, Member = db.Members.FirstOrDefault(x => x.Name == mName), Value = value });
             }
         }
 

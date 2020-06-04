@@ -1,4 +1,5 @@
 ﻿using Adex.Common;
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Adex.Data.MetaModel
@@ -15,6 +16,10 @@ namespace Adex.Data.MetaModel
         public Entity From { get; set; }
 
         public Entity To { get; set; }
+
+        public string Kind { get; set; }
+
+        public DateTime Date { get; set; }
 
         public override string ToString()
         {

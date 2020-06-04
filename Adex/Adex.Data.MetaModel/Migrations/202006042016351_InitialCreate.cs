@@ -50,6 +50,8 @@
                         Id = c.Int(nullable: false),
                         From_Id = c.Int(),
                         To_Id = c.Int(),
+                        Kind = c.String(),
+                        Date = c.DateTime(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Entities", t => t.Id)

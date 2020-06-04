@@ -9,5 +9,9 @@ namespace Adex.Common
         int FromId { get; }
 
         int ToId { get; }
+
+        string Kind { get; set; }
+
+        DateTime Date { get; set; }
     }
 }

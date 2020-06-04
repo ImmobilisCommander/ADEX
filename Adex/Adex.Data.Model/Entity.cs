@@ -16,7 +16,9 @@ namespace Adex.Data.Model
         /// <summary>
         /// External identifier
         /// </summary>
+        [Index(IsUnique = true)]
         [MaxLength(200)]
+        [Required]
         public string Reference { get; set; }
     }
 }
