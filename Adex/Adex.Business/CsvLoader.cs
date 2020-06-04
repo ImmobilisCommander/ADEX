@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 
-namespace Adex.Library
+namespace Adex.Business
 {
     public partial class CsvLoader : IDisposable
     {

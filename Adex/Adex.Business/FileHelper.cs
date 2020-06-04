@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Adex.Library
+namespace Adex.Business
 {
     public static class FileHelper
     {

@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Adex.Library\Adex.Library.csproj" />
+    <ProjectReference Include="..\Adex.Business\Adex.Business.csproj" />
     <ProjectReference Include="..\Adex.Data.MetaModel\Adex.Data.MetaModel.csproj" />
     <ProjectReference Include="..\Adex.Data.Model\Adex.Data.Model.csproj" />
   </ItemGroup>

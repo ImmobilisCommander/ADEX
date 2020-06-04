@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace Adex.Library
+namespace Adex.Business
 {
     /// <summary>
     /// Custom implementation of <see cref="CsvReader"/>

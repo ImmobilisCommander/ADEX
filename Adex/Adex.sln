@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adex.App", "Adex.App\Adex.App.csproj", "{7B94B0B0-1F0E-4468-80CE-6F04C393F908}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adex.Library", "Adex.Library\Adex.Library.csproj", "{A30E2C44-F100-4373-A886-D0A9110478BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adex.Business", "Adex.Business\Adex.Business.csproj", "{A30E2C44-F100-4373-A886-D0A9110478BD}"
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Adex.Web", "Adex.Web\Adex.Web.njsproj", "{9656FE10-6758-437B-8DFA-1E01733AE530}"
 EndProject

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Adex.Library;
+using Adex.Business;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,7 +23,7 @@ namespace Adex.WebApi.Controllers
 
         [HttpGet]
         [Route("generate/{nbRecords}")]
-        public void Generate(int nbRecords)
+        public async Task Generate(int nbRecords)
         {
             var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
             foreach (var f in files)
@@ -32,11 +32,19 @@ namespace Adex.WebApi.Controllers
             }
         }
 
+        private class MonObjet
+        {
+            public string Name { get; set; }
+
+            public string[] Tab { get; set; }
+        }
+
         [HttpGet]
         [Route("search/{txt}")]
-        public IEnumerable<string> Search(string txt)
+        public async Task<ActionResult> Search(string txt)
         {
-            return new string []{ "hello", "world" };        
+            var obj = new MonObjet { Name = txt, Tab = new string[] { "Hello", "World", txt } };
+            return new JsonResult(obj);        
         }
     }
 }
