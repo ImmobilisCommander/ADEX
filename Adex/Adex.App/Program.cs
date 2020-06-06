@@ -26,12 +26,20 @@ namespace Adex.App
         {
             _logger.Info("Starting ********************************");
 
+            using (var loader = new CvsLoaderMetadata())
+            {
+                loader.OnMessage += Loader_OnMessage;
+
+                loader.LoadReferences();
+                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv");
+            }
+
             // FillAdexMetaDb();
 
             // FillAdexDb();
 
 
-            File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", LoadSample(15000));
+            // File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", LoadSample(15000));
         }
 
         private static void FillAdexDb()
@@ -57,6 +65,8 @@ namespace Adex.App
                     db.Members.Add(new Member { Name = m });
                 }
                 db.SaveChanges();
+
+
 
                 AddMetadata(db, members, new string[] { "QBSTAWWV", "[FR]", "FRANCE", "[PA]", "Prestataires associés", "IP Santé domicile", "16 Rue de Montbrillant", "Buroparc Rive Gauche", "", "", "69003", "LYON" });
                 AddMetadata(db, members, new string[] { "MQKQLNIC", "[FR]", "FRANCE", "[DM]", "Dispositifs médicaux", "SIGVARIS", "ZI SUD D'ANDREZIEUX", "RUE B. THIMONNIER", "", "", "42173", "SAINT-JUST SAINT-RAMBERT CEDEX" });
@@ -117,7 +127,7 @@ namespace Adex.App
             //    FileHelper.ReWriteToUTF8(f, @"E:\Git\ImmobilisCommander\ADEX\Data", size);
             //}
 
-            using (var loader = new CsvLoader())
+            using (var loader = new CsvLoaderNormalized())
             {
                 loader.OnMessage += Loader_OnMessage;
                 loader.LoadReferences();

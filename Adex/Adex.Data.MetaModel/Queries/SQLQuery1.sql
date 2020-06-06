@@ -14,6 +14,7 @@ from
 	inner join Metadatas mb on mb.Entity_Id = b.Id
 	inner join Members mbb on mbb.Id = mb.Member_Id and mbb.Name = 'denomination_sociale'
 
+select * from Members
 
 /*
 truncate table Metadatas

@@ -7,8 +7,12 @@ namespace Adex.Common
     {
         event EventHandler<MessageEventArgs> OnMessage;
 
-        void LoadLinks(string path, Dictionary<string, IEntity> companies, Dictionary<string, IEntity> beneficiaries, Dictionary<string, ILink> links);
+        void LoadReferences();
 
-        void LoadProviders(string path, Dictionary<string, IEntity> entities);
+        void LoadProviders(string path);
+
+        void LoadLinks(string path);
+
+        string LinksToJson();
     }
 }

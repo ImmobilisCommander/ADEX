@@ -13,7 +13,7 @@ using System.Timers;
 
 namespace Adex.Business
 {
-    public partial class CsvLoader : IDisposable
+    public partial class CsvLoaderNormalized : IDisposable, ICsvLoader
     {
         private CsvConfiguration _configuration = null;
         private CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
@@ -27,7 +27,7 @@ namespace Adex.Business
 
         public event EventHandler<MessageEventArgs> OnMessage;
 
-        public CsvLoader()
+        public CsvLoaderNormalized()
         {
             _configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
@@ -56,7 +56,7 @@ namespace Adex.Business
             _links = new Dictionary<string, Link>();
         }
 
-        ~CsvLoader()
+        ~CsvLoaderNormalized()
         {
             Dispose(false);
         }
@@ -281,6 +281,7 @@ namespace Adex.Business
                     _companies = null;
                     _beneficiaries = null;
                     _links = null;
+
                     _configuration = null;
                     _cultureFr = null;
                 }
