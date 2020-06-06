@@ -2,9 +2,10 @@
 using Adex.Data.MetaModel;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Dapper;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure.Interception;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,10 +22,12 @@ namespace Adex.Business
         private CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
         private Timer _timer = null;
 
-        private HashSet<string> _existingReferences = null;
-        private HashSet<string> _existingMembers = null;
+        private HashSet<Entity> _existingReferences = null;
+        private HashSet<Member> _existingMembers = null;
         private int _mainCounter = 0;
         private bool _disposedValue;
+
+        public string DbConnectionString { get; set; }
 
         public CvsLoaderMetadata()
         {
@@ -58,10 +61,11 @@ namespace Adex.Business
 
         public void LoadReferences()
         {
-            using (var db = new AdexMetaContext())
+            using (var con = new SqlConnection(DbConnectionString))
             {
-                _existingReferences = new HashSet<string>(db.Entities.Select(x => x.Reference));
-                _existingMembers = new HashSet<string>(db.Members.Select(x => x.Name));
+                con.Open();
+                _existingReferences = con.Query<Entity>("select * from Entities").ToHashSet();
+                _existingMembers = con.Query<Member>("select * from Members").ToHashSet();
             }
         }
 
@@ -77,89 +81,200 @@ namespace Adex.Business
                     csv.Read();
                     csv.ReadHeader();
 
-                    using (var db = new AdexMetaContext())
+                    using (var con = new SqlConnection(DbConnectionString))
                     {
-                        db.Database.Log = delegate (string log)
-                        {
-                            OnMessage?.Invoke(this, new MessageEventArgs { Message = log });
-                        };
+                        con.Open();
 
+                        #region AJOUT DES EN-TÊTES MANQUANTS
                         var header = csv.Context.HeaderRecord;
-                        IEnumerable<string> membersToAdd = from x in header
-                                                           where !_existingMembers.Any(y => header.Contains(y))
-                                                           select x;
+                        var membersToAdd = header.Except(_existingMembers.Select(x => x.Name)).ToList();
+                        if (membersToAdd != null && membersToAdd.Any())
+                        {
+                            foreach (var m in membersToAdd)
+                            {
+                                var member = new Member { Name = m };
+                                member.Id = con.InsertMember(member);
+                                _existingMembers.Add(member);
+                            }
+                        }
+                        #endregion
+
+                        while (csv.Read())
+                        {
+                            var externalId = csv.GetField("identifiant");
+                            if (!_existingReferences.Any(x => x.Reference == externalId))
+                            {
+                                var entity = new Entity()
+                                {
+                                    Reference = externalId
+                                };
+                                entity.Id = con.InsertEntity(entity);
+
+                                for (int i = 0; i < csv.Context.HeaderRecord.Length; i++)
+                                {
+                                    var col = csv.Context.HeaderRecord[i];
+                                    var id = con.InsertMetadata(entity.Id, _existingMembers.FirstOrDefault(x => x.Name == col).Id, csv[i].ToString());
+                                }
+
+                                _existingReferences.Add(entity);
+                                counter++;
+                            }
+
+                            _mainCounter++;
+                        }
+                    }
+                }
+            }
+
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Found {_mainCounter} records in file \"{path}\"", Level = Level.Debug });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {counter} new companies", Level = Level.Debug });
+        }
+
+        public void LoadLinks(string path)
+        {
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing file \"{path}\"" });
+
+            int records = 0;
+            int counterCompanies = 0;
+            int counterBenef = 0;
+            int counterBonds = 0;
+
+            using (var sr = new StreamReader(path, true))
+            {
+                using (var csv = new CustomCsvReader(sr, _configuration))
+                {
+                    csv.Configuration.Delimiter = ";";
+                    csv.Read();
+                    csv.ReadHeader();
+
+                    var idx_entreprise_identifiant = csv.GetFieldIndex("entreprise_identifiant");
+                    var idx_denomination_sociale = csv.GetFieldIndex("denomination_sociale");
+
+                    var idx_benef_identifiant_valeur = csv.GetFieldIndex("benef_identifiant_valeur");
+                    var idx_benef_nom = csv.GetFieldIndex("benef_nom");
+                    var idx_benef_prenom = csv.GetFieldIndex("benef_prenom");
+
+                    var idx_ligne_identifiant = csv.GetFieldIndex("ligne_identifiant");
+
+                    using (var con = new SqlConnection(DbConnectionString))
+                    {
+                        con.Open();
+
+                        #region AJOUT DES EN-TÊTES MANQUANTS
+                        var header = csv.Context.HeaderRecord;
+                        var membersToAdd = header.Except(_existingMembers.Select(x => x.Name)).ToList();
 
                         if (membersToAdd != null && membersToAdd.Any())
                         {
                             foreach (var m in membersToAdd)
                             {
-                                db.Members.Add(new Member { Name = m });
+                                var member = new Member { Name = m };
+                                member.Id = con.InsertMember(member);
+                                _existingMembers.Add(member);
                             }
-                            db.SaveChanges();
                         }
-                    }
+                        #endregion
 
-                    using (var db = new AdexMetaContext())
-                    {
-                        var members = db.Members.ToHashSet();
                         while (csv.Read())
                         {
-                            var externalId = csv.GetField("identifiant");
-                            if (!_existingReferences.Contains(externalId))
+                            try
                             {
-                                try
+                                var date = csv.GetField(new string[] { "avant_date_signature", "conv_date_signature", "remu_date" })?.Trim();
+
+                                var dateSignature = Convert.ToDateTime(date, _cultureFr);
+
+                                if (dateSignature.Year == 2019)
                                 {
-                                    var o = new Entity()
-                                    {
-                                        Reference = externalId
-                                    };
-                                    db.Entities.Add(o);
+                                    Entity company = null;
+                                    Entity benef = null;
+                                    Link link = null;
 
-                                    for (int i = 0; i < csv.Context.HeaderRecord.Length; i++)
+                                    var externalId = csv.GetField(idx_entreprise_identifiant);
+                                    if (!_existingReferences.Any(x => x.Reference == externalId))
                                     {
-                                        var m = new Metadata
+                                        var denomination = csv.GetField(idx_entreprise_identifiant);
+                                        company = new Entity()
                                         {
-                                            Entity = o,
-                                            Member = members.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[i]),
-                                            Value = csv[i].ToString()
+                                            Reference = externalId
                                         };
+                                        company.Id = con.InsertEntity(company);
 
-                                        if (m.Member == null)
-                                        {
+                                        con.InsertMetadata(company.Id, _existingMembers.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[idx_entreprise_identifiant]).Id, denomination);
 
-                                        }
-                                        db.Metadatas.Add(m);
+                                        _existingReferences.Add(company);
+                                        counterCompanies++;
+                                    }
+                                    else
+                                    {
+                                        company = _existingReferences.FirstOrDefault(x => x.Reference == externalId);
                                     }
 
-                                    _existingReferences.Add(externalId);
-                                }
-                                catch (Exception e)
-                                {
-                                    OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{e.Message}: {csv.Context.RawRecord}" });
+                                    externalId = csv.GetField(idx_benef_identifiant_valeur)?.Trim();
+                                    if (!_existingReferences.Any(x => x.Reference == externalId))
+                                    {
+                                        var lastName = csv.GetField(idx_benef_nom)?.Trim();
+                                        var firstName = csv.GetField(idx_benef_prenom)?.Trim();
+                                        benef = new Entity()
+                                        {
+                                            Reference = externalId
+                                        };
+                                        benef.Id = con.InsertEntity(benef);
+
+                                        con.InsertMetadata(benef.Id, _existingMembers.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[idx_benef_prenom]).Id, firstName);
+                                        con.InsertMetadata(benef.Id, _existingMembers.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[idx_benef_nom]).Id, lastName);
+
+                                        _existingReferences.Add(benef);
+                                        counterBenef++;
+                                    }
+                                    else
+                                    {
+                                        benef = _existingReferences.FirstOrDefault(x => x.Reference == externalId);
+                                    }
+
+                                    externalId = csv.GetField(idx_ligne_identifiant).Trim();
+                                    if (!_existingReferences.Any(x => x.Reference == externalId))
+                                    {
+                                        // remu_convention_liee
+                                        var amount = csv.GetField(new string[] { "avant_montant_ttc", "conv_montant_ttc", "remu_montant_ttc" })?.Trim();
+                                        var kind = csv.GetField(new string[] { "avant_nature", "conv_objet" })?.Trim();
+
+                                        var entity = new Entity()
+                                        {
+                                            Reference = externalId
+                                        };
+                                        entity.Id = con.InsertEntity(entity);
+                                        _existingReferences.Add(entity);
+
+                                        link = new Link
+                                        {
+                                            Id = entity.Id,
+                                            //Amount = Convert.ToDecimal(amount, _cultureFr),
+                                            Kind = kind,
+                                            Date = Convert.ToDateTime(date, _cultureFr),
+                                            From = company,
+                                            To = benef,
+                                        };
+                                        link.Id = con.InsertLink(link);
+
+                                        counterBonds++;
+                                    }
                                 }
                             }
-
-                            if (counter % 100 == 0)
+                            catch (Exception e)
                             {
-                                db.SaveChanges();
+                                OnMessage?.Invoke(this, new MessageEventArgs { Message = $"\"{path}\" {e.Message}: {csv.Context.RawRecord}" });
                             }
 
-                            counter++;
                             _mainCounter++;
+                            records++;
                         }
-
-                        db.SaveChanges();
                     }
                 }
             }
 
-            //OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Found {counter} records in file \"{path}\"", Level = Level.Debug });
-            //OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {_companies.Count} new companies", Level = Level.Debug });
-        }
-
-        public void LoadLinks(string path)
-        {
-            throw new NotImplementedException();
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Read {records} records" });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Added {counterCompanies} companies, {counterBenef} beneficiaries, {counterBonds} insterest bonds" });
+            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {_existingReferences.Count} entities" });
         }
 
         public string LinksToJson()

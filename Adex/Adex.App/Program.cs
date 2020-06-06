@@ -29,9 +29,12 @@ namespace Adex.App
             using (var loader = new CvsLoaderMetadata())
             {
                 loader.OnMessage += Loader_OnMessage;
-
+                loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;";
                 loader.LoadReferences();
-                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv");
+                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\big_entreprise_2020_05_13_04_00.csv");
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_avantage_2020_05_13_04_00.csv");
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_convention_2020_05_13_04_00.csv");
+                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_remuneration_2020_05_13_04_00.csv");
             }
 
             // FillAdexMetaDb();
@@ -121,11 +124,11 @@ namespace Adex.App
         {
             string retour = null;
 
-            //var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
-            //foreach (var f in files)
-            //{
-            //    FileHelper.ReWriteToUTF8(f, @"E:\Git\ImmobilisCommander\ADEX\Data", size);
-            //}
+            var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
+            foreach (var f in files)
+            {
+                FileHelper.ReWriteToUTF8(f, @"E:\Git\ImmobilisCommander\ADEX\Data", size);
+            }
 
             using (var loader = new CsvLoaderNormalized())
             {
@@ -167,7 +170,7 @@ namespace Adex.App
                 default:
                     break;
             }
-            Console.WriteLine(e.Message);
+            Console.WriteLine($"{sender} {e.Message}");
             Console.ForegroundColor = ConsoleColor.Gray;
         }
     }

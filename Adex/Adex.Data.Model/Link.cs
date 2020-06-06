@@ -8,10 +8,10 @@ namespace Adex.Data.Model
     public class Link : Entity, ILink
     {
         [NotMapped]
-        public int FromId { get { return From.Id; } }
+        public int From_Id { get { return From.Id; } }
 
         [NotMapped]
-        public int ToId { get { return To.Id; } }
+        public int To_Id { get { return To.Id; } }
 
         public Entity From { get; set; }
 

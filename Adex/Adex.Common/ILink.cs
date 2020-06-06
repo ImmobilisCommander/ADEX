@@ -6,9 +6,9 @@ namespace Adex.Common
 {
     public interface ILink
     {
-        int FromId { get; }
+        int From_Id { get; }
 
-        int ToId { get; }
+        int To_Id { get; }
 
         string Kind { get; set; }
 
