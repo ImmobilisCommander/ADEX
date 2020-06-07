@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,30 +22,26 @@ namespace Adex.WebApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
-        [Route("generate/{nbRecords}")]
-        public async Task Generate(int nbRecords)
-        {
-            var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
-            foreach (var f in files)
-            {
-                FileHelper.ReWriteToUTF8(f, @"E:\Git\ImmobilisCommander\ADEX\Data", nbRecords);
-            }
-        }
-
-        private class MonObjet
-        {
-            public string Name { get; set; }
-
-            public string[] Tab { get; set; }
-        }
-
+        /// <summary>
+        /// This method enable user to search for codes of companies or beneficiaries.
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("search/{txt}")]
         public async Task<ActionResult> Search(string txt)
         {
-            var obj = new MonObjet { Name = txt, Tab = new string[] { "Hello", "World", txt } };
-            return new JsonResult(obj);        
+            using (var loader = new CsvLoaderNormalized())
+            {
+                loader.OnMessage += Loader_OnMessage;
+
+                return new JsonResult(loader.LinksToJson(txt, 1000));
+            }
+        }
+
+        private void Loader_OnMessage(object sender, Common.MessageEventArgs e)
+        {
+            Debug.Write(e.Message);
         }
     }
 }

@@ -13,6 +13,6 @@ namespace Adex.Common
 
         void LoadLinks(string path);
 
-        string LinksToJson();
+        List<DatavizItem> LinksToJson(string txt, int take);
     }
 }

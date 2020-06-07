@@ -35,5 +35,19 @@ namespace Adex.Business
         {
             return connection.ExecuteScalar<int>("insert into Links (Id, From_Id, To_Id, Kind, Date) values (@Id, @From_Id, @To_Id, @Kind, @Date);SELECT CAST(SCOPE_IDENTITY() as int)", obj);
         }
+
+        public static string GetFullErrorMessage(this Exception x)
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"{x.GetType().FullName}: {x.Message}");
+
+            if (x.InnerException != null)
+            {
+                sb.AppendLine(GetFullErrorMessage(x.InnerException));
+            }
+
+            return sb.ToString();
+        }
     }
 }

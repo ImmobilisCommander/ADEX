@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace Adex.App
 {
@@ -26,23 +27,22 @@ namespace Adex.App
         {
             _logger.Info("Starting ********************************");
 
-            using (var loader = new CvsLoaderMetadata())
-            {
-                loader.OnMessage += Loader_OnMessage;
-                loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;";
-                loader.LoadReferences();
-                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\big_entreprise_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_avantage_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_convention_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_remuneration_2020_05_13_04_00.csv");
-            }
+            File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", JsonConvert.SerializeObject(LoadSample(15000)));
+
+            //using (var loader = new CvsLoaderMetadata())
+            //{
+            //    loader.OnMessage += Loader_OnMessage;
+            //    loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;";
+            //    loader.LoadReferences();
+            //    loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\big_entreprise_2020_05_13_04_00.csv");
+            //    loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_avantage_2020_05_13_04_00.csv");
+            //    loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_convention_2020_05_13_04_00.csv");
+            //    loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_remuneration_2020_05_13_04_00.csv");
+            //}
 
             // FillAdexMetaDb();
 
             // FillAdexDb();
-
-
-            // File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", LoadSample(15000));
         }
 
         private static void FillAdexDb()
@@ -120,9 +120,9 @@ namespace Adex.App
             }
         }
 
-        private static string LoadSample(int size)
+        private static List<DatavizItem> LoadSample(int size)
         {
-            string retour = null;
+            List<DatavizItem> retour = null;
 
             var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
             foreach (var f in files)
@@ -142,7 +142,7 @@ namespace Adex.App
 
                 loader.Save();
 
-                //retour = CsvLoader.LinksToJson();
+                retour = loader.LinksToJson(null, 1000);
 
                 loader.OnMessage -= Loader_OnMessage;
             }

@@ -277,7 +277,7 @@ namespace Adex.Business
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {_existingReferences.Count} entities" });
         }
 
-        public string LinksToJson()
+        public List<DatavizItem> LinksToJson(string txt, int take)
         {
             throw new NotImplementedException();
         }

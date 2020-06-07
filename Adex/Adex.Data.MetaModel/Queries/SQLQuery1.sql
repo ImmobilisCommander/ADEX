@@ -1,4 +1,5 @@
-﻿ALTER INDEX IX_Reference ON Entities DISABLE;
+﻿/*
+ALTER INDEX IX_Reference ON Entities DISABLE;
 ALTER INDEX IX_From_Id ON Links DISABLE;
 ALTER INDEX IX_Id ON Links DISABLE;
 ALTER INDEX IX_To_Id ON Links DISABLE;
@@ -11,9 +12,10 @@ ALTER INDEX IX_Id ON Links REBUILD;
 ALTER INDEX IX_To_Id ON Links REBUILD;
 ALTER INDEX IX_Entity_Id ON Metadatas REBUILD;
 ALTER INDEX IX_Member_Id ON Metadatas REBUILD;
+*/
 
 
-select a.Id, a.Reference, ma.Id, ma.Value as PropertyValue, mb.Id, mba.Name as PropertyName, l.Kind, l.Date, b.Reference, mb.Value as PropertyValue
+select a.Id, a.Reference as Company_Code, ma.Id, ma.Value as Social_Denomination, l.Kind, l.Date, b.Reference, mb.Value as Lastname, mc.Value as Firstname
 from 
 	Entities a
 	inner join Metadatas ma on ma.Entity_Id = a.Id
@@ -21,10 +23,13 @@ from
 	inner join Links l on l.From_Id = a.Id
 	inner join Entities b on b.Id = l.To_Id
 	inner join Metadatas mb on mb.Entity_Id = b.Id
-	inner join Members mbb on mbb.Id = mb.Member_Id and mbb.Name = 'benef_nom'
+	inner join Members mbbx on mbbx.Id = mb.Member_Id and mbbx.Name = 'benef_nom'
+	inner join Entities c on c.Id = l.To_Id
+	inner join Metadatas mc on mc.Entity_Id = c.Id
+	inner join Members mbcx on mbcx.Id = mc.Member_Id and mbcx.Name = 'benef_prenom'
 where
 	a.Reference = 'NROJFJET'
-
+order by b.Reference
 
 
 select a.Reference as Company, b.Reference as Beneficiary, count(*) as Nb

@@ -15,7 +15,14 @@ from
 	inner join Links l on l.From_Id = ec.Id
 	inner join Entities ep on ep.Id = l.To_Id
 	inner join Persons p on p.Id = ep.Id
-	
+
+select *
+from
+	Links l
+	inner join Entities e on e.Id = l.From_Id
+where
+	e.Reference like 'ZJFVYRIK'
+
 /*
 delete from FinancialLinks
 delete from Links

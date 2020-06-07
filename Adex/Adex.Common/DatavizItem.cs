@@ -1,17 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Adex.Business
+namespace Adex.Common
 {
     public class DatavizItem
     {
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("size")]
+        [JsonProperty("size")]
         public int Size { get; set; }
 
-        [JsonPropertyName("imports")]
+        [JsonProperty("imports")]
         public List<string> Imports { get; set; }
 
         public override string ToString()

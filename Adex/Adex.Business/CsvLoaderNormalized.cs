@@ -3,8 +3,12 @@ using Adex.Data.Model;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Data.Entity.Validation;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -62,7 +66,7 @@ namespace Adex.Business
         }
 
         public void LoadReferences()
-        { 
+        {
             using (var db = new AdexContext())
             {
                 _existingReferences = new HashSet<string>(db.Entities.Select(x => x.Reference));
@@ -84,13 +88,14 @@ namespace Adex.Business
                     while (csv.Read())
                     {
                         var externalId = csv.GetField("identifiant");
-                        if (!_existingReferences.Contains(externalId) && !_companies.ContainsKey(externalId))
+                        if (!_existingReferences.Contains(externalId))
                         {
                             _companies.Add(externalId, new Company()
                             {
                                 Reference = externalId,
                                 Designation = csv.GetField("denomination_sociale")
                             });
+                            _existingReferences.Add(externalId);
                         }
                         counter++;
                     }
@@ -135,14 +140,14 @@ namespace Adex.Business
 
                             var dateSignature = Convert.ToDateTime(date, _cultureFr);
 
-                            if (dateSignature.Year == 2019)
+                            if (dateSignature.Year == 2019 && !string.IsNullOrEmpty(csv.GetField(idx_benef_identifiant_valeur)))
                             {
                                 Company company = null;
                                 Person benef = null;
                                 Link link = null;
 
                                 var externalId = csv.GetField(idx_entreprise_identifiant);
-                                if (!_companies.ContainsKey(externalId))
+                                if (!_existingReferences.Any(x => x == externalId))
                                 {
                                     company = new Company()
                                     {
@@ -150,6 +155,7 @@ namespace Adex.Business
                                         Designation = csv.GetField(idx_denomination_sociale)
                                     };
                                     _companies.Add(company.Reference, company);
+                                    _existingReferences.Add(externalId);
                                     counterCompanies++;
                                 }
                                 else
@@ -158,7 +164,7 @@ namespace Adex.Business
                                 }
 
                                 externalId = csv.GetField(idx_benef_identifiant_valeur)?.Trim();
-                                if (!_beneficiaries.ContainsKey(externalId))
+                                if (!_existingReferences.Any(x => x == externalId))
                                 {
                                     var lastName = csv.GetField(idx_benef_nom)?.Trim();
                                     var firstName = csv.GetField(idx_benef_prenom)?.Trim();
@@ -170,6 +176,7 @@ namespace Adex.Business
                                         LastName = lastName
                                     };
                                     _beneficiaries.Add(benef.Reference, benef);
+                                    _existingReferences.Add(externalId);
                                     counterBenef++;
                                 }
                                 else
@@ -178,7 +185,7 @@ namespace Adex.Business
                                 }
 
                                 externalId = csv.GetField(idx_ligne_identifiant).Trim();
-                                if (!_links.ContainsKey(externalId))
+                                if (!_existingReferences.Any(x => x == externalId))
                                 {
                                     // remu_convention_liee
                                     var amount = csv.GetField(new string[] { "avant_montant_ttc", "conv_montant_ttc", "remu_montant_ttc" })?.Trim();
@@ -194,6 +201,7 @@ namespace Adex.Business
                                         To = benef,
                                     };
                                     _links.Add(link.Reference, link);
+                                    _existingReferences.Add(externalId);
                                     counterBonds++;
                                 }
                             }
@@ -227,40 +235,71 @@ namespace Adex.Business
                         db.Links.AddRange(_links.Select(x => x.Value));
                         db.SaveChanges();
                         t.Commit();
+
+                        OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_companies.Count()} new companies have been saved", Level = Level.Info });
+                        OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_beneficiaries.Count()} new beneficiaries have been saved", Level = Level.Info });
+                        OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_links.Count()} new links have been saved", Level = Level.Info });
+                    }
+                    catch (DbEntityValidationException e)
+                    {
+                        foreach (var x in e.EntityValidationErrors)
+                        {
+                            OnMessage?.Invoke(this, new MessageEventArgs { Message = x.Entry.Entity.GetType().Name, Level = Level.Error });
+                            foreach (var y in x.ValidationErrors)
+                            {
+                                OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{y.PropertyName}: {y.ErrorMessage}", Level = Level.Error });
+                            }
+                        }
+                        t.Rollback();
                     }
                     catch (Exception e)
                     {
-                        OnMessage?.Invoke(this, new MessageEventArgs { Message = e.Message, Level = Level.Error });
+                        OnMessage?.Invoke(this, new MessageEventArgs { Message = e.GetFullErrorMessage(), Level = Level.Error });
                         t.Rollback();
                     }
                 }
             }
-
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_companies.Count} new companies have been saved", Level = Level.Info });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_beneficiaries.Count} new beneficiaries have been saved", Level = Level.Info });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_links.Count} new links have been saved", Level = Level.Info });
 
             _companies.Clear();
             _beneficiaries.Clear();
             _links.Clear();
         }
 
-        public string LinksToJson()
+        public List<DatavizItem> LinksToJson(string txt, int take)
         {
-            var all = _links.Select(x => new { id = x.Value.From.Reference, name = x.Value.From.Reference }).Distinct().ToList();
-            all.AddRange(_links.Select(x => new { id = x.Value.To.Reference, name = x.Value.To.Reference }).Distinct());
-
-            var links = new List<DatavizItem>();
-
-            foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)))
+            var links = new List<Link>();
+            using (var db = new AdexContext())
             {
-                var temp = _links.Where(x => x.Value.From.Reference == item.id).Where(x => !string.IsNullOrEmpty(x.Value.To.Reference)).Select(x => x.Value.To.Reference);
-                links.Add(new DatavizItem { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
+                db.Database.Log = (log) =>
+                {
+                    OnMessage?.Invoke(this, new MessageEventArgs { Level = Level.Debug, Message = log });
+                };
+
+                if (!string.IsNullOrEmpty(txt))
+                {
+                    if (db.Entities.Any(x => x.Reference.Contains(txt)))
+                    {
+                        links.AddRange(db.Links.Include("From").Include("To").Where(x => x.From.Reference.Contains(txt)));
+                        links.AddRange(db.Links.Include("From").Include("To").Where(x => x.To.Reference.Contains(txt)));
+                    }
+                }
+                else
+                {
+                    links = db.Links.Include("From").Include("To").ToList();
+                }
+            }
+            var all = links.Select(x => new { id = x.From.Reference, name = x.From.Reference }).Distinct().ToList();
+            all.AddRange(links.Select(x => new { id = x.To.Reference, name = x.To.Reference }).Distinct());
+
+            var dataViz = new List<DatavizItem>();
+
+            foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)).Take(take))
+            {
+                var temp = links.Where(x => x.From.Reference == item.id).Where(x => !string.IsNullOrEmpty(x.To.Reference)).Select(x => x.To.Reference);
+                dataViz.Add(new DatavizItem { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
             }
 
-            var json = JsonConvert.SerializeObject(links.OrderBy(x => x.Name), Formatting.Indented);
-
-            return json;
+            return dataViz;
         }
 
         public void Dispose()
