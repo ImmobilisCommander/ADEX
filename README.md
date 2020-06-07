@@ -6,3 +6,5 @@ In order to carry out its missions, the HAS collaborates daily with experts for 
 
 ## How?
 Using a full .Net core solution. This set of projects is meant to exploit gigabytes of data from import to restitution.
+
+![Interests bonds for ZJFVYRIK](Data/ZJFVYRIK.PNG "Interests bonds for ZJFVYRIK")
