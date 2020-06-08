@@ -1,4 +1,8 @@
-﻿
+﻿// <copyright file="AdexContext.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
 using System.Data.Entity;
 
 namespace Adex.Data.Model
@@ -19,23 +23,5 @@ namespace Adex.Data.Model
             : base("Adex")
         {
         }
-
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            //modelBuilder.Entity<BankAccount>().ToTable("BankAccounts");
-            //modelBuilder.Entity<CreditCard>().ToTable("CreditCards");
-
-            base.OnModelCreating(modelBuilder);
-        }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Adex;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
-        //}
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    base.OnModelCreating(modelBuilder);
-        //}
     }
 }

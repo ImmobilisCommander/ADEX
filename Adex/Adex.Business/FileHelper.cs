@@ -1,4 +1,9 @@
-﻿using System.IO;
+﻿// <copyright file="FileHelper.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
+using System.IO;
 using System.Text;
 
 namespace Adex.Business
@@ -6,7 +11,7 @@ namespace Adex.Business
     public static class FileHelper
     {
         /// <summary>
-        /// 
+        /// Rewrite any file to UTF-8 format
         /// </summary>
         /// <param name="sourceFile"></param>
         /// <param name="destinationDirectory"></param>

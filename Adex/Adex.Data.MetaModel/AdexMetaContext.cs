@@ -1,4 +1,9 @@
-﻿using System.Data.Entity;
+﻿// <copyright file="AdexMetaContext.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
+using System.Data.Entity;
 
 namespace Adex.Data.MetaModel
 {

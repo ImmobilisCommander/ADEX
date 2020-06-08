@@ -1,4 +1,9 @@
-﻿using Adex.Common;
+﻿// <copyright file="Link.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
+using Adex.Common;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 

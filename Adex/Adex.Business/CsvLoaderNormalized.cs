@@ -1,14 +1,16 @@
-﻿using Adex.Common;
+﻿// <copyright file="CsvLoaderNormalized.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
+using Adex.Common;
 using Adex.Data.Model;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -265,8 +267,10 @@ namespace Adex.Business
             _links.Clear();
         }
 
-        public List<DatavizItem> LinksToJson(string txt, int take)
+        public List<DatavizItem> LinksToJson(string txt, int? take)
         {
+            var retour = new List<DatavizItem>();
+
             var links = new List<Link>();
             using (var db = new AdexContext())
             {
@@ -291,15 +295,13 @@ namespace Adex.Business
             var all = links.Select(x => new { id = x.From.Reference, name = x.From.Reference }).Distinct().ToList();
             all.AddRange(links.Select(x => new { id = x.To.Reference, name = x.To.Reference }).Distinct());
 
-            var dataViz = new List<DatavizItem>();
-
-            foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)).Take(take))
+            foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)).Take(take ?? all.Count))
             {
                 var temp = links.Where(x => x.From.Reference == item.id).Where(x => !string.IsNullOrEmpty(x.To.Reference)).Select(x => x.To.Reference);
-                dataViz.Add(new DatavizItem { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
+                retour.Add(new DatavizItem { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
             }
 
-            return dataViz;
+            return retour;
         }
 
         public void Dispose()

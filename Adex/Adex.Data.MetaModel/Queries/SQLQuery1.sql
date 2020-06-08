@@ -32,13 +32,17 @@ where
 order by b.Reference
 
 
-select a.Reference as Company, b.Reference as Beneficiary, count(*) as Nb
+select a.Reference as Company, b.Reference as Beneficiary, mb.Value, count(*) as Nb
 from
 	Entities a
 	inner join Links l on l.From_Id = a.Id
 	inner join Entities b on b.Id = l.To_Id
+	inner join Metadatas mb on mb.Entity_Id = b.Id
+	inner join Members mbb on mbb.Id = mb.Member_Id and (mbb.Name = 'benef_nom' or mbb.Name = 'benef_prenom')
+where
+	a.Reference = 'NROJFJET'
 Group by
-	a.Reference, b.Reference
+	a.Reference, b.Reference, mb.Value
 Having
 	count(*) > 1
 order by count(*) desc

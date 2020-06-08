@@ -1,8 +1,11 @@
-﻿using Adex.Common;
+﻿// <copyright file="Extensions.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
 using Adex.Data.MetaModel;
 using Dapper;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 

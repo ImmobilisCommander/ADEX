@@ -1,4 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿// <copyright file="DatavizItem.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 

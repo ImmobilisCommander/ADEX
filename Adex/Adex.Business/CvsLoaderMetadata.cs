@@ -1,4 +1,9 @@
-﻿using Adex.Common;
+﻿// <copyright file="CvsLoaderMetadata.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
+using Adex.Common;
 using Adex.Data.MetaModel;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -277,9 +282,16 @@ namespace Adex.Business
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {_existingReferences.Count} entities" });
         }
 
-        public List<DatavizItem> LinksToJson(string txt, int take)
+        public void Save()
         {
             throw new NotImplementedException();
+        }
+
+        public List<DatavizItem> LinksToJson(string txt, int? take)
+        {
+            var retour = new List<DatavizItem>();
+
+            return retour;
         }
 
         public void Dispose()

@@ -1,4 +1,9 @@
-﻿using CsvHelper;
+﻿// <copyright file="CustomCsvReader.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
+using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using System;

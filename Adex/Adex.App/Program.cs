@@ -1,15 +1,13 @@
-﻿using Adex.Common;
-using Adex.Business;
-using Adex.Data.MetaModel;
-using Adex.Data.Model;
+﻿// <copyright file="Program.cs" company="julien_lefevre@outlook.fr">
+//   Copyright (c) 2020 All Rights Reserved
+//   <author>Julien LEFEVRE</author>
+// </copyright>
+
 using log4net;
 using log4net.Config;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using Newtonsoft.Json;
+using System.IO;
+using System.Reflection;
 
 namespace Adex.App
 {
@@ -27,151 +25,12 @@ namespace Adex.App
         {
             _logger.Info("Starting ********************************");
 
-            File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", JsonConvert.SerializeObject(LoadSample(15000)));
-
-            //using (var loader = new CvsLoaderMetadata())
-            //{
-            //    loader.OnMessage += Loader_OnMessage;
-            //    loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;";
-            //    loader.LoadReferences();
-            //    loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\big_entreprise_2020_05_13_04_00.csv");
-            //    loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_avantage_2020_05_13_04_00.csv");
-            //    loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_convention_2020_05_13_04_00.csv");
-            //    loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_remuneration_2020_05_13_04_00.csv");
-            //}
-
-            // FillAdexMetaDb();
-
-            // FillAdexDb();
-        }
-
-        private static void FillAdexDb()
-        {
-            using (var db = new AdexContext())
-            {
-                var c = new Company { Reference = "MyID", Designation = "TEST SA" };
-                db.Companies.Add(c);
-                var p = new Person { Reference = "DRAOULT", FirstName = "Didier", LastName = "RAOULT" };
-                db.Persons.Add(p);
-                db.Links.Add(new Data.Model.Link { Reference = "MyID_DRAOULT", From = c, To = p });
-                db.SaveChanges();
-            }
-        }
-
-        private static void FillAdexMetaDb()
-        {
-            using (var db = new AdexMetaContext())
-            {
-                var members = new string[] { "identifiant", "pays_code", "pays", "secteur_activite_code", "secteur", "denomination_sociale", "adresse_1", "adresse_2", "adresse_3", "adresse_4", "code_postal", "ville" };
-                foreach (var m in members)
-                {
-                    db.Members.Add(new Member { Name = m });
-                }
-                db.SaveChanges();
+            //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", JsonConvert.SerializeObject(TestCode.LoadSampleFromNormalizedDatabase(15000)));
 
 
+            TestCode.FillAdexMetadataWithDapper();
 
-                AddMetadata(db, members, new string[] { "QBSTAWWV", "[FR]", "FRANCE", "[PA]", "Prestataires associés", "IP Santé domicile", "16 Rue de Montbrillant", "Buroparc Rive Gauche", "", "", "69003", "LYON" });
-                AddMetadata(db, members, new string[] { "MQKQLNIC", "[FR]", "FRANCE", "[DM]", "Dispositifs médicaux", "SIGVARIS", "ZI SUD D'ANDREZIEUX", "RUE B. THIMONNIER", "", "", "42173", "SAINT-JUST SAINT-RAMBERT CEDEX" });
-                AddMetadata(db, members, new string[] { "OETEUQSP", "[FR]", "FRANCE", "[AUT]", "Autres", "HEALTHCARE COMPLIANCE CONSULTING FRANCE SAS", "47 BOULEVARD CHARLES V", "", "", "", "14600", "HONFLEUR" });
-
-                db.SaveChanges();
-
-                var a = new Data.MetaModel.Link
-                {
-                    Reference = "",
-                    From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"),
-                    To = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC")
-                };
-                a.Reference = $"{a.From.Reference}-{a.To.Reference}";
-                db.Links.Add(a);
-
-                var b = new Data.MetaModel.Link
-                {
-                    Reference = "",
-                    From = db.Entities.FirstOrDefault(x => x.Reference == "QBSTAWWV"),
-                    To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP")
-                };
-                b.Reference = $"{b.From.Reference}-{b.To.Reference}";
-                db.Links.Add(b);
-
-                var c = new Data.MetaModel.Link
-                {
-                    Reference = "",
-                    From = db.Entities.FirstOrDefault(x => x.Reference == "MQKQLNIC"),
-                    To = db.Entities.FirstOrDefault(x => x.Reference == "OETEUQSP")
-                };
-                c.Reference = $"{c.From.Reference}-{c.To.Reference}";
-                db.Links.Add(c);
-
-                db.SaveChanges();
-            }
-        }
-
-        private static void AddMetadata(AdexMetaContext db, string[] members, string[] a)
-        {
-            var e = new Data.MetaModel.Entity() { Reference = a[0] };
-            db.Entities.Add(e);
-            for (int i = 0; i < members.Length; i++)
-            {
-                var mName = members[i];
-                var value = a[i];
-                db.Metadatas.Add(new Metadata { Entity = e, Member = db.Members.FirstOrDefault(x => x.Name == mName), Value = value });
-            }
-        }
-
-        private static List<DatavizItem> LoadSample(int size)
-        {
-            List<DatavizItem> retour = null;
-
-            var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
-            foreach (var f in files)
-            {
-                FileHelper.ReWriteToUTF8(f, @"E:\Git\ImmobilisCommander\ADEX\Data", size);
-            }
-
-            using (var loader = new CsvLoaderNormalized())
-            {
-                loader.OnMessage += Loader_OnMessage;
-                loader.LoadReferences();
-
-                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv");
-
-                loader.Save();
-
-                retour = loader.LinksToJson(null, 1000);
-
-                loader.OnMessage -= Loader_OnMessage;
-            }
-
-            return retour;
-        }
-
-        private static void Loader_OnMessage(object sender, MessageEventArgs e)
-        {
-            switch (e.Level)
-            {
-                case Level.Debug:
-                    _logger.Debug(e.Message);
-                    break;
-                case Level.Info:
-                    _logger.Info(e.Message);
-                    break;
-                case Level.Warn:
-                    _logger.Warn(e.Message);
-                    break;
-                case Level.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    _logger.Error(e.Message);
-                    break;
-                default:
-                    break;
-            }
-            Console.WriteLine($"{sender} {e.Message}");
-            Console.ForegroundColor = ConsoleColor.Gray;
+            //TestCode.FillAdexDb();
         }
     }
 }
