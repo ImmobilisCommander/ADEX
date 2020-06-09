@@ -152,14 +152,18 @@ namespace Adex.Business
                     csv.Read();
                     csv.ReadHeader();
 
-                    var idx_entreprise_identifiant = csv.GetFieldIndex("entreprise_identifiant");
-                    var idx_denomination_sociale = csv.GetFieldIndex("denomination_sociale");
+                    var idx_entreprise_identifiant = csv.GetFieldIndex(CsvColumnsName.EntrepriseIdentifiant);
+                    var idx_denomination_sociale = csv.GetFieldIndex(CsvColumnsName.DenominationSociale);
 
-                    var idx_benef_identifiant_valeur = csv.GetFieldIndex("benef_identifiant_valeur");
-                    var idx_benef_nom = csv.GetFieldIndex("benef_nom");
-                    var idx_benef_prenom = csv.GetFieldIndex("benef_prenom");
+                    var idx_benef_nom = csv.GetFieldIndex(CsvColumnsName.BenefNom);
+                    var idx_benef_prenom = csv.GetFieldIndex(CsvColumnsName.BenefPrenom);
+                    var idx_benef_identifiant_valeur = csv.GetFieldIndex(CsvColumnsName.BenefIdentifiantValeur);
+                    var idx_benef_categorie_code = csv.GetFieldIndex(CsvColumnsName.BenefCategorieCode);
+                    var idx_benef_qualite_code = csv.GetFieldIndex(CsvColumnsName.BenefQualiteCode);
+                    var idx_benef_specialite_code = csv.GetFieldIndex(CsvColumnsName.BenefSpecialiteCode);
+                    var idx_benef_titre_code = csv.GetFieldIndex(CsvColumnsName.BenefTitreCode);
 
-                    var idx_ligne_identifiant = csv.GetFieldIndex("ligne_identifiant");
+                    var idx_ligne_identifiant = csv.GetFieldIndex(CsvColumnsName.LigneIdentifiant);
 
                     using (var con = new SqlConnection(DbConnectionString))
                     {
@@ -184,7 +188,7 @@ namespace Adex.Business
                         {
                             try
                             {
-                                var date = csv.GetField(new string[] { "avant_date_signature", "conv_date_signature", "remu_date" })?.Trim();
+                                var date = csv.GetField(new string[] { CsvColumnsName.AvantDateSignature, CsvColumnsName.ConvDateSignature, CsvColumnsName.RemuDate })?.Trim();
 
                                 var dateSignature = Convert.ToDateTime(date, _cultureFr);
 
@@ -215,6 +219,12 @@ namespace Adex.Business
                                     }
 
                                     externalId = csv.GetField(idx_benef_identifiant_valeur)?.Trim();
+
+                                    if (string.IsNullOrEmpty(externalId) || "-;[0];[AUTRE];[BR];[SO];N/A;NA;NC;NON RENSEIGNE;Non renseigné;SO;".Contains(externalId))
+                                    {
+                                        externalId = csv.GetHashCodeBenef();
+                                    }
+
                                     if (!_existingReferences.Any(x => x.Reference == externalId))
                                     {
                                         var lastName = csv.GetField(idx_benef_nom)?.Trim();
@@ -240,7 +250,7 @@ namespace Adex.Business
                                     if (!_existingReferences.Any(x => x.Reference == externalId))
                                     {
                                         // remu_convention_liee
-                                        var amount = csv.GetField(new string[] { "avant_montant_ttc", "conv_montant_ttc", "remu_montant_ttc" })?.Trim();
+                                        var amount = csv.GetField(new string[] { CsvColumnsName.AvantMontantTtc, CsvColumnsName.ConvMontantTtc, CsvColumnsName.RemuMontantTtc })?.Trim();
                                         var kind = csv.GetField(new string[] { "avant_nature", "conv_objet" })?.Trim();
 
                                         var entity = new Entity()

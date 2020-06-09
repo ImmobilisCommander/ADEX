@@ -15,34 +15,44 @@ ALTER INDEX IX_Member_Id ON Metadatas REBUILD;
 */
 
 
-select a.Id, a.Reference as Company_Code, ma.Id, ma.Value as Social_Denomination, l.Kind, l.Date, b.Reference, mb.Value as Lastname, mc.Value as Firstname
+select a.Id, a.Reference as Company_Code, ma.Id, ma.Value as Social_Denomination, le.Reference as LinkReference, l.Kind, l.Date, b.Reference, mb.Value as Lastname, mc.Value as Firstname
 from 
 	Entities a
 	inner join Metadatas ma on ma.Entity_Id = a.Id
 	inner join Members mba on mba.Id = ma.Member_Id and mba.Name = 'denomination_sociale'
+
 	inner join Links l on l.From_Id = a.Id
+	inner join Entities le on le.Id = l.Id
+
 	inner join Entities b on b.Id = l.To_Id
-	inner join Metadatas mb on mb.Entity_Id = b.Id
+
+	inner join Metadatas mb on mb.Entity_Id =l.To_Id
 	inner join Members mbbx on mbbx.Id = mb.Member_Id and mbbx.Name = 'benef_nom'
-	inner join Entities c on c.Id = l.To_Id
-	inner join Metadatas mc on mc.Entity_Id = c.Id
+
+	inner join Metadatas mc on mc.Entity_Id = l.To_Id
 	inner join Members mbcx on mbcx.Id = mc.Member_Id and mbcx.Name = 'benef_prenom'
-where
-	a.Reference = 'NROJFJET'
-order by b.Reference
+--where
+	--a.Reference = 'NROJFJET'
+
+order by a.Reference
 
 
-select a.Reference as Company, b.Reference as Beneficiary, mb.Value, count(*) as Nb
+select a.Reference as Company, b.Reference as Beneficiary, ma.Value as LastName, mb.Value as FirstName, count(*) as Nb
 from
 	Entities a
 	inner join Links l on l.From_Id = a.Id
+
 	inner join Entities b on b.Id = l.To_Id
-	inner join Metadatas mb on mb.Entity_Id = b.Id
-	inner join Members mbb on mbb.Id = mb.Member_Id and (mbb.Name = 'benef_nom' or mbb.Name = 'benef_prenom')
-where
-	a.Reference = 'NROJFJET'
+
+	inner join Metadatas ma on ma.Entity_Id = l.To_Id
+	inner join Members mba on mba.Id = ma.Member_Id and (mba.Name = 'benef_nom')
+
+	inner join Metadatas mb on mb.Entity_Id = l.To_Id
+	inner join Members mbb on mbb.Id = mb.Member_Id and (mbb.Name = 'benef_prenom')
+--where
+--	a.Reference = 'NROJFJET'
 Group by
-	a.Reference, b.Reference, mb.Value
+	a.Reference, b.Reference, ma.Value, mb.Value
 Having
 	count(*) > 1
 order by count(*) desc
