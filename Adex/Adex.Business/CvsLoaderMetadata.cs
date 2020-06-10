@@ -158,6 +158,7 @@ namespace Adex.Business
                     var idx_benef_nom = csv.GetFieldIndex(CsvColumnsName.BenefNom);
                     var idx_benef_prenom = csv.GetFieldIndex(CsvColumnsName.BenefPrenom);
                     var idx_benef_identifiant_valeur = csv.GetFieldIndex(CsvColumnsName.BenefIdentifiantValeur);
+                    var idx_benef_denomination_sociale = csv.GetFieldIndex(CsvColumnsName.BenefDenominationSociale);
                     var idx_benef_categorie_code = csv.GetFieldIndex(CsvColumnsName.BenefCategorieCode);
                     var idx_benef_qualite_code = csv.GetFieldIndex(CsvColumnsName.BenefQualiteCode);
                     var idx_benef_specialite_code = csv.GetFieldIndex(CsvColumnsName.BenefSpecialiteCode);
@@ -220,23 +221,32 @@ namespace Adex.Business
 
                                     externalId = csv.GetField(idx_benef_identifiant_valeur)?.Trim();
 
-                                    if (string.IsNullOrEmpty(externalId) || "-;[0];[AUTRE];[BR];[SO];N/A;NA;NC;NON RENSEIGNE;Non renseigné;SO;".Contains(externalId))
+                                    if (string.IsNullOrEmpty(externalId) || "-;[0];[autre];[br];[so];n/a;na;nc;non renseigne;non renseigné;so;infirmier".Contains(externalId.ToLowerInvariant()))
                                     {
                                         externalId = csv.GetHashCodeBenef();
                                     }
 
                                     if (!_existingReferences.Any(x => x.Reference == externalId))
                                     {
-                                        var lastName = csv.GetField(idx_benef_nom)?.Trim();
-                                        var firstName = csv.GetField(idx_benef_prenom)?.Trim();
                                         benef = new Entity()
                                         {
                                             Reference = externalId
                                         };
                                         benef.Id = con.InsertEntity(benef);
 
-                                        con.InsertMetadata(benef.Id, _existingMembers.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[idx_benef_prenom]).Id, firstName);
-                                        con.InsertMetadata(benef.Id, _existingMembers.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[idx_benef_nom]).Id, lastName);
+                                        if (!"[etu][prs][vet]".Contains(csv.GetField(idx_benef_categorie_code).ToLowerInvariant()))
+                                        {
+                                            var brandName = csv.GetField(idx_benef_denomination_sociale)?.Trim();
+                                            con.InsertMetadata(benef.Id, _existingMembers.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[idx_benef_categorie_code]).Id, brandName);
+                                        }
+                                        else
+                                        {
+                                            var lastName = csv.GetField(idx_benef_nom)?.Trim();
+                                            var firstName = csv.GetField(idx_benef_prenom)?.Trim();
+
+                                            con.InsertMetadata(benef.Id, _existingMembers.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[idx_benef_prenom]).Id, firstName);
+                                            con.InsertMetadata(benef.Id, _existingMembers.FirstOrDefault(x => x.Name == csv.Context.HeaderRecord[idx_benef_nom]).Id, lastName);
+                                        }
 
                                         _existingReferences.Add(benef);
                                         counterBenef++;
