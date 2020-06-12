@@ -10,3 +10,5 @@ Using a full .Net core solution. This set of projects is meant to exploit gigaby
 Two datamodels are tested. The normalized one uses one class per entity. The metamodel one uses the principle of one table for all (nearly all) entities. All the data is stored in some tables that do not represent the model itself.
 
 ![Interests bonds for ZJFVYRIK](Data/ZJFVYRIK.PNG "Interests bonds for ZJFVYRIK")
+
+![Sample data Interests bonds for major actors](Data/Galaxy.PNG "Sample data, interests bonds for major actors")
