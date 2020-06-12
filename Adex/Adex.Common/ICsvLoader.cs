@@ -43,6 +43,6 @@ namespace Adex.Common
         /// <param name="txt">Text to search</param>
         /// <param name="take">Number of records to return</param>
         /// <returns></returns>
-        List<DatavizItem> LinksToJson(string txt, int? take);
+        GraphDataSet LinksToJson(string txt, int? take);
     }
 }

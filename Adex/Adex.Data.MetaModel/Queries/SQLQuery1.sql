@@ -36,25 +36,40 @@ from
 order by a.Reference
 
 
-select a.Reference as Company, b.Reference as Beneficiary, ma.Value as [LastName or Institute], mb.Value as FirstName, count(*) as Nb
+select top 100 *
 from
-	Entities a
-	inner join Links l on l.From_Id = a.Id
+	(
+	select a.Reference as Company, b.Reference as Beneficiary, bm1.Value + ' ' + bm2.Value as SocialDenomination, count(*) as NumberOfLinks
+	from
+		Entities a
+		inner join Links l on l.From_Id = a.Id
 
-	inner join Entities b on b.Id = l.To_Id
+		inner join Entities b on b.Id = l.To_Id
+		inner join Metadatas bm1 on bm1.Entity_Id = b.Id
+		inner join Members bmb1 on bmb1.Id = bm1.Member_Id and bmb1.Name = 'benef_nom'
+		inner join Metadatas bm2 on bm2.Entity_Id = b.Id
+		inner join Members bmb2 on bmb2.Id = bm2.Member_Id and bmb2.Name = 'benef_prenom'
+	Group by
+		a.Reference, b.Reference, bm1.Value, bm2.Value
+	Having
+		count(*) > 10
 
-	inner join Metadatas ma on ma.Entity_Id = l.To_Id
-	inner join Members mba on mba.Id = ma.Member_Id and (mba.Name = 'benef_nom' or mba.Name = 'denomination_sociale')
+	union all
 
-	inner join Metadatas mb on mb.Entity_Id = l.To_Id
-	inner join Members mbb on mbb.Id = mb.Member_Id and (mbb.Name = 'benef_prenom')
---where
---	ma.Value = 'HOPITAL HENRI MONDOR'
-Group by
-	a.Reference, b.Reference, ma.Value, mb.Value
-Having
-	count(*) > 10
-order by count(*) desc
+	select a.Reference, b.Reference, bm1.Value, count(*)
+	from
+		Entities a
+		inner join Links l on l.From_Id = a.Id
+
+		inner join Entities b on b.Id = l.To_Id
+		inner join Metadatas bm1 on bm1.Entity_Id = b.Id
+		inner join Members bmb1 on bmb1.Id = bm1.Member_Id and bmb1.Name = 'denomination_sociale'
+	Group by
+		a.Reference, b.Reference, bm1.Value
+	Having
+		count(*) > 10	
+	) as tbl
+order by NumberOfLinks desc
 
 select count(*) from Entities
 select count(*) from Links
@@ -62,11 +77,12 @@ select count(*) from Members
 select count(*) from Metadatas
 select * from Links
 select * from Members order by [Name] asc
-select * 
+select top 1000 * 
 from 
 	Entities e
 	inner join Metadatas m on m.Entity_Id = e.Id
-where m.Value like '%BOUAYED%'
+
+where e.Reference = 'NROJFJET'
 
 /*
 truncate table Metadatas

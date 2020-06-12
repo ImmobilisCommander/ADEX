@@ -8,6 +8,7 @@ using Adex.Common;
 using Adex.Data.MetaModel;
 using Adex.Data.Model;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,6 +33,19 @@ namespace Adex.App
                 db.Persons.Add(p);
                 db.Links.Add(new Data.Model.Link { Reference = "MyID_DRAOULT", From = c, To = p });
                 db.SaveChanges();
+            }
+        }
+
+        internal static void GetJsonAdexMetadataWithDapper()
+        {
+            using (var loader = new CvsLoaderMetadata())
+            {
+                loader.OnMessage += Loader_OnMessage;
+
+                loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;";
+                File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\data.json", JsonConvert.SerializeObject(loader.LinksToJson("", null).ForceDirectedData, Formatting.Indented));
+
+                loader.OnMessage -= Loader_OnMessage;
             }
         }
 
@@ -113,9 +127,9 @@ namespace Adex.App
             }
         }
 
-        public static List<DatavizItem> LoadSampleFromMetadataDatabase(int? size)
+        public static GraphDataSet LoadSampleFromMetadataDatabase(int? size)
         {
-            List<DatavizItem> retour = null;
+            GraphDataSet retour = null;
 
             RewriteSampleFiles(size);
 
@@ -139,9 +153,9 @@ namespace Adex.App
             return retour;
         }
 
-        public static List<DatavizItem> LoadSampleFromNormalizedDatabase(int? size)
+        public static GraphDataSet LoadSampleFromNormalizedDatabase(int? size)
         {
-            List<DatavizItem> retour = null;
+            var retour = new GraphDataSet();
 
             RewriteSampleFiles(size);
 

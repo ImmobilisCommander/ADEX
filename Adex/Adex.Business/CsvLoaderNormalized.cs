@@ -267,9 +267,9 @@ namespace Adex.Business
             _links.Clear();
         }
 
-        public List<DatavizItem> LinksToJson(string txt, int? take)
+        public GraphDataSet LinksToJson(string txt, int? take)
         {
-            var retour = new List<DatavizItem>();
+            var retour = new GraphDataSet();
 
             var links = new List<Link>();
             using (var db = new AdexContext())
@@ -298,7 +298,7 @@ namespace Adex.Business
             foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)).Take(take ?? all.Count))
             {
                 var temp = links.Where(x => x.From.Reference == item.id).Where(x => !string.IsNullOrEmpty(x.To.Reference)).Select(x => x.To.Reference);
-                retour.Add(new DatavizItem { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
+                retour.BundlingItems.Add(new EdgeBundlingItem { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
             }
 
             return retour;

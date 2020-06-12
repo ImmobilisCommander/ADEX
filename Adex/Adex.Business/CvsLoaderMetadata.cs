@@ -11,14 +11,29 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Timers;
 
 namespace Adex.Business
 {
+    internal class NodeComparer : IEqualityComparer<ForceDirectedNodeItem>
+    {
+        public bool Equals([AllowNull] ForceDirectedNodeItem x, [AllowNull] ForceDirectedNodeItem y)
+        {
+            return x.Id == y.Id;
+        }
+
+        public int GetHashCode([DisallowNull] ForceDirectedNodeItem obj)
+        {
+            return obj.Id.GetHashCode();
+        }
+    }
+
     public class CvsLoaderMetadata : IDisposable, ICsvLoader
     {
         public event EventHandler<MessageEventArgs> OnMessage;
@@ -261,7 +276,7 @@ namespace Adex.Business
                                     {
                                         // remu_convention_liee
                                         var amount = csv.GetField(new string[] { CsvColumnsName.AvantMontantTtc, CsvColumnsName.ConvMontantTtc, CsvColumnsName.RemuMontantTtc })?.Trim();
-                                        var kind = csv.GetField(new string[] { "avant_nature", "conv_objet" })?.Trim();
+                                        var kind = csv.GetField(new string[] { CsvColumnsName.AvantNature, CsvColumnsName.ConvObjet })?.Trim();
 
                                         var entity = new Entity()
                                         {
@@ -302,16 +317,73 @@ namespace Adex.Business
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {_existingReferences.Count} entities" });
         }
 
+        public GraphDataSet LinksToJson(string txt, int? take)
+        {
+            var retour = new GraphDataSet() { ForceDirectedData = new ForceDirectedData() };
+
+            string query = @"select *
+from
+	(
+	select a.Reference as Company, b.Reference as Beneficiary, bm1.Value + ' ' + bm2.Value as SocialDenomination, count(*) as NumberOfLinks
+	from
+		Entities a
+		inner join Links l on l.From_Id = a.Id
+
+		inner join Entities b on b.Id = l.To_Id
+		inner join Metadatas bm1 on bm1.Entity_Id = b.Id
+		inner join Members bmb1 on bmb1.Id = bm1.Member_Id and bmb1.Name = 'benef_nom'
+		inner join Metadatas bm2 on bm2.Entity_Id = b.Id
+		inner join Members bmb2 on bmb2.Id = bm2.Member_Id and bmb2.Name = 'benef_prenom'
+	Group by
+		a.Reference, b.Reference, bm1.Value, bm2.Value
+	Having
+		count(*) > 10
+
+	union all
+
+	select a.Reference, b.Reference, bm1.Value, count(*)
+	from
+		Entities a
+		inner join Links l on l.From_Id = a.Id
+
+		inner join Entities b on b.Id = l.To_Id
+		inner join Metadatas bm1 on bm1.Entity_Id = b.Id
+		inner join Members bmb1 on bmb1.Id = bm1.Member_Id and bmb1.Name = 'denomination_sociale'
+	Group by
+		a.Reference, b.Reference, bm1.Value
+	Having
+		count(*) > 10	
+	) as tbl
+order by NumberOfLinks desc";
+
+            IEnumerable<QueryResult> result = null;
+
+            using (var con = new SqlConnection(DbConnectionString))
+            {
+                result = con.Query<QueryResult>(query);
+            }
+
+            retour.BundlingItems.AddRange(result.Select(x => x.Company).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));
+            retour.BundlingItems.AddRange(result.Select(x => x.Beneficiary).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));
+
+            retour.ForceDirectedData.ForceDirectedNodes.AddRange(result.Select(x => new ForceDirectedNodeItem { Id = x.Company, Name = x.Company, Group = 1 }).Distinct(new NodeComparer()));
+            retour.ForceDirectedData.ForceDirectedNodes.AddRange(result.Select(x => new ForceDirectedNodeItem { Id = x.Beneficiary, Name = x.SocialDenomination, Group = 2 }).Distinct(new NodeComparer()));
+            retour.ForceDirectedData.ForceDirectedLinks.AddRange(result.Select(x => new ForceDirectedLinkItem { Source = x.Company, Target = x.Beneficiary, Size = Convert.ToInt32(x.NumberOfLinks) }));
+
+            return retour;
+        }
+
         public void Save()
         {
             throw new NotImplementedException();
         }
 
-        public List<DatavizItem> LinksToJson(string txt, int? take)
+        internal class QueryResult
         {
-            var retour = new List<DatavizItem>();
-
-            return retour;
+            public string Company { get; set; }
+            public string Beneficiary { get; set; }
+            public string SocialDenomination { get; set; }
+            public string NumberOfLinks { get; set; }
         }
 
         public void Dispose()
