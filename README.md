@@ -11,4 +11,4 @@ Two datamodels are tested. The normalized one uses one class per entity. The met
 
 ![Interests bonds for ZJFVYRIK](Data/ZJFVYRIK.PNG "Interests bonds for ZJFVYRIK")
 
-![Sample data Interests bonds for major actors](Data/Galaxy.PNG "Sample data, interests bonds for major actors")
+![Sample data Interests bonds for major actors](Data/Galaxy.png "Sample data, interests bonds for major actors")
