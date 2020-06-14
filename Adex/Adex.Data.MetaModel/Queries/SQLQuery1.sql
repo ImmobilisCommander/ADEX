@@ -36,13 +36,18 @@ from
 order by a.Reference
 
 
-select top 100 *
+select *
 from
 	(
-	select a.Reference as Company, b.Reference as Beneficiary, bm1.Value + ' ' + bm2.Value as SocialDenomination, count(*) as NumberOfLinks
+	select a.Reference as Company, am.Value as Designation, b.Reference as Beneficiary, bm1.Value + ' ' + bm2.Value as SocialDenomination, count(*) as NumberOfLinks, SUM(CONVERT(decimal, lm.Value)) as Amount
 	from
 		Entities a
+		inner join Metadatas am on am.Entity_Id = a.Id
+		inner join Members amb on amb.Id = am.Member_Id and amb.Name = 'denomination_sociale'
+
 		inner join Links l on l.From_Id = a.Id
+		inner join Metadatas lm on lm.Entity_Id = l.Id
+		inner join Members lmb on lmb.Id = lm.Member_Id and lmb.Name like '%_montant_ttc'
 
 		inner join Entities b on b.Id = l.To_Id
 		inner join Metadatas bm1 on bm1.Entity_Id = b.Id
@@ -50,22 +55,27 @@ from
 		inner join Metadatas bm2 on bm2.Entity_Id = b.Id
 		inner join Members bmb2 on bmb2.Id = bm2.Member_Id and bmb2.Name = 'benef_prenom'
 	Group by
-		a.Reference, b.Reference, bm1.Value, bm2.Value
+		a.Reference, am.Value, b.Reference, bm1.Value, bm2.Value
 	Having
 		count(*) > 10
 
 	union all
 
-	select a.Reference, b.Reference, bm1.Value, count(*)
+	select a.Reference, am.Value, b.Reference, bm1.Value, count(*), SUM(CONVERT(decimal, lm.Value))
 	from
 		Entities a
+		inner join Metadatas am on am.Entity_Id = a.Id
+		inner join Members amb on amb.Id = am.Member_Id and amb.Name = 'denomination_sociale'
+
 		inner join Links l on l.From_Id = a.Id
+		inner join Metadatas lm on lm.Entity_Id = l.Id
+		inner join Members lmb on lmb.Id = lm.Member_Id and lmb.Name like '%_montant_ttc'
 
 		inner join Entities b on b.Id = l.To_Id
 		inner join Metadatas bm1 on bm1.Entity_Id = b.Id
 		inner join Members bmb1 on bmb1.Id = bm1.Member_Id and bmb1.Name = 'denomination_sociale'
 	Group by
-		a.Reference, b.Reference, bm1.Value
+		a.Reference, am.Value, b.Reference, bm1.Value
 	Having
 		count(*) > 10	
 	) as tbl

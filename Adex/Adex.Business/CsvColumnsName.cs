@@ -28,7 +28,7 @@ namespace Adex.Business
         public const string BenefTitreCode = "benef_titre_code";
         public const string BenefTitreLibelle = "benef_titre_libelle";
         public const string BenefSpecialiteCode = "benef_specialite_code";
-        public const string BenefSpeicaliteLibelle = "benef_speicalite_libelle";
+        public const string BenefSpecialiteLibelle = "benef_speicalite_libelle";
         public const string BenefIdentifiantTypeCode = "benef_identifiant_type_code";
         public const string IdentifiantType = "identifiant_type";
         public const string BenefIdentifiantValeur = "benef_identifiant_valeur";

@@ -46,8 +46,11 @@ namespace Adex.Common
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("amount")]
+        public decimal Amount { get; set; }
+
         [JsonProperty("group")]
-        public int Group { get; set; }
+        public string Group { get; set; }
     }
 
     public class ForceDirectedData
