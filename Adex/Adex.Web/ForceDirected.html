@@ -1,0 +1,217 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+        }
+
+        .svg-container {
+            display: inline-block;
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            vertical-align: top;
+            overflow: hidden;
+        }
+
+        .svg-content {
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            /*            background-color: dimgray;*/
+        }
+
+        .node {
+            font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+            fill: #bbb;
+        }
+
+            .node:hover {
+                fill: #000;
+            }
+
+        .link {
+            stroke: steelblue;
+            stroke-opacity: 0.4;
+            fill: none;
+            pointer-events: none;
+        }
+
+        .node:hover,
+        .node--source,
+        .node--target {
+            font-weight: 700;
+        }
+
+        .node--source {
+            fill: #2ca02c;
+        }
+
+        .node--target {
+            fill: #d62728;
+        }
+
+        .link--source,
+        .link--target {
+            stroke-opacity: 1;
+            stroke-width: 2px;
+        }
+
+        .link--source {
+            stroke: #d62728;
+        }
+
+        .link--target {
+            stroke: #2ca02c;
+        }
+    </style>
+</head>
+<body>
+    <div id="container" class="svg-container">
+    </div>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+        function chart() {
+            var width = 1800, height = 1800;
+
+            const links = data.links.map(d => Object.create(d));
+            const nodes = data.nodes.map(d => Object.create(d));
+
+            var attractForce = d3.forceManyBody().strength(getAttrStrength).distanceMax(300).distanceMin(250);
+            var repelForce = d3.forceManyBody().strength(getRepelStrength).distanceMax(100).distanceMin(0);
+
+            const simulation = d3.forceSimulation(nodes).alphaDecay(0.1)
+                .force("link", d3.forceLink(links).id(getId).distance(getDistance))
+                //.force("charge", d3.forceManyBody().strength(getStrength))
+                .force("collision", d3.forceCollide().radius(getRadius))
+                //.force("attractForce", attractForce)
+                .force("repelForce", repelForce)
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                //.force("x", d3.forceX())
+                //.force("y", d3.forceY())
+                ;
+
+            const svg = d3.select("div#container").append("svg")
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", [0, 0, width, height])
+                .classed("svg-content", true)
+                ;
+
+            const link = svg.append("g")
+                .attr("stroke", "#999")
+                .attr("stroke-opacity", 0.6)
+                .selectAll("line")
+                .data(links)
+                .join("line")
+                //.attr("stroke-width", d => Math.sqrt(d.size))
+                ;
+
+            const node = svg.append("g")
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 1.5)
+                .selectAll("circle")
+                .data(nodes)
+                .join("circle")
+                .attr("r", getRadius)
+                .attr("fill", color)
+                .call(drag(simulation))
+                ;
+
+            node.append("title").text(d => d.name + ' ' + d.amount);
+
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+
+                node
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y);
+            });
+
+            //invalidation.then(() => simulation.stop());
+        }
+
+        const scale = d3.scaleOrdinal(d3.schemeCategory10).domain(["2", "0", "3", "1"]);
+
+        function getRadius(d, b, nodes) {
+            var r = Math.round(Math.sqrt(d.amount / 5000));
+            //console.log(d.amount + '  => ' + r);
+            return r;
+        }
+
+        function getAttrStrength(d) {
+            var r = Math.round(Math.log(d.amount) * Math.log(d.amount) * Math.log(d.amount) / 100);
+            //console.log(d.amount + ' => ' + r);
+            return r;
+        }
+
+        function getRepelStrength(d) {
+            var r = -Math.round(Math.log(d.amount) * Math.log(d.amount));
+            //console.log(d.amount + ' => ' + r);
+            return r;
+        }
+
+        function getStrength(d, b, nodes) {
+            var r = -Math.round(Math.log(d.amount) * Math.log(d.amount) * Math.log(d.amount) / 100);
+            //console.log(d.amount + ' => ' + r);
+            return r;
+        }
+
+        function getDistance(link, b, nodes) {
+            var rs = getRadius(link.source);
+            var rt = getRadius(link.target);
+            var r = Math.round((rs + rt) * 1.5);
+            //console.log(link.source.amount + '/' + rs + ', ' + link.target.amount + '/' + rt + ' => ' + r);
+            return r;
+        }
+
+        function getId(node, b, nodes) {
+            return node.id;
+        }
+
+        function color(d) {
+            return scale(d.group);
+        }
+
+        function drag(simulation) {
+
+            function dragstarted(d) {
+                if (!d3.event.active) simulation.alphaTarget(0.1).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(d) {
+                d.fx = d3.event.x;
+                d.fy = d3.event.y;
+            }
+
+            function dragended(d) {
+                if (!d3.event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
+        }
+
+        var data = {};
+
+        d3.json("data.json").then(function (obj) {
+            data = obj;
+            chart();
+        });
+
+
+    </script>
+</body>
+</html>

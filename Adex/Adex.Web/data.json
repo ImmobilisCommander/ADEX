@@ -1,0 +1,6862 @@
+{
+  "links": [
+    {
+      "source": "PKEXPDIP",
+      "target": "10001307890",
+      "size": 27567
+    },
+    {
+      "source": "ALIOWAMT",
+      "target": "10003352894",
+      "size": 56557
+    },
+    {
+      "source": "CDFBAGMB",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 30001
+    },
+    {
+      "source": "WLIYIISM",
+      "target": "10000053909",
+      "size": 24001
+    },
+    {
+      "source": "UJFOMHUR",
+      "target": "10001056729",
+      "size": 68622
+    },
+    {
+      "source": "UJFOMHUR",
+      "target": "10001056729",
+      "size": 68622
+    },
+    {
+      "source": "OCWMUJPN",
+      "target": "751723198",
+      "size": 200001
+    },
+    {
+      "source": "OCWMUJPN",
+      "target": "10005176135",
+      "size": 200001
+    },
+    {
+      "source": "OCWMUJPN",
+      "target": "10002425667",
+      "size": 200001
+    },
+    {
+      "source": "OCWMUJPN",
+      "target": "10004985874",
+      "size": 200001
+    },
+    {
+      "source": "JLSLDVXR",
+      "target": "10003415089",
+      "size": 39001
+    },
+    {
+      "source": "ZJFVYRIK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 335001
+    },
+    {
+      "source": "ZJFVYRIK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 335059
+    },
+    {
+      "source": "ZJFVYRIK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 335041
+    },
+    {
+      "source": "ZJFVYRIK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 335074
+    },
+    {
+      "source": "CMBPBLCE",
+      "target": "10100122810",
+      "size": 143941
+    },
+    {
+      "source": "CMBPBLCE",
+      "target": "10002106663",
+      "size": 143941
+    },
+    {
+      "source": "EAWYUCKO",
+      "target": "10003374302",
+      "size": 48001
+    },
+    {
+      "source": "EAWYUCKO",
+      "target": "10003374302",
+      "size": 48001
+    },
+    {
+      "source": "OJLDTOPC",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 224695
+    },
+    {
+      "source": "OJLDTOPC",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 224567
+    },
+    {
+      "source": "OJLDTOPC",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 224651
+    },
+    {
+      "source": "OJLDTOPC",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 224542
+    },
+    {
+      "source": "OJLDTOPC",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 224562
+    },
+    {
+      "source": "OJLDTOPC",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 224687
+    },
+    {
+      "source": "OJLDTOPC",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 224538
+    },
+    {
+      "source": "CUTAKCNM",
+      "target": "10100677136",
+      "size": 67501
+    },
+    {
+      "source": "CUTAKCNM",
+      "target": "10004035837",
+      "size": 67501
+    },
+    {
+      "source": "YCGPZYNI",
+      "target": "10001401537",
+      "size": 44923
+    },
+    {
+      "source": "YCGPZYNI",
+      "target": "10003865903",
+      "size": 44926
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100547024",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10005164305",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003836581",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002383247",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100296143",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002312543",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100702355",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100083582",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003987137",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10001271773",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100205276",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100076065",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100669190",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "420785354",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100212603",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003876751",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100086338",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100700771",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10001802452",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002762382",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10005233571",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002941283",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10001331759",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002297710",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100789998",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10101357308",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002604238",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100827889",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100538932",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10101679685",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100819852",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10000579838",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10001449767",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002431053",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003006706",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10101081114",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002113941",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100390045",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100631059",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10001602894",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100744563",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003171187",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10101380839",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100490183",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100717585",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002393329",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003069597",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003073086",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10001384204",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100530871",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100400257",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003129573",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100837995",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100227536",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002185071",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10015644375",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100685916",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100035426",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "930000328",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "590780383",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003871539",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002498292",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002113313",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10101004017",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "560000135",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10004431564",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100647857",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10001594927",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002944766",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002626926",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100178572",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002480498",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002526134",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100107985",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100087922",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100482859",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10100903789",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10101111911",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002521549",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002085511",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10002435088",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "10003041737",
+      "size": 2396626
+    },
+    {
+      "source": "UDUQLMWQ",
+      "target": "330781352",
+      "size": 2396626
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310497
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310491
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310497
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310501
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310491
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310511
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310504
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310499
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310517
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310493
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310493
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310502
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310499
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310516
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310497
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310519
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310491
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310503
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310493
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310509
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310497
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310497
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310493
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310493
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310519
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310518
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310499
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310497
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310505
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310503
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310489
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310508
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310497
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310507
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310489
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310489
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310491
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310511
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310508
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "10002708658",
+      "size": 16310488
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310499
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310489
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310497
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310516
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310509
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310529
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310507
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310501
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310489
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310508
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310493
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310512
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310512
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310491
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310498
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310496
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310502
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310489
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310495
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310492
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310500
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310490
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "ZKEJWAGJ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 16310494
+    },
+    {
+      "source": "HCJRVLKR",
+      "target": "10004009055",
+      "size": 90001
+    },
+    {
+      "source": "KOQQUWZZ",
+      "target": "10003092375",
+      "size": 325748
+    },
+    {
+      "source": "KOQQUWZZ",
+      "target": "10003092375",
+      "size": 325748
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10003816815",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10003696944",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10000211242",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10000211242",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10005161863",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10100391910",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10003826475",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10004609177",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10002813078",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10003832457",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10001393726",
+      "size": 495187
+    },
+    {
+      "source": "NWOHMCKM",
+      "target": "10100272003",
+      "size": 495187
+    },
+    {
+      "source": "VMIJVHLC",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 24001
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7142",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "3237",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "3237",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "10101353117",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7860",
+      "size": 3940075
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7860",
+      "size": 3940075
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7860",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7860",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "10101093549",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "10002152535",
+      "size": 3940076
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "10101093259",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "10101182037",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "914",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7340",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7340",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7540",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7540",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "10100518504",
+      "size": 3940075
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "10100535169",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "5952",
+      "size": 3940075
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "5952",
+      "size": 3940078
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "5952",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "5952",
+      "size": 3940075
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "5952",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "10001249175",
+      "size": 3940075
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7142",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7142",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7142",
+      "size": 3940075
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7142",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7142",
+      "size": 3940074
+    },
+    {
+      "source": "OPFMIKBW",
+      "target": "7142",
+      "size": 3940074
+    },
+    {
+      "source": "CDDAEEDI",
+      "target": "40873542100012",
+      "size": 26401
+    },
+    {
+      "source": "GDPHEUVT",
+      "target": "10002476819",
+      "size": 86401
+    },
+    {
+      "source": "GDPHEUVT",
+      "target": "74/4428",
+      "size": 86401
+    },
+    {
+      "source": "VATGSPQV",
+      "target": "10100870178",
+      "size": 66302
+    },
+    {
+      "source": "YZVAJOYP",
+      "target": "10003129318",
+      "size": 20901
+    },
+    {
+      "source": "RSOPVOUL",
+      "target": "10100794709",
+      "size": 285501
+    },
+    {
+      "source": "RSOPVOUL",
+      "target": "10003802195",
+      "size": 285501
+    },
+    {
+      "source": "RSOPVOUL",
+      "target": "10100688786",
+      "size": 285501
+    },
+    {
+      "source": "RSOPVOUL",
+      "target": "10100584019",
+      "size": 285501
+    },
+    {
+      "source": "RSOPVOUL",
+      "target": "10100393981",
+      "size": 285501
+    },
+    {
+      "source": "RSOPVOUL",
+      "target": "10100278588",
+      "size": 285501
+    },
+    {
+      "source": "RSOPVOUL",
+      "target": "10002495207",
+      "size": 285501
+    },
+    {
+      "source": "RSOPVOUL",
+      "target": "10100533032",
+      "size": 285501
+    },
+    {
+      "source": "SGWPURBP",
+      "target": "10000211242",
+      "size": 22001
+    },
+    {
+      "source": "QCUOYUXO",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 41206
+    },
+    {
+      "source": "QCUOYUXO",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 41206
+    },
+    {
+      "source": "LUZHHKWG",
+      "target": "10003468450",
+      "size": 43276
+    },
+    {
+      "source": "QQCOOTXZ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 20802
+    },
+    {
+      "source": "ESAKOQOQ",
+      "target": "10000320118",
+      "size": 84001
+    },
+    {
+      "source": "ESAKOQOQ",
+      "target": "10000320118",
+      "size": 84001
+    },
+    {
+      "source": "XECYDDGU",
+      "target": "10100082048",
+      "size": 21934
+    },
+    {
+      "source": "RLHMSZAS",
+      "target": "10002115235",
+      "size": 53201
+    },
+    {
+      "source": "RLHMSZAS",
+      "target": "10003128989",
+      "size": 53201
+    },
+    {
+      "source": "EWSZMFYC",
+      "target": "00000000000",
+      "size": 129130
+    },
+    {
+      "source": "EWSZMFYC",
+      "target": "00000000000",
+      "size": 129130
+    },
+    {
+      "source": "ZHCILBYG",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 60804
+    },
+    {
+      "source": "ZHCILBYG",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 60812
+    },
+    {
+      "source": "MOMFCMVF",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 170361
+    },
+    {
+      "source": "MOMFCMVF",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 170361
+    },
+    {
+      "source": "MOMFCMVF",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 170361
+    },
+    {
+      "source": "MOMFCMVF",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 170361
+    },
+    {
+      "source": "WMQRNJKV",
+      "target": "10001607810",
+      "size": 22801
+    },
+    {
+      "source": "JUJJFUKK",
+      "target": "10002024304",
+      "size": 50376
+    },
+    {
+      "source": "JUJJFUKK",
+      "target": "10001510337",
+      "size": 50376
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10003432209",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10005180061",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10101206679",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10000608744",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10000558212",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10003696944",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10003854899",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10005161863",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10000464817",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10004009055",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10004009055",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10004009055",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10005178966",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10005178966",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10001393726",
+      "size": 2598051
+    },
+    {
+      "source": "WGQBUMQA",
+      "target": "10003743472",
+      "size": 2598051
+    },
+    {
+      "source": "QYIBQMOL",
+      "target": "10100934669",
+      "size": 246577
+    },
+    {
+      "source": "QYIBQMOL",
+      "target": "10002586526",
+      "size": 246576
+    },
+    {
+      "source": "QYIBQMOL",
+      "target": "10003279907",
+      "size": 246577
+    },
+    {
+      "source": "QYIBQMOL",
+      "target": "10003295226",
+      "size": 246576
+    },
+    {
+      "source": "QYIBQMOL",
+      "target": "10002400850",
+      "size": 246576
+    },
+    {
+      "source": "QYIBQMOL",
+      "target": "10002807252",
+      "size": 246576
+    },
+    {
+      "source": "QMIBDEAJ",
+      "target": "10002462439",
+      "size": 23662
+    },
+    {
+      "source": "QLXTOPUX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 33485
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894696
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894725
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894663
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894675
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894680
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894698
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894672
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894664
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894653
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894671
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894658
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894658
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894712
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894715
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894689
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894726
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894694
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894743
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894661
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894682
+    },
+    {
+      "source": "SYCNVYRX",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 894710
+    },
+    {
+      "source": "OXYXKFPD",
+      "target": "10002770443",
+      "size": 211801
+    },
+    {
+      "source": "OXYXKFPD",
+      "target": "10002770443",
+      "size": 211801
+    },
+    {
+      "source": "OXYXKFPD",
+      "target": "10002770229",
+      "size": 211801
+    },
+    {
+      "source": "OXYXKFPD",
+      "target": "10003900551",
+      "size": 211801
+    },
+    {
+      "source": "OXYXKFPD",
+      "target": "10002238250",
+      "size": 211801
+    },
+    {
+      "source": "OXYXKFPD",
+      "target": "10003927901",
+      "size": 211801
+    },
+    {
+      "source": "OXYXKFPD",
+      "target": "10003695466",
+      "size": 211801
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10001270502",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10002323623",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10002868734",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10003756359",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10000995117",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10003834651",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10002088366",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10003225652",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10001243764",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10001963502",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10001416360",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10000367754",
+      "size": 683357
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10001043545",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10003890497",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10002024585",
+      "size": 683357
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10001586741",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10002314721",
+      "size": 683360
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10001574820",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10003292033",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10003414603",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10003290227",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10003908992",
+      "size": 683358
+    },
+    {
+      "source": "LFSWZPFF",
+      "target": "10001510337",
+      "size": 683357
+    },
+    {
+      "source": "IEDPPWZY",
+      "target": "10000032846",
+      "size": 54548
+    },
+    {
+      "source": "IEDPPWZY",
+      "target": "10000089002",
+      "size": 54548
+    },
+    {
+      "source": "ABDOTVKL",
+      "target": "faf754ae74b403c44e61ea5aac13eec6",
+      "size": 493543
+    },
+    {
+      "source": "WGXMREAT",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 23664
+    },
+    {
+      "source": "LXINHIJV",
+      "target": "10004804166",
+      "size": 36001
+    },
+    {
+      "source": "URRGRWPI",
+      "target": "10003729935",
+      "size": 150406
+    },
+    {
+      "source": "URRGRWPI",
+      "target": "10003729935",
+      "size": 150406
+    },
+    {
+      "source": "URRGRWPI",
+      "target": "10002083466",
+      "size": 150406
+    },
+    {
+      "source": "URRGRWPI",
+      "target": "10003415089",
+      "size": 150408
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10002229440",
+      "size": 2116838
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10001905297",
+      "size": 2116844
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10001905297",
+      "size": 2116840
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10000541564",
+      "size": 2116838
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10004431176",
+      "size": 2116842
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10100034437",
+      "size": 2116842
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10002995735",
+      "size": 2116840
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10005950026",
+      "size": 2116842
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10002559499",
+      "size": 2116838
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10002915956",
+      "size": 2116840
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10001162469",
+      "size": 2116846
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10005179105",
+      "size": 2116842
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10100086775",
+      "size": 2116839
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10002419645",
+      "size": 2116840
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10005178859",
+      "size": 2116838
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10003797213",
+      "size": 2116838
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10002239886",
+      "size": 2116838
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10003117222",
+      "size": 2116840
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10001693760",
+      "size": 2116844
+    },
+    {
+      "source": "IBYAFPVW",
+      "target": "10001401537",
+      "size": 2116838
+    },
+    {
+      "source": "GCEOYRBT",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 55001
+    },
+    {
+      "source": "GCEOYRBT",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 55001
+    },
+    {
+      "source": "WEFUVCUO",
+      "target": "10001642965",
+      "size": 44221
+    },
+    {
+      "source": "WEFUVCUO",
+      "target": "10001642965",
+      "size": 44221
+    },
+    {
+      "source": "RHIKHDHD",
+      "target": "10002670890",
+      "size": 27851
+    },
+    {
+      "source": "XTEERFWI",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 143673
+    },
+    {
+      "source": "XTEERFWI",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 143678
+    },
+    {
+      "source": "XTEERFWI",
+      "target": "10000483155",
+      "size": 143674
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344277
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344277
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344277
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344278
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344278
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344277
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344277
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344277
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 344278
+    },
+    {
+      "source": "CVBOTJEQ",
+      "target": "10001867083",
+      "size": 344277
+    },
+    {
+      "source": "SOWWIAEU",
+      "target": "10001336519",
+      "size": 121363
+    },
+    {
+      "source": "SOWWIAEU",
+      "target": "10001336519",
+      "size": 121363
+    },
+    {
+      "source": "AAEHBOCE",
+      "target": "10002765807",
+      "size": 21775
+    },
+    {
+      "source": "GNDLAOTI",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 26114
+    },
+    {
+      "source": "DUUEWMTC",
+      "target": "10002236445",
+      "size": 28501
+    },
+    {
+      "source": "QSAOGJVK",
+      "target": "85349G",
+      "size": 46104
+    },
+    {
+      "source": "QSAOGJVK",
+      "target": "10001589307",
+      "size": 46101
+    },
+    {
+      "source": "YWQOQGJP",
+      "target": "10000615756",
+      "size": 80002
+    },
+    {
+      "source": "YWQOQGJP",
+      "target": "10000082056",
+      "size": 80002
+    },
+    {
+      "source": "NYSJAATT",
+      "target": "10002874179",
+      "size": 23411
+    },
+    {
+      "source": "HBYWHOVM",
+      "target": "10000520063",
+      "size": 103602
+    },
+    {
+      "source": "RIZLLUIF",
+      "target": "10100176691",
+      "size": 119641
+    },
+    {
+      "source": "RIZLLUIF",
+      "target": "10100403939",
+      "size": 119641
+    },
+    {
+      "source": "RIZLLUIF",
+      "target": "10001496511",
+      "size": 119641
+    },
+    {
+      "source": "RIZLLUIF",
+      "target": "10100404945",
+      "size": 119641
+    },
+    {
+      "source": "WHAIAXQQ",
+      "target": "10003373130",
+      "size": 34501
+    },
+    {
+      "source": "ZMTBGRYE",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 296001
+    },
+    {
+      "source": "ZMTBGRYE",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 296001
+    },
+    {
+      "source": "KVSGYDSG",
+      "target": "10000600550",
+      "size": 329128
+    },
+    {
+      "source": "KVSGYDSG",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 329128
+    },
+    {
+      "source": "KVSGYDSG",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 329128
+    },
+    {
+      "source": "KVSGYDSG",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 329128
+    },
+    {
+      "source": "KVSGYDSG",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 329128
+    },
+    {
+      "source": "KVSGYDSG",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 329128
+    },
+    {
+      "source": "KVSGYDSG",
+      "target": "10002400520",
+      "size": 329128
+    },
+    {
+      "source": "NQVYPIOA",
+      "target": "10002407012",
+      "size": 21871
+    },
+    {
+      "source": "ROIOUDWP",
+      "target": "10003693792",
+      "size": 165436
+    },
+    {
+      "source": "ROIOUDWP",
+      "target": "10002402815",
+      "size": 165436
+    },
+    {
+      "source": "ROIOUDWP",
+      "target": "10002395811",
+      "size": 165436
+    },
+    {
+      "source": "ROIOUDWP",
+      "target": "10003806782",
+      "size": 165436
+    },
+    {
+      "source": "ROIOUDWP",
+      "target": "10002249315",
+      "size": 165436
+    },
+    {
+      "source": "ROIOUDWP",
+      "target": "10002249315",
+      "size": 165436
+    },
+    {
+      "source": "QQJGVCQH",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 600852
+    },
+    {
+      "source": "QQJGVCQH",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 600879
+    },
+    {
+      "source": "QQJGVCQH",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 600854
+    },
+    {
+      "source": "QQJGVCQH",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 600851
+    },
+    {
+      "source": "QQJGVCQH",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 600857
+    },
+    {
+      "source": "VYMXZTKY",
+      "target": "10002302858",
+      "size": 40001
+    },
+    {
+      "source": "NMVSDMIK",
+      "target": "10003689329",
+      "size": 36001
+    },
+    {
+      "source": "TUVGCMDW",
+      "target": "10000445394",
+      "size": 60001
+    },
+    {
+      "source": "TIGSYUXQ",
+      "target": "10000416841",
+      "size": 20126
+    },
+    {
+      "source": "MKDIFWVV",
+      "target": "10003874715",
+      "size": 24501
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10001664704",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10001664704",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10003854105",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10003854105",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10002452125",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10002778255",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10002778255",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10003094199",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10003094199",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10002765914",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10002810124",
+      "size": 532652
+    },
+    {
+      "source": "UXWMHOCF",
+      "target": "10002810124",
+      "size": 532652
+    },
+    {
+      "source": "OUMNRESV",
+      "target": "10003258042",
+      "size": 97993
+    },
+    {
+      "source": "OUMNRESV",
+      "target": "10003180881",
+      "size": 97993
+    },
+    {
+      "source": "QZEOEPNT",
+      "target": "10002290400",
+      "size": 20426
+    },
+    {
+      "source": "ZEGBLERU",
+      "target": "10002873320",
+      "size": 69384
+    },
+    {
+      "source": "ZEGBLERU",
+      "target": "10002873320",
+      "size": 69384
+    },
+    {
+      "source": "ZEGBLERU",
+      "target": "10002873320",
+      "size": 69384
+    },
+    {
+      "source": "XDLKEHJV",
+      "target": "10002910296",
+      "size": 45569
+    },
+    {
+      "source": "XDLKEHJV",
+      "target": "10002243961",
+      "size": 45568
+    },
+    {
+      "source": "JMXXCUZJ",
+      "target": "10003473385",
+      "size": 46477
+    },
+    {
+      "source": "EOXMLODC",
+      "target": "300780038",
+      "size": 64450
+    },
+    {
+      "source": "EOXMLODC",
+      "target": "300780038",
+      "size": 64450
+    },
+    {
+      "source": "OLJHKFPZ",
+      "target": "14861",
+      "size": 24942
+    },
+    {
+      "source": "BBHWATEY",
+      "target": "10001826964",
+      "size": 73951
+    },
+    {
+      "source": "BBHWATEY",
+      "target": "10002826732",
+      "size": 73952
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "10002084530",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876244
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876254
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876248
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876250
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876244
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876254
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876243
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876249
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876241
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876245
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876244
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876250
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876249
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876243
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876242
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876243
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876244
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876242
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876245
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876243
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876248
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876245
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876249
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876243
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876245
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876248
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876246
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876244
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876246
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876245
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876250
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876239
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876245
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876243
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876241
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 4876247
+    },
+    {
+      "source": "PTBTSRUS",
+      "target": "10100300366",
+      "size": 4876239
+    },
+    {
+      "source": "HLZKPKWP",
+      "target": "10003061412",
+      "size": 271165
+    },
+    {
+      "source": "HLZKPKWP",
+      "target": "10003061412",
+      "size": 271165
+    },
+    {
+      "source": "HLZKPKWP",
+      "target": "10003297479",
+      "size": 271165
+    },
+    {
+      "source": "HLZKPKWP",
+      "target": "10003297479",
+      "size": 271165
+    },
+    {
+      "source": "HLZKPKWP",
+      "target": "10003297479",
+      "size": 271165
+    },
+    {
+      "source": "HLZKPKWP",
+      "target": "10003297479",
+      "size": 271165
+    },
+    {
+      "source": "HLZKPKWP",
+      "target": "10003061412",
+      "size": 271165
+    },
+    {
+      "source": "HLZKPKWP",
+      "target": "10003061412",
+      "size": 271165
+    },
+    {
+      "source": "TIRTQOIB",
+      "target": "10003072591",
+      "size": 23201
+    },
+    {
+      "source": "IVNKPJPH",
+      "target": "10000252584",
+      "size": 20761
+    },
+    {
+      "source": "LUBSMPIT",
+      "target": "000000000",
+      "size": 25701
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10003797536",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10002432218",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 567779
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 567779
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 567780
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10001046803",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10003425542",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10003104683",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10002537776",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10001024677",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10002314465",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10003848388",
+      "size": 567778
+    },
+    {
+      "source": "CJANOIAP",
+      "target": "10002859725",
+      "size": 567778
+    },
+    {
+      "source": "KIKIOHQV",
+      "target": "10001552164",
+      "size": 77702
+    },
+    {
+      "source": "KIKIOHQV",
+      "target": "10001552164",
+      "size": 77701
+    },
+    {
+      "source": "NROJFJET",
+      "target": "10004024401",
+      "size": 106726
+    },
+    {
+      "source": "NROJFJET",
+      "target": "10003273751",
+      "size": 106726
+    },
+    {
+      "source": "NROJFJET",
+      "target": "10003764460",
+      "size": 106726
+    },
+    {
+      "source": "DHAJEHML",
+      "target": "10100188662",
+      "size": 120001
+    },
+    {
+      "source": "DHAJEHML",
+      "target": "10001365435",
+      "size": 120001
+    },
+    {
+      "source": "DHAJEHML",
+      "target": "10003733671",
+      "size": 120001
+    },
+    {
+      "source": "DHAJEHML",
+      "target": "10003367769",
+      "size": 120001
+    },
+    {
+      "source": "KVVTURRV",
+      "target": "10000099282",
+      "size": 70005
+    },
+    {
+      "source": "MIDIVVAQ",
+      "target": "10002811734",
+      "size": 379202
+    },
+    {
+      "source": "NBSRCFCY",
+      "target": "10004396569",
+      "size": 59401
+    },
+    {
+      "source": "NBSRCFCY",
+      "target": "10003364048",
+      "size": 59401
+    },
+    {
+      "source": "HVXDYTZA",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 161100
+    },
+    {
+      "source": "HVXDYTZA",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 161047
+    },
+    {
+      "source": "HVXDYTZA",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 161117
+    },
+    {
+      "source": "RMUAWANO",
+      "target": "10001012854",
+      "size": 28702
+    },
+    {
+      "source": "XQKKRVGN",
+      "target": "10003301248",
+      "size": 25729
+    },
+    {
+      "source": "DJHCALMO",
+      "target": "10003771267",
+      "size": 141601
+    },
+    {
+      "source": "DJHCALMO",
+      "target": "10001648541",
+      "size": 141601
+    },
+    {
+      "source": "DJHCALMO",
+      "target": "10003222444",
+      "size": 141601
+    },
+    {
+      "source": "LHUOBTVI",
+      "target": "10002107646",
+      "size": 24577
+    },
+    {
+      "source": "YVMIBKBE",
+      "target": "10003946026",
+      "size": 21601
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10002296134",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10004031612",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10003069605",
+      "size": 5178418
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10003731857",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10001062552",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10101388907",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10002297785",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10001564086",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10001261220",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10100105633",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10001587426",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10005174718",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10003870259",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10003433876",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10004425723",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10004037189",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178415
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178415
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178417
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178416
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178413
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178412
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178415
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10002872454",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10001379519",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "10002303930",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178414
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178411
+    },
+    {
+      "source": "BGYNRSTD",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 5178410
+    },
+    {
+      "source": "AEALSHBL",
+      "target": "10003926085",
+      "size": 86151
+    },
+    {
+      "source": "AEALSHBL",
+      "target": "10003926085",
+      "size": 86153
+    },
+    {
+      "source": "JPKZVNMH",
+      "target": "10000434612",
+      "size": 20102
+    },
+    {
+      "source": "XMIWTXSA",
+      "target": "10004409008",
+      "size": 20554
+    },
+    {
+      "source": "QVPNRMYE",
+      "target": "10003059085",
+      "size": 131863
+    },
+    {
+      "source": "QVPNRMYE",
+      "target": "10000178888",
+      "size": 131863
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "46c091a41befb796129bcfbad22d76db",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "46c091a41befb796129bcfbad22d76db",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "89b700992733ab4e3a5496ed20695edd",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "8f62660b2080fc0d6f426cbb4304b36b",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10001350981",
+      "size": 19194779
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10001024677",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10001024677",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10001919421",
+      "size": 19194778
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10002621380",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10002621380",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10002621380",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101046901",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101046901",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101046901",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101046901",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101251642",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101251642",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101251642",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101251642",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101692837",
+      "size": 19194777
+    },
+    {
+      "source": "RFBQGDJJ",
+      "target": "10101692837",
+      "size": 19194777
+    },
+    {
+      "source": "KKSKQTRZ",
+      "target": "10001229938",
+      "size": 20666
+    },
+    {
+      "source": "FZGDZFKK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 490458
+    },
+    {
+      "source": "FZGDZFKK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 490326
+    },
+    {
+      "source": "FZGDZFKK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 490457
+    },
+    {
+      "source": "FZGDZFKK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 490442
+    },
+    {
+      "source": "FZGDZFKK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 490332
+    },
+    {
+      "source": "FZGDZFKK",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 490514
+    },
+    {
+      "source": "ZKQOTRNA",
+      "target": "d41d8cd98f00b204e9800998ecf8427e",
+      "size": 22002
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002396934",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10001534865",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10100032795",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002726494",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002673373",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10003802195",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002722444",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002561172",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10004609284",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002776267",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10001066967",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10100082766",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002993417",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10003806931",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10003412326",
+      "size": 825020
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10004609177",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10001158145",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10003133617",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002988805",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002183837",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10001970226",
+      "size": 825002
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002090792",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10003781035",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10002306198",
+      "size": 825001
+    },
+    {
+      "source": "BMEPLZCA",
+      "target": "10100392397",
+      "size": 825001
+    },
+    {
+      "source": "MCOHIVWS",
+      "target": "10003760831",
+      "size": 247867
+    },
+    {
+      "source": "MCOHIVWS",
+      "target": "10003758207",
+      "size": 247866
+    },
+    {
+      "source": "MCOHIVWS",
+      "target": "400011177",
+      "size": 247867
+    },
+    {
+      "source": "MCOHIVWS",
+      "target": "300780038",
+      "size": 247868
+    },
+    {
+      "source": "MCOHIVWS",
+      "target": "300780038",
+      "size": 247868
+    },
+    {
+      "source": "MCOHIVWS",
+      "target": "10001492130",
+      "size": 247866
+    },
+    {
+      "source": "MCOHIVWS",
+      "target": "10002038841",
+      "size": 247867
+    },
+    {
+      "source": "EJSJYHQL",
+      "target": "10002645942",
+      "size": 27416
+    }
+  ],
+  "nodes": [
+    {
+      "id": "PKEXPDIP",
+      "name": "Ultradent Products GmbH",
+      "amount": 27564.0,
+      "group": "1"
+    },
+    {
+      "id": "ALIOWAMT",
+      "name": "Integra MicroFrance",
+      "amount": 56556.0,
+      "group": "1"
+    },
+    {
+      "id": "CDFBAGMB",
+      "name": "BIOCYTEX",
+      "amount": 30000.0,
+      "group": "1"
+    },
+    {
+      "id": "WLIYIISM",
+      "name": "Nobel Biocare Services AG",
+      "amount": 24000.0,
+      "group": "1"
+    },
+    {
+      "id": "UJFOMHUR",
+      "name": "Vertex Pharmaceuticals Incorporated",
+      "amount": 68621.0,
+      "group": "1"
+    },
+    {
+      "id": "OCWMUJPN",
+      "name": "CARL ZEISS MEDITEC AG",
+      "amount": 200000.0,
+      "group": "1"
+    },
+    {
+      "id": "JLSLDVXR",
+      "name": "BOSTON SCIENTIFIC SAS",
+      "amount": 39000.0,
+      "group": "1"
+    },
+    {
+      "id": "ZJFVYRIK",
+      "name": "BOIRON",
+      "amount": 335000.0,
+      "group": "1"
+    },
+    {
+      "id": "CMBPBLCE",
+      "name": "INNATE PHARMA",
+      "amount": 143940.0,
+      "group": "1"
+    },
+    {
+      "id": "EAWYUCKO",
+      "name": "NOVATECH SA",
+      "amount": 48000.0,
+      "group": "1"
+    },
+    {
+      "id": "OJLDTOPC",
+      "name": "Essilor",
+      "amount": 224437.0,
+      "group": "1"
+    },
+    {
+      "id": "CUTAKCNM",
+      "name": "AMPLITUDE",
+      "amount": 67500.0,
+      "group": "1"
+    },
+    {
+      "id": "YCGPZYNI",
+      "name": "ASTON MEDICAL Anciennement SOCIETE DE GENIE MEDICAL - S.G.M.",
+      "amount": 44922.0,
+      "group": "1"
+    },
+    {
+      "id": "UDUQLMWQ",
+      "name": "Kappa Santé",
+      "amount": 2396625.0,
+      "group": "1"
+    },
+    {
+      "id": "ZKEJWAGJ",
+      "name": "BOEHRINGER INGELHEIM FRANCE",
+      "amount": 16310487.0,
+      "group": "1"
+    },
+    {
+      "id": "HCJRVLKR",
+      "name": "MicroVention Inc.",
+      "amount": 90000.0,
+      "group": "1"
+    },
+    {
+      "id": "KOQQUWZZ",
+      "name": "Stryker Trauma GmbH",
+      "amount": 325747.0,
+      "group": "1"
+    },
+    {
+      "id": "NWOHMCKM",
+      "name": "Covidien AG",
+      "amount": 495186.0,
+      "group": "1"
+    },
+    {
+      "id": "VMIJVHLC",
+      "name": "3M France",
+      "amount": 24000.0,
+      "group": "1"
+    },
+    {
+      "id": "OPFMIKBW",
+      "name": "LES LABORATOIRES SERVIER",
+      "amount": 3940073.0,
+      "group": "1"
+    },
+    {
+      "id": "CDDAEEDI",
+      "name": "Laboratoier Innotech international",
+      "amount": 26400.0,
+      "group": "1"
+    },
+    {
+      "id": "GDPHEUVT",
+      "name": "Laboratoire Innothera",
+      "amount": 86400.0,
+      "group": "1"
+    },
+    {
+      "id": "VATGSPQV",
+      "name": "bioMérieux",
+      "amount": 66300.0,
+      "group": "1"
+    },
+    {
+      "id": "YZVAJOYP",
+      "name": "Fresenius Medical Care France S.A.S.",
+      "amount": 20900.0,
+      "group": "1"
+    },
+    {
+      "id": "RSOPVOUL",
+      "name": "EDAP TMS France SAS",
+      "amount": 285500.0,
+      "group": "1"
+    },
+    {
+      "id": "SGWPURBP",
+      "name": "BALT INTERNATIONAL",
+      "amount": 22000.0,
+      "group": "1"
+    },
+    {
+      "id": "QCUOYUXO",
+      "name": "BRACCO IMAGING FRANCE",
+      "amount": 41197.0,
+      "group": "1"
+    },
+    {
+      "id": "LUZHHKWG",
+      "name": "KASIOS",
+      "amount": 43275.0,
+      "group": "1"
+    },
+    {
+      "id": "QQCOOTXZ",
+      "name": "Labvoratoire CHAUVIN",
+      "amount": 20801.0,
+      "group": "1"
+    },
+    {
+      "id": "ESAKOQOQ",
+      "name": "Becton Dickinson France SAS",
+      "amount": 84000.0,
+      "group": "1"
+    },
+    {
+      "id": "XECYDDGU",
+      "name": "ALLERGAN FRANCE",
+      "amount": 21933.0,
+      "group": "1"
+    },
+    {
+      "id": "RLHMSZAS",
+      "name": "LES LABORATOIRES OSTEAL MEDICAL",
+      "amount": 53200.0,
+      "group": "1"
+    },
+    {
+      "id": "EWSZMFYC",
+      "name": "Zimmer Dental SAS",
+      "amount": 129129.0,
+      "group": "1"
+    },
+    {
+      "id": "ZHCILBYG",
+      "name": "BARD FRANCE SAS",
+      "amount": 60800.0,
+      "group": "1"
+    },
+    {
+      "id": "MOMFCMVF",
+      "name": "BIOCODEX",
+      "amount": 170360.0,
+      "group": "1"
+    },
+    {
+      "id": "WMQRNJKV",
+      "name": "IPSEN PHARMA",
+      "amount": 22800.0,
+      "group": "1"
+    },
+    {
+      "id": "JUJJFUKK",
+      "name": "LABORATOIRE GLAXOSMITHKLINE",
+      "amount": 50375.0,
+      "group": "1"
+    },
+    {
+      "id": "WGQBUMQA",
+      "name": "MicroVention Europe",
+      "amount": 2598050.0,
+      "group": "1"
+    },
+    {
+      "id": "QYIBQMOL",
+      "name": "MERZ PHARMA France",
+      "amount": 246575.0,
+      "group": "1"
+    },
+    {
+      "id": "QMIBDEAJ",
+      "name": "B.BRAUN MEDICAL SAS",
+      "amount": 23661.0,
+      "group": "1"
+    },
+    {
+      "id": "QLXTOPUX",
+      "name": "Cochlear France",
+      "amount": 33421.0,
+      "group": "1"
+    },
+    {
+      "id": "SYCNVYRX",
+      "name": "ASTRAZENECA",
+      "amount": 894652.0,
+      "group": "1"
+    },
+    {
+      "id": "OXYXKFPD",
+      "name": "Biosensors France SAS",
+      "amount": 211800.0,
+      "group": "1"
+    },
+    {
+      "id": "LFSWZPFF",
+      "name": "AbbVie",
+      "amount": 683356.0,
+      "group": "1"
+    },
+    {
+      "id": "IEDPPWZY",
+      "name": "BIOTECH DENTAL",
+      "amount": 54547.0,
+      "group": "1"
+    },
+    {
+      "id": "ABDOTVKL",
+      "name": "ORTHOFIX SA",
+      "amount": 493542.0,
+      "group": "1"
+    },
+    {
+      "id": "WGXMREAT",
+      "name": "PHONAK FRANCE",
+      "amount": 23590.0,
+      "group": "1"
+    },
+    {
+      "id": "LXINHIJV",
+      "name": "GC TECHNOLOGY",
+      "amount": 36000.0,
+      "group": "1"
+    },
+    {
+      "id": "URRGRWPI",
+      "name": "BIOTRONIK FRANCE SAS",
+      "amount": 150405.0,
+      "group": "1"
+    },
+    {
+      "id": "IBYAFPVW",
+      "name": "MEDACTA FRANCE",
+      "amount": 2116836.0,
+      "group": "1"
+    },
+    {
+      "id": "GCEOYRBT",
+      "name": "W L GORE & ASSOCIES",
+      "amount": 55000.0,
+      "group": "1"
+    },
+    {
+      "id": "WEFUVCUO",
+      "name": "PR EDITIONS SAS",
+      "amount": 44220.0,
+      "group": "1"
+    },
+    {
+      "id": "RHIKHDHD",
+      "name": "VITALAIRE",
+      "amount": 27850.0,
+      "group": "1"
+    },
+    {
+      "id": "XTEERFWI",
+      "name": "LEO Pharma",
+      "amount": 143672.0,
+      "group": "1"
+    },
+    {
+      "id": "CVBOTJEQ",
+      "name": "UPSA SAS",
+      "amount": 344276.0,
+      "group": "1"
+    },
+    {
+      "id": "SOWWIAEU",
+      "name": "Bayer HealthCare SAS",
+      "amount": 121358.0,
+      "group": "1"
+    },
+    {
+      "id": "AAEHBOCE",
+      "name": "LABORATOIRES ALCON",
+      "amount": 21773.0,
+      "group": "1"
+    },
+    {
+      "id": "GNDLAOTI",
+      "name": "CORIN FRANCE",
+      "amount": 26111.0,
+      "group": "1"
+    },
+    {
+      "id": "DUUEWMTC",
+      "name": "Karyopharm Therapeutics Inc.",
+      "amount": 28500.0,
+      "group": "1"
+    },
+    {
+      "id": "QSAOGJVK",
+      "name": "BIOGARAN",
+      "amount": 46100.0,
+      "group": "1"
+    },
+    {
+      "id": "YWQOQGJP",
+      "name": "Philips France Commercial",
+      "amount": 80000.0,
+      "group": "1"
+    },
+    {
+      "id": "NYSJAATT",
+      "name": "EXACTECH INTERNATIONAL OPERATION Ltd.",
+      "amount": 23410.0,
+      "group": "1"
+    },
+    {
+      "id": "HBYWHOVM",
+      "name": "OLYMPUS EUROPA SE & CO. KG",
+      "amount": 103600.0,
+      "group": "1"
+    },
+    {
+      "id": "RIZLLUIF",
+      "name": "BRISTOL-MYERS SQUIBB",
+      "amount": 119640.0,
+      "group": "1"
+    },
+    {
+      "id": "WHAIAXQQ",
+      "name": "Withings",
+      "amount": 34500.0,
+      "group": "1"
+    },
+    {
+      "id": "ZMTBGRYE",
+      "name": "STRYKER FRANCE SAS",
+      "amount": 296000.0,
+      "group": "1"
+    },
+    {
+      "id": "KVSGYDSG",
+      "name": "Guerbet",
+      "amount": 329127.0,
+      "group": "1"
+    },
+    {
+      "id": "NQVYPIOA",
+      "name": "BIOSERENITY",
+      "amount": 21870.0,
+      "group": "1"
+    },
+    {
+      "id": "ROIOUDWP",
+      "name": "SERENITY MEDICAL SERVICES SARL",
+      "amount": 165435.0,
+      "group": "1"
+    },
+    {
+      "id": "QQJGVCQH",
+      "name": "Takeda France",
+      "amount": 600850.0,
+      "group": "1"
+    },
+    {
+      "id": "VYMXZTKY",
+      "name": "PAREXEL International",
+      "amount": 40000.0,
+      "group": "1"
+    },
+    {
+      "id": "NMVSDMIK",
+      "name": "Amplifon Groupe France",
+      "amount": 36000.0,
+      "group": "1"
+    },
+    {
+      "id": "TUVGCMDW",
+      "name": "PURESSENTIEL",
+      "amount": 60000.0,
+      "group": "1"
+    },
+    {
+      "id": "TIGSYUXQ",
+      "name": "STENTYS S.A",
+      "amount": 20125.0,
+      "group": "1"
+    },
+    {
+      "id": "MKDIFWVV",
+      "name": "Celgene Corporation",
+      "amount": 24500.0,
+      "group": "1"
+    },
+    {
+      "id": "UXWMHOCF",
+      "name": "SPINEART SA",
+      "amount": 532651.0,
+      "group": "1"
+    },
+    {
+      "id": "OUMNRESV",
+      "name": "PIERRE FABRE MEDICAMENT",
+      "amount": 97992.0,
+      "group": "1"
+    },
+    {
+      "id": "QZEOEPNT",
+      "name": "Adler Ortho srl",
+      "amount": 20425.0,
+      "group": "1"
+    },
+    {
+      "id": "ZEGBLERU",
+      "name": "Ascension Orthopedics, Inc.",
+      "amount": 69383.0,
+      "group": "1"
+    },
+    {
+      "id": "XDLKEHJV",
+      "name": "MERCK SERONO",
+      "amount": 45566.0,
+      "group": "1"
+    },
+    {
+      "id": "JMXXCUZJ",
+      "name": "LEO Pharma A/S",
+      "amount": 46476.0,
+      "group": "1"
+    },
+    {
+      "id": "EOXMLODC",
+      "name": "vasopharm",
+      "amount": 64449.0,
+      "group": "1"
+    },
+    {
+      "id": "OLJHKFPZ",
+      "name": "Ceva Santé Animale",
+      "amount": 24940.0,
+      "group": "1"
+    },
+    {
+      "id": "BBHWATEY",
+      "name": "Johnson & Johnson Medical SAS",
+      "amount": 73950.0,
+      "group": "1"
+    },
+    {
+      "id": "PTBTSRUS",
+      "name": "Lilly France SAS",
+      "amount": 4876238.0,
+      "group": "1"
+    },
+    {
+      "id": "HLZKPKWP",
+      "name": "MEDICREA INTERNATIONAL",
+      "amount": 271164.0,
+      "group": "1"
+    },
+    {
+      "id": "TIRTQOIB",
+      "name": "ONXEO",
+      "amount": 23200.0,
+      "group": "1"
+    },
+    {
+      "id": "IVNKPJPH",
+      "name": "SORIN GROUP Italia S.r.l.",
+      "amount": 20760.0,
+      "group": "1"
+    },
+    {
+      "id": "LUBSMPIT",
+      "name": "Nestle Skin Health",
+      "amount": 25700.0,
+      "group": "1"
+    },
+    {
+      "id": "CJANOIAP",
+      "name": "MEDTRONIC INTERNATIONAL TRADING SARL",
+      "amount": 567777.0,
+      "group": "1"
+    },
+    {
+      "id": "KIKIOHQV",
+      "name": "Sociétés étrangères du groupe Novartis",
+      "amount": 77700.0,
+      "group": "1"
+    },
+    {
+      "id": "NROJFJET",
+      "name": "MSD France",
+      "amount": 106725.0,
+      "group": "1"
+    },
+    {
+      "id": "DHAJEHML",
+      "name": "Neo Medical S.A.",
+      "amount": 120000.0,
+      "group": "1"
+    },
+    {
+      "id": "KVVTURRV",
+      "name": "CEMAG CARE",
+      "amount": 70004.0,
+      "group": "1"
+    },
+    {
+      "id": "MIDIVVAQ",
+      "name": "IOWA APPROACH INC",
+      "amount": 379200.0,
+      "group": "1"
+    },
+    {
+      "id": "NBSRCFCY",
+      "name": "Zimmer GmbH",
+      "amount": 59400.0,
+      "group": "1"
+    },
+    {
+      "id": "HVXDYTZA",
+      "name": "LABORATOIRES COLOPLAST",
+      "amount": 161045.0,
+      "group": "1"
+    },
+    {
+      "id": "RMUAWANO",
+      "name": "NOVO NORDISK",
+      "amount": 28700.0,
+      "group": "1"
+    },
+    {
+      "id": "XQKKRVGN",
+      "name": "SHIRE INTERNATIONAL",
+      "amount": 25727.0,
+      "group": "1"
+    },
+    {
+      "id": "DJHCALMO",
+      "name": "SSS International Clinical Research GmbH",
+      "amount": 141600.0,
+      "group": "1"
+    },
+    {
+      "id": "LHUOBTVI",
+      "name": "SCIENCE ET MEDECINE",
+      "amount": 24569.0,
+      "group": "1"
+    },
+    {
+      "id": "YVMIBKBE",
+      "name": "LivaNova SAS",
+      "amount": 21600.0,
+      "group": "1"
+    },
+    {
+      "id": "BGYNRSTD",
+      "name": "MEDTRONIC France S.A.S",
+      "amount": 5178409.0,
+      "group": "1"
+    },
+    {
+      "id": "AEALSHBL",
+      "name": "AbbVie Inc. Headquarters",
+      "amount": 86145.0,
+      "group": "1"
+    },
+    {
+      "id": "JPKZVNMH",
+      "name": "VIFOR FRANCE SA",
+      "amount": 20100.0,
+      "group": "1"
+    },
+    {
+      "id": "XMIWTXSA",
+      "name": "E-HEALTH SERVICES SANOÏA",
+      "amount": 20553.0,
+      "group": "1"
+    },
+    {
+      "id": "QVPNRMYE",
+      "name": "Integra LifeSciences Corporation",
+      "amount": 131862.0,
+      "group": "1"
+    },
+    {
+      "id": "RFBQGDJJ",
+      "name": "MicroPort CRM France SAS",
+      "amount": 19194776.0,
+      "group": "1"
+    },
+    {
+      "id": "KKSKQTRZ",
+      "name": "KARL STORZ SE & Co. KG",
+      "amount": 20665.0,
+      "group": "1"
+    },
+    {
+      "id": "FZGDZFKK",
+      "name": "GUERBET France",
+      "amount": 490291.0,
+      "group": "1"
+    },
+    {
+      "id": "ZKQOTRNA",
+      "name": "HEMOTECH",
+      "amount": 22000.0,
+      "group": "1"
+    },
+    {
+      "id": "BMEPLZCA",
+      "name": "INTUITIVE SURGICAL SAS",
+      "amount": 825000.0,
+      "group": "1"
+    },
+    {
+      "id": "MCOHIVWS",
+      "name": "PPD FRANCE SAS",
+      "amount": 247865.0,
+      "group": "1"
+    },
+    {
+      "id": "EJSJYHQL",
+      "name": "ABBOTT MEDICAL FRANCE SAS",
+      "amount": 27411.0,
+      "group": "1"
+    },
+    {
+      "id": "10001307890",
+      "name": "PELISSIER BRUNO",
+      "amount": 27564.0,
+      "group": "2"
+    },
+    {
+      "id": "10003352894",
+      "name": "DESSI PATRICK",
+      "amount": 56556.0,
+      "group": "2"
+    },
+    {
+      "id": "d41d8cd98f00b204e9800998ecf8427e",
+      "name": "EQUIPE SOIGNANTE EQUIPE SOIGNANTE",
+      "amount": 30063350.0,
+      "group": "2"
+    },
+    {
+      "id": "10000053909",
+      "name": "TOUATI Bernard",
+      "amount": 24000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001056729",
+      "name": "DELHAES LAURENCE",
+      "amount": 68621.0,
+      "group": "2"
+    },
+    {
+      "id": "751723198",
+      "name": "ALBOU GANEM CATHERINE",
+      "amount": 50000.0,
+      "group": "2"
+    },
+    {
+      "id": "10005176135",
+      "name": "TRINH LIEM",
+      "amount": 50000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002425667",
+      "name": "GULDENFELS YVES",
+      "amount": 50000.0,
+      "group": "2"
+    },
+    {
+      "id": "10004985874",
+      "name": "RENARD JEAN PAUL",
+      "amount": 50000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003415089",
+      "name": "AVRAN ALEXANDRE",
+      "amount": 69000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100122810",
+      "name": "BATTISTELLA MAXIME",
+      "amount": 92100.0,
+      "group": "2"
+    },
+    {
+      "id": "10002106663",
+      "name": "TROUSSARD XAVIER",
+      "amount": 51840.0,
+      "group": "2"
+    },
+    {
+      "id": "10003374302",
+      "name": "DUTAU HERVE",
+      "amount": 48000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100677136",
+      "name": "DIJOUX PIERRICK",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10004035837",
+      "name": "BIETTE GREGORY",
+      "amount": 45000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001401537",
+      "name": "HAMADOUCHE MOUSSA",
+      "amount": 69506.0,
+      "group": "2"
+    },
+    {
+      "id": "10003865903",
+      "name": "ARNOULD HERVE",
+      "amount": 23322.0,
+      "group": "2"
+    },
+    {
+      "id": "10100547024",
+      "name": "COMBE PIERRE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10005164305",
+      "name": "PREVOST JEAN BRIAC",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003836581",
+      "name": "SIRE CHRISTIAN",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002383247",
+      "name": "NAHON SOPHIE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100296143",
+      "name": "SAADA BOUZID ESMA",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002312543",
+      "name": "ROMANO OLIVIER",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100702355",
+      "name": "TOULLEC CLEMENCE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100083582",
+      "name": "POINTREAU YOANN",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003987137",
+      "name": "LE TOURNEAU CHRISTOPHE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10001271773",
+      "name": "ROTARSKI MACIEJ",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100205276",
+      "name": "FRIKHA AHMED",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100076065",
+      "name": "CHAMOIS JEROME",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100669190",
+      "name": "KREBS LORRAINE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "420785354",
+      "name": "VICCICA AMANDINE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100212603",
+      "name": "GALLAND GIRODET SIGOLENE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003876751",
+      "name": "CERUSE PHILIPPE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100086338",
+      "name": "HENRIQUES DE FIGUEREDO BENEDICTE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100700771",
+      "name": "PETRAU CAMILLE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10001802452",
+      "name": "CAROLA ELISABETH",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002762382",
+      "name": "GUICHARD FRANCOIS",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10005233571",
+      "name": "ROMEO EMILIE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002941283",
+      "name": "LABOUREY JEAN LUC",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10001331759",
+      "name": "BOUTAN LAROZE ARNAUD",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002297710",
+      "name": "GIRAUD GENOUVILLE CLAIRE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100789998",
+      "name": "BECKER PHAM QUANG HAI ALICE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10101357308",
+      "name": "PESTRE MUNIER JULIA",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002604238",
+      "name": "ETIENNE PIERRE LUC",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100827889",
+      "name": "MORICEAU GUILLAUME",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100538932",
+      "name": "DALLOZ PIERRE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10101679685",
+      "name": "EL NEMR MOHAMED",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100819852",
+      "name": "FARNETI DELPHINE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10000579838",
+      "name": "COJEAN ZELEK ISABELLE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10001449767",
+      "name": "HENAULT STEPHANE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002431053",
+      "name": "WAGNER JEAN PHILIPPE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003006706",
+      "name": "FOURNEL PIERRE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10101081114",
+      "name": "JOHNSON ALISON",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002113941",
+      "name": "KALUZINSKI LAURE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100390045",
+      "name": "CORNEA CLAUDIU",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100631059",
+      "name": "MARQUES NATHALIE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10001602894",
+      "name": "SELLAM ZINEB",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100744563",
+      "name": "MIMOUNE HASSINA",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003171187",
+      "name": "MOREAU LIONEL",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10101380839",
+      "name": "LORIGUET LEA",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100490183",
+      "name": "MALAAB AWAD MANAL",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100717585",
+      "name": "JDID WALID",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002393329",
+      "name": "DIAB RAFIK",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003069597",
+      "name": "MOULLET ISABELLE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003073086",
+      "name": "VINCENT LIONEL",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10001384204",
+      "name": "DES GUETZ GAETAN",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100530871",
+      "name": "GANDY CECILE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100400257",
+      "name": "PAVILLET JULIEN",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003129573",
+      "name": "FAYETTE JEROME",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100837995",
+      "name": "NAJEM ABEER",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100227536",
+      "name": "NAKRY TONY",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002185071",
+      "name": "MARTI ADINA CAMELIA",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10015644375",
+      "name": "BRUNA ANTOINE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100685916",
+      "name": "DASTE AMAURY",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100035426",
+      "name": "GIROUX JULIE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "930000328",
+      "name": "JOLLY FREDERIQUE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "590780383",
+      "name": "CODRON FRANCOIS",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003871539",
+      "name": "PRADES JEAN MICHEL",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002498292",
+      "name": "BOSSET MATHIEU",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002113313",
+      "name": "BABIN EMMANUEL",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10101004017",
+      "name": "LEBELLEC LOIC",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "560000135",
+      "name": "LE FLOCH PASCAL",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10004431564",
+      "name": "LAFOND CEDRIK",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100647857",
+      "name": "BENMAMMAR KHEIR EDDINE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10001594927",
+      "name": "DELBALDO CATHERINE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002944766",
+      "name": "MATHE NICOLAS",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002626926",
+      "name": "BESSON DOMINIQUE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100178572",
+      "name": "BUIRET GUILLAUME",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002480498",
+      "name": "SAKEK-FERHAT NACERA",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002526134",
+      "name": "DELECROIX VALERIE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100107985",
+      "name": "CHIDIAC JEAN",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100087922",
+      "name": "BLOUET AURÉLIEN",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100482859",
+      "name": "BOUCHEKOUA MOHAMED",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10100903789",
+      "name": "JANORAY GUILLAUME",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10101111911",
+      "name": "BERNADACH MAUREEN",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002521549",
+      "name": "RAMEE JEAN FRANCOIS",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002085511",
+      "name": "ARSENE OLIVIER",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002435088",
+      "name": "BOREL CHRISTIAN",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10003041737",
+      "name": "ARDISSON PHILIPPE",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "330781352",
+      "name": "CAMOIN Marion",
+      "amount": 28875.0,
+      "group": "2"
+    },
+    {
+      "id": "10002708658",
+      "name": "BONNEAU DANIEL",
+      "amount": 34842.0,
+      "group": "2"
+    },
+    {
+      "id": "10004009055",
+      "name": "PIEROT LAURENT",
+      "amount": 788750.0,
+      "group": "2"
+    },
+    {
+      "id": "10003092375",
+      "name": "LAFOSSE LAURENT",
+      "amount": 325747.0,
+      "group": "2"
+    },
+    {
+      "id": "10003816815",
+      "name": "BEAUJEUX Remy",
+      "amount": 32000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003696944",
+      "name": "COGNARD Christophe",
+      "amount": 414650.0,
+      "group": "2"
+    },
+    {
+      "id": "10000211242",
+      "name": "MORET JACQUES",
+      "amount": 159000.0,
+      "group": "2"
+    },
+    {
+      "id": "10005161863",
+      "name": "COSTALAT Vincent",
+      "amount": 206550.0,
+      "group": "2"
+    },
+    {
+      "id": "10100391910",
+      "name": "GASCOU GREGORY",
+      "amount": 23840.0,
+      "group": "2"
+    },
+    {
+      "id": "10003826475",
+      "name": "BECOUARN GUILLAUME",
+      "amount": 20460.0,
+      "group": "2"
+    },
+    {
+      "id": "10004609177",
+      "name": "BASTE JEANMARC",
+      "amount": 77200.0,
+      "group": "2"
+    },
+    {
+      "id": "10002813078",
+      "name": "RULLIER ERIC",
+      "amount": 58800.0,
+      "group": "2"
+    },
+    {
+      "id": "10003832457",
+      "name": "TOPART PHILIPPE",
+      "amount": 21000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001393726",
+      "name": "MOUNAYER CHARLES",
+      "amount": 407500.0,
+      "group": "2"
+    },
+    {
+      "id": "10100272003",
+      "name": "DENOST QUENTIN",
+      "amount": 26186.0,
+      "group": "2"
+    },
+    {
+      "id": "7142",
+      "name": "STORMACQ ALAIN",
+      "amount": 594644.0,
+      "group": "2"
+    },
+    {
+      "id": "3237",
+      "name": "BARTEL GERARD",
+      "amount": 45717.0,
+      "group": "2"
+    },
+    {
+      "id": "10101353117",
+      "name": "KILLIAN MARTIN",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "7860",
+      "name": "SOCHAT LAURENT",
+      "amount": 103903.0,
+      "group": "2"
+    },
+    {
+      "id": "10101093549",
+      "name": "COHEN ROMAIN",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002152535",
+      "name": "COTTIN YVES",
+      "amount": 53150.0,
+      "group": "2"
+    },
+    {
+      "id": "10101093259",
+      "name": "VERDONK FRANCK",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "10101182037",
+      "name": "PEZEL THEO",
+      "amount": 24000.0,
+      "group": "2"
+    },
+    {
+      "id": "914",
+      "name": "MARY JEAN-LOUIS",
+      "amount": 44000.0,
+      "group": "2"
+    },
+    {
+      "id": "7340",
+      "name": "PINAUD MARYVONNE",
+      "amount": 378830.0,
+      "group": "2"
+    },
+    {
+      "id": "7540",
+      "name": "TAILLIAR SERGE",
+      "amount": 69000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100518504",
+      "name": "GARCIA MAGALI",
+      "amount": 23000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100535169",
+      "name": "ABTAN JEREMIE",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "5952",
+      "name": "BOUVERET ADRIEN",
+      "amount": 2474229.0,
+      "group": "2"
+    },
+    {
+      "id": "10001249175",
+      "name": "GUERET Pascal",
+      "amount": 29600.0,
+      "group": "2"
+    },
+    {
+      "id": "40873542100012",
+      "name": "CACOUB Patrice",
+      "amount": 26400.0,
+      "group": "2"
+    },
+    {
+      "id": "10002476819",
+      "name": "REGNARD JACQUES",
+      "amount": 28800.0,
+      "group": "2"
+    },
+    {
+      "id": "74/4428",
+      "name": "BECKER FRANCOIS",
+      "amount": 57600.0,
+      "group": "2"
+    },
+    {
+      "id": "10100870178",
+      "name": "BAL ANTONIN",
+      "amount": 66300.0,
+      "group": "2"
+    },
+    {
+      "id": "10003129318",
+      "name": "RIMMELE THOMAS",
+      "amount": 20900.0,
+      "group": "2"
+    },
+    {
+      "id": "10100794709",
+      "name": "RIZK JEROME",
+      "amount": 45500.0,
+      "group": "2"
+    },
+    {
+      "id": "10003802195",
+      "name": "GERARD CYRIL",
+      "amount": 52500.0,
+      "group": "2"
+    },
+    {
+      "id": "10100688786",
+      "name": "LIPSKER ALLAN",
+      "amount": 60000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100584019",
+      "name": "CODAS DUARTE RICARDO",
+      "amount": 45000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100393981",
+      "name": "BELAS OLIVIER",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100278588",
+      "name": "NEVOUX PIERRE",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002495207",
+      "name": "HENRY PIERRE CHARLES",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10100533032",
+      "name": "BAILLY VINCENT",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10003468450",
+      "name": "DUBOIS GILLES",
+      "amount": 43275.0,
+      "group": "2"
+    },
+    {
+      "id": "10000320118",
+      "name": "MONSONEGO JOSEPH",
+      "amount": 84000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100082048",
+      "name": "APTEL FLORENT",
+      "amount": 21933.0,
+      "group": "2"
+    },
+    {
+      "id": "10002115235",
+      "name": "LEMARECHAL PHILIPPE",
+      "amount": 28000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003128989",
+      "name": "BARREY CEDRIC",
+      "amount": 25200.0,
+      "group": "2"
+    },
+    {
+      "id": "00000000000",
+      "name": "BOUAYED SALIM",
+      "amount": 129129.0,
+      "group": "2"
+    },
+    {
+      "id": "10001607810",
+      "name": "SCHNITZLER ALEXIS",
+      "amount": 22800.0,
+      "group": "2"
+    },
+    {
+      "id": "10002024304",
+      "name": "SAILLARD DOMINIQUE",
+      "amount": 25375.0,
+      "group": "2"
+    },
+    {
+      "id": "10001510337",
+      "name": "FALISSARD BRUNO",
+      "amount": 62560.0,
+      "group": "2"
+    },
+    {
+      "id": "10003432209",
+      "name": "CHAU Yves",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10005180061",
+      "name": "DERELLE Anne-Laure",
+      "amount": 90000.0,
+      "group": "2"
+    },
+    {
+      "id": "10101206679",
+      "name": "AGGOUR Mohamed",
+      "amount": 45000.0,
+      "group": "2"
+    },
+    {
+      "id": "10000608744",
+      "name": "SPELLE LAURENT",
+      "amount": 120000.0,
+      "group": "2"
+    },
+    {
+      "id": "10000558212",
+      "name": "BIONDI Alessandra",
+      "amount": 90000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003854899",
+      "name": "BARREAU XAVIER",
+      "amount": 240000.0,
+      "group": "2"
+    },
+    {
+      "id": "10000464817",
+      "name": "HERBRETEAU DENIS",
+      "amount": 260000.0,
+      "group": "2"
+    },
+    {
+      "id": "10005178966",
+      "name": "PAPAGIANNAKI CHRYSANTHI",
+      "amount": 41800.0,
+      "group": "2"
+    },
+    {
+      "id": "10003743472",
+      "name": "SOUROUR NADER",
+      "amount": 97500.0,
+      "group": "2"
+    },
+    {
+      "id": "10100934669",
+      "name": "SEBBAH SIMON",
+      "amount": 87982.0,
+      "group": "2"
+    },
+    {
+      "id": "10002586526",
+      "name": "VOINEAU HERVE",
+      "amount": 36773.0,
+      "group": "2"
+    },
+    {
+      "id": "10003279907",
+      "name": "AUQUE JEAN MICHEL",
+      "amount": 33432.0,
+      "group": "2"
+    },
+    {
+      "id": "10003295226",
+      "name": "SAUBIEZ CATHERINE",
+      "amount": 29103.0,
+      "group": "2"
+    },
+    {
+      "id": "10002400850",
+      "name": "VEDRINE FEYS NATHALIE",
+      "amount": 28519.0,
+      "group": "2"
+    },
+    {
+      "id": "10002807252",
+      "name": "KRASSOULIA ALEXANDRE",
+      "amount": 30766.0,
+      "group": "2"
+    },
+    {
+      "id": "10002462439",
+      "name": "BRAX MICHEL",
+      "amount": 23661.0,
+      "group": "2"
+    },
+    {
+      "id": "10002770443",
+      "name": "LEVY RAPHY",
+      "amount": 62000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002770229",
+      "name": "KARSENTY BERNARD",
+      "amount": 38000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003900551",
+      "name": "TOUATI CLAUDE",
+      "amount": 38000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002238250",
+      "name": "LEROY Fabrice",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10003927901",
+      "name": "ELHADAD SIMON",
+      "amount": 28800.0,
+      "group": "2"
+    },
+    {
+      "id": "10003695466",
+      "name": "PY ANTOINE",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10001270502",
+      "name": "HEZODE CHRISTOPHE",
+      "amount": 20970.0,
+      "group": "2"
+    },
+    {
+      "id": "10002323623",
+      "name": "CUISSARD LAURENT",
+      "amount": 23225.0,
+      "group": "2"
+    },
+    {
+      "id": "10002868734",
+      "name": "COMBIS JEAN MARC",
+      "amount": 27250.0,
+      "group": "2"
+    },
+    {
+      "id": "10003756359",
+      "name": "SITRUK VERONIQUE",
+      "amount": 27900.0,
+      "group": "2"
+    },
+    {
+      "id": "10000995117",
+      "name": "BOYER DARRIGRAND NATHALIE",
+      "amount": 21650.0,
+      "group": "2"
+    },
+    {
+      "id": "10003834651",
+      "name": "THEVENET PHILIPPE",
+      "amount": 20100.0,
+      "group": "2"
+    },
+    {
+      "id": "10002088366",
+      "name": "SI AHMED SI NAFA",
+      "amount": 21050.0,
+      "group": "2"
+    },
+    {
+      "id": "10003225652",
+      "name": "LIAUTARD JACQUES",
+      "amount": 21600.0,
+      "group": "2"
+    },
+    {
+      "id": "10001243764",
+      "name": "ROCHE BRUNO",
+      "amount": 22200.0,
+      "group": "2"
+    },
+    {
+      "id": "10001963502",
+      "name": "RIACHI GHASSAN",
+      "amount": 25500.0,
+      "group": "2"
+    },
+    {
+      "id": "10001416360",
+      "name": "POSPAIT DAN",
+      "amount": 28150.0,
+      "group": "2"
+    },
+    {
+      "id": "10000367754",
+      "name": "BERGMANN JEAN FRANCOIS",
+      "amount": 35250.0,
+      "group": "2"
+    },
+    {
+      "id": "10001043545",
+      "name": "FOUCHARD-HUBERT ISABELLE",
+      "amount": 22937.0,
+      "group": "2"
+    },
+    {
+      "id": "10003890497",
+      "name": "LARREY DOMINIQUE",
+      "amount": 29340.0,
+      "group": "2"
+    },
+    {
+      "id": "10002024585",
+      "name": "TAUVERON PHILIPPE",
+      "amount": 102000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001586741",
+      "name": "NJIKE NAKSEU NGUEFANG MICHELINE",
+      "amount": 22099.0,
+      "group": "2"
+    },
+    {
+      "id": "10002314721",
+      "name": "PEYRIN BIROULET LAURENT",
+      "amount": 26056.0,
+      "group": "2"
+    },
+    {
+      "id": "10001574820",
+      "name": "OZENNE VIOLAINE",
+      "amount": 22374.0,
+      "group": "2"
+    },
+    {
+      "id": "10003292033",
+      "name": "HEBUTERNE XAVIER",
+      "amount": 52170.0,
+      "group": "2"
+    },
+    {
+      "id": "10003414603",
+      "name": "CHINOUNE FARID",
+      "amount": 20100.0,
+      "group": "2"
+    },
+    {
+      "id": "10003290227",
+      "name": "OUZAN DENIS",
+      "amount": 28125.0,
+      "group": "2"
+    },
+    {
+      "id": "10003908992",
+      "name": "CONSTANT THIERRY",
+      "amount": 25750.0,
+      "group": "2"
+    },
+    {
+      "id": "10000032846",
+      "name": "MISSIKA PATRICK",
+      "amount": 28000.0,
+      "group": "2"
+    },
+    {
+      "id": "10000089002",
+      "name": "KHOURY ELIAS",
+      "amount": 26547.0,
+      "group": "2"
+    },
+    {
+      "id": "faf754ae74b403c44e61ea5aac13eec6",
+      "name": "BAUWENS PAUL HENRI",
+      "amount": 493542.0,
+      "group": "2"
+    },
+    {
+      "id": "10004804166",
+      "name": "CERVETTI JEAN PIERRE",
+      "amount": 36000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003729935",
+      "name": "ZERAH THIERRY",
+      "amount": 96405.0,
+      "group": "2"
+    },
+    {
+      "id": "10002083466",
+      "name": "BIZEAU OLIVIER",
+      "amount": 24000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002229440",
+      "name": "Roumazeille Bertrand",
+      "amount": 107552.0,
+      "group": "2"
+    },
+    {
+      "id": "10001905297",
+      "name": "VIE PASCAL",
+      "amount": 108920.0,
+      "group": "2"
+    },
+    {
+      "id": "10000541564",
+      "name": "THOMAS REGIS",
+      "amount": 110892.0,
+      "group": "2"
+    },
+    {
+      "id": "10004431176",
+      "name": "MEZIANE AHMED",
+      "amount": 60000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100034437",
+      "name": "FOUILLERON NICOLAS",
+      "amount": 31550.0,
+      "group": "2"
+    },
+    {
+      "id": "10002995735",
+      "name": "FORNASIERI CHRISTOPHE",
+      "amount": 70120.0,
+      "group": "2"
+    },
+    {
+      "id": "10005950026",
+      "name": "GIRAUD BENOIT",
+      "amount": 23850.0,
+      "group": "2"
+    },
+    {
+      "id": "10002559499",
+      "name": "GAGNA GILLES",
+      "amount": 59642.0,
+      "group": "2"
+    },
+    {
+      "id": "10002915956",
+      "name": "BENZAQUEN DAVID",
+      "amount": 35000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001162469",
+      "name": "LAUDE FRÉDÉRIC",
+      "amount": 908500.0,
+      "group": "2"
+    },
+    {
+      "id": "10005179105",
+      "name": "MARCHETTI EMMANUEL",
+      "amount": 23400.0,
+      "group": "2"
+    },
+    {
+      "id": "10100086775",
+      "name": "DUFFIET PASCAL",
+      "amount": 47000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002419645",
+      "name": "COURSIMAULT BENOIT",
+      "amount": 32200.0,
+      "group": "2"
+    },
+    {
+      "id": "10005178859",
+      "name": "BOCQUET DONATIEN",
+      "amount": 24824.0,
+      "group": "2"
+    },
+    {
+      "id": "10003797213",
+      "name": "LAFFARGUE PHILIPPE",
+      "amount": 110774.0,
+      "group": "2"
+    },
+    {
+      "id": "10002239886",
+      "name": "MONNIN CHRISTOPHE",
+      "amount": 41548.0,
+      "group": "2"
+    },
+    {
+      "id": "10003117222",
+      "name": "CHALENCON FRANCOIS",
+      "amount": 69328.0,
+      "group": "2"
+    },
+    {
+      "id": "10001693760",
+      "name": "Moreau Pascal",
+      "amount": 203830.0,
+      "group": "2"
+    },
+    {
+      "id": "10001642965",
+      "name": "ROUSSEL RONAN",
+      "amount": 44220.0,
+      "group": "2"
+    },
+    {
+      "id": "10002670890",
+      "name": "PRIGENT ARNAUD",
+      "amount": 27850.0,
+      "group": "2"
+    },
+    {
+      "id": "10000483155",
+      "name": "ELALAMY ISMAIL",
+      "amount": 57600.0,
+      "group": "2"
+    },
+    {
+      "id": "10001867083",
+      "name": "CARDOT JEAN-MICHEL",
+      "amount": 82500.0,
+      "group": "2"
+    },
+    {
+      "id": "10001336519",
+      "name": "BERGERON CHRISTINE",
+      "amount": 121358.0,
+      "group": "2"
+    },
+    {
+      "id": "10002765807",
+      "name": "DOMINGUEZ MARCEL",
+      "amount": 21773.0,
+      "group": "2"
+    },
+    {
+      "id": "10002236445",
+      "name": "FACON THIERRY",
+      "amount": 28500.0,
+      "group": "2"
+    },
+    {
+      "id": "85349G",
+      "name": "NICOLAS PATRICK",
+      "amount": 20500.0,
+      "group": "2"
+    },
+    {
+      "id": "10001589307",
+      "name": "SENE DAMIEN",
+      "amount": 25600.0,
+      "group": "2"
+    },
+    {
+      "id": "10000615756",
+      "name": "HASSLER MICHELLE",
+      "amount": 40000.0,
+      "group": "2"
+    },
+    {
+      "id": "10000082056",
+      "name": "JENNEQUIN CATHERINE",
+      "amount": 40000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002874179",
+      "name": "GIORDANO GERARD",
+      "amount": 23410.0,
+      "group": "2"
+    },
+    {
+      "id": "10000520063",
+      "name": "GAYET BRICE",
+      "amount": 103600.0,
+      "group": "2"
+    },
+    {
+      "id": "10100176691",
+      "name": "BARTHELEMY PHILIPPE",
+      "amount": 29910.0,
+      "group": "2"
+    },
+    {
+      "id": "10100403939",
+      "name": "VANO YANN ALEXANDRE",
+      "amount": 29910.0,
+      "group": "2"
+    },
+    {
+      "id": "10001496511",
+      "name": "GROSS GOUPIL MARINE",
+      "amount": 29910.0,
+      "group": "2"
+    },
+    {
+      "id": "10100404945",
+      "name": "BORCHIELLINI DELPHINE",
+      "amount": 29910.0,
+      "group": "2"
+    },
+    {
+      "id": "10003373130",
+      "name": "TARLET JEAN MICHEL",
+      "amount": 34500.0,
+      "group": "2"
+    },
+    {
+      "id": "10000600550",
+      "name": "OPPENHEIM CATHERINE",
+      "amount": 39115.0,
+      "group": "2"
+    },
+    {
+      "id": "10002400520",
+      "name": "KREMER STEPHANE",
+      "amount": 27244.0,
+      "group": "2"
+    },
+    {
+      "id": "10002407012",
+      "name": "SCHWAN RAYMUND",
+      "amount": 21870.0,
+      "group": "2"
+    },
+    {
+      "id": "10003693792",
+      "name": "MASNOU PASCAL",
+      "amount": 30860.0,
+      "group": "2"
+    },
+    {
+      "id": "10002402815",
+      "name": "RAFFO EMMANUEL",
+      "amount": 27460.0,
+      "group": "2"
+    },
+    {
+      "id": "10002395811",
+      "name": "MAILLARD LOUIS",
+      "amount": 21795.0,
+      "group": "2"
+    },
+    {
+      "id": "10003806782",
+      "name": "VESPIGNANI HERVE",
+      "amount": 31010.0,
+      "group": "2"
+    },
+    {
+      "id": "10002249315",
+      "name": "DERAMBURE PHILIPPE",
+      "amount": 54310.0,
+      "group": "2"
+    },
+    {
+      "id": "10002302858",
+      "name": "LELEU XAVIER",
+      "amount": 40000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003689329",
+      "name": "TRAN BA HUY PATRICE",
+      "amount": 36000.0,
+      "group": "2"
+    },
+    {
+      "id": "10000445394",
+      "name": "AUBIER MICHEL",
+      "amount": 60000.0,
+      "group": "2"
+    },
+    {
+      "id": "10000416841",
+      "name": "SPAULDING CHRISTIAN",
+      "amount": 20125.0,
+      "group": "2"
+    },
+    {
+      "id": "10003874715",
+      "name": "COIFFIER BERTRAND",
+      "amount": 24500.0,
+      "group": "2"
+    },
+    {
+      "id": "10001664704",
+      "name": "VALLY PATRICK",
+      "amount": 50640.0,
+      "group": "2"
+    },
+    {
+      "id": "10003854105",
+      "name": "PEDRAM Morad",
+      "amount": 68001.0,
+      "group": "2"
+    },
+    {
+      "id": "10002452125",
+      "name": "SROUR Robin",
+      "amount": 26487.0,
+      "group": "2"
+    },
+    {
+      "id": "10002778255",
+      "name": "VADIER François",
+      "amount": 125534.0,
+      "group": "2"
+    },
+    {
+      "id": "10003094199",
+      "name": "LAPRAS Christophe",
+      "amount": 129712.0,
+      "group": "2"
+    },
+    {
+      "id": "10002765914",
+      "name": "POINTILLART VINCENT",
+      "amount": 32200.0,
+      "group": "2"
+    },
+    {
+      "id": "10002810124",
+      "name": "MANGIONE PAOLO",
+      "amount": 100077.0,
+      "group": "2"
+    },
+    {
+      "id": "10003258042",
+      "name": "SALVETAT MARYLINE",
+      "amount": 53280.0,
+      "group": "2"
+    },
+    {
+      "id": "10003180881",
+      "name": "MONOD PIERRE",
+      "amount": 44712.0,
+      "group": "2"
+    },
+    {
+      "id": "10002290400",
+      "name": "HENRY EMMANUEL",
+      "amount": 20425.0,
+      "group": "2"
+    },
+    {
+      "id": "10002873320",
+      "name": "GLASSON JEAN-MARC",
+      "amount": 69383.0,
+      "group": "2"
+    },
+    {
+      "id": "10002910296",
+      "name": "PATHAK ATUL",
+      "amount": 20566.0,
+      "group": "2"
+    },
+    {
+      "id": "10002243961",
+      "name": "VERMERSCH PATRICK",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003473385",
+      "name": "RUER MULARD MIREILLE",
+      "amount": 46476.0,
+      "group": "2"
+    },
+    {
+      "id": "300780038",
+      "name": "ALLAL SALIM",
+      "amount": 159190.0,
+      "group": "2"
+    },
+    {
+      "id": "14861",
+      "name": "CHIMIENTI CLAUDIO",
+      "amount": 24940.0,
+      "group": "2"
+    },
+    {
+      "id": "10001826964",
+      "name": "MERTL PATRICE",
+      "amount": 52750.0,
+      "group": "2"
+    },
+    {
+      "id": "10002826732",
+      "name": "SACHER FREDERIC",
+      "amount": 21200.0,
+      "group": "2"
+    },
+    {
+      "id": "10002084530",
+      "name": "AOUANE FARID",
+      "amount": 31310.0,
+      "group": "2"
+    },
+    {
+      "id": "10100300366",
+      "name": "SCHNEIDER PIERRE",
+      "amount": 27840.0,
+      "group": "2"
+    },
+    {
+      "id": "10003061412",
+      "name": "FIERE VINCENT",
+      "amount": 160146.0,
+      "group": "2"
+    },
+    {
+      "id": "10003297479",
+      "name": "CLEMENT JEAN-LUC",
+      "amount": 111018.0,
+      "group": "2"
+    },
+    {
+      "id": "10003072591",
+      "name": "MERLE PHILIPPE",
+      "amount": 23200.0,
+      "group": "2"
+    },
+    {
+      "id": "10000252584",
+      "name": "POUARD PHILIPPE",
+      "amount": 20760.0,
+      "group": "2"
+    },
+    {
+      "id": "000000000",
+      "name": "SIMON LAURA",
+      "amount": 25700.0,
+      "group": "2"
+    },
+    {
+      "id": "10003797536",
+      "name": "Assaker Richard",
+      "amount": 38500.0,
+      "group": "2"
+    },
+    {
+      "id": "10002432218",
+      "name": "GANGI AFSHIN",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001046803",
+      "name": "FARAH BRUNO",
+      "amount": 30600.0,
+      "group": "2"
+    },
+    {
+      "id": "10003425542",
+      "name": "VIDAL VINCENT",
+      "amount": 35000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003104683",
+      "name": "CHABARDES STEPHAN",
+      "amount": 53500.0,
+      "group": "2"
+    },
+    {
+      "id": "10002537776",
+      "name": "DUPOIRON DENIS",
+      "amount": 23000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001024677",
+      "name": "Ritter Philippe",
+      "amount": 1034768.0,
+      "group": "2"
+    },
+    {
+      "id": "10002314465",
+      "name": "CHAROSKY SEBASTIEN",
+      "amount": 37000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003848388",
+      "name": "LE HUEC JEAN CHARLES",
+      "amount": 33000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002859725",
+      "name": "FAJADET JEAN",
+      "amount": 38600.0,
+      "group": "2"
+    },
+    {
+      "id": "10001552164",
+      "name": "D AGOSTINO MARIA ANTONIETTA",
+      "amount": 77700.0,
+      "group": "2"
+    },
+    {
+      "id": "10004024401",
+      "name": "AMEDEE MANESME OLIVIER",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003273751",
+      "name": "DELLAMONICA PIERRE",
+      "amount": 20125.0,
+      "group": "2"
+    },
+    {
+      "id": "10003764460",
+      "name": "MARCELLI JEAN MICHEL",
+      "amount": 61600.0,
+      "group": "2"
+    },
+    {
+      "id": "10100188662",
+      "name": "QUIENNEC STEFFEN",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001365435",
+      "name": "HOFFMANN ETIENNE",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003733671",
+      "name": "ALLAIN JEROME",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003367769",
+      "name": "BARAT JEAN LUC",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10000099282",
+      "name": "NACCACHE ALAIN",
+      "amount": 70004.0,
+      "group": "2"
+    },
+    {
+      "id": "10002811734",
+      "name": "JAIS PIERRE",
+      "amount": 379200.0,
+      "group": "2"
+    },
+    {
+      "id": "10004396569",
+      "name": "PARRATTE SEBASTIEN",
+      "amount": 27600.0,
+      "group": "2"
+    },
+    {
+      "id": "10003364048",
+      "name": "argenson jean-noêl",
+      "amount": 31800.0,
+      "group": "2"
+    },
+    {
+      "id": "10001012854",
+      "name": "MADIOU JEAN PHILIPPE",
+      "amount": 28700.0,
+      "group": "2"
+    },
+    {
+      "id": "10003301248",
+      "name": "SCHNEIDER STEPHANE",
+      "amount": 25727.0,
+      "group": "2"
+    },
+    {
+      "id": "10003771267",
+      "name": "ELTCHANINOFF HELENE",
+      "amount": 48000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001648541",
+      "name": "TCHETCHE DIDIER",
+      "amount": 46800.0,
+      "group": "2"
+    },
+    {
+      "id": "10003222444",
+      "name": "LECLERCQ FLORENCE",
+      "amount": 46800.0,
+      "group": "2"
+    },
+    {
+      "id": "10002107646",
+      "name": "LECLERCQ SYLVAIN",
+      "amount": 24569.0,
+      "group": "2"
+    },
+    {
+      "id": "10003946026",
+      "name": "GRIMAUD JEAN-PHILIPPE",
+      "amount": 21600.0,
+      "group": "2"
+    },
+    {
+      "id": "10002296134",
+      "name": "HAULON STEPHAN",
+      "amount": 37500.0,
+      "group": "2"
+    },
+    {
+      "id": "10004031612",
+      "name": "RIGOARD PHILIPPE",
+      "amount": 26928.0,
+      "group": "2"
+    },
+    {
+      "id": "10003069605",
+      "name": "NICOLINI PHILIPPE",
+      "amount": 22894.0,
+      "group": "2"
+    },
+    {
+      "id": "10003731857",
+      "name": "BECQUEMIN JEAN-PIERRE",
+      "amount": 37500.0,
+      "group": "2"
+    },
+    {
+      "id": "10001062552",
+      "name": "THOMAS OLIVIER",
+      "amount": 21072.0,
+      "group": "2"
+    },
+    {
+      "id": "10101388907",
+      "name": "RICHTER JOHANN SEBASTIAN",
+      "amount": 21042.0,
+      "group": "2"
+    },
+    {
+      "id": "10002297785",
+      "name": "DUCASSE ERIC",
+      "amount": 25120.0,
+      "group": "2"
+    },
+    {
+      "id": "10001564086",
+      "name": "AMOUR JULIEN",
+      "amount": 42125.0,
+      "group": "2"
+    },
+    {
+      "id": "10001261220",
+      "name": "TEIGER EMMANUEL",
+      "amount": 30200.0,
+      "group": "2"
+    },
+    {
+      "id": "10100105633",
+      "name": "OBEID IBRAHIM",
+      "amount": 23400.0,
+      "group": "2"
+    },
+    {
+      "id": "10001587426",
+      "name": "AMARA MOHAMED",
+      "amount": 24236.0,
+      "group": "2"
+    },
+    {
+      "id": "10005174718",
+      "name": "CANAUD LUDOVIC",
+      "amount": 41400.0,
+      "group": "2"
+    },
+    {
+      "id": "10003870259",
+      "name": "DEFAYE PASCAL",
+      "amount": 31460.0,
+      "group": "2"
+    },
+    {
+      "id": "10003433876",
+      "name": "VELLY LIONEL JEAN",
+      "amount": 22750.0,
+      "group": "2"
+    },
+    {
+      "id": "10004425723",
+      "name": "PIARDI TULIO",
+      "amount": 31000.0,
+      "group": "2"
+    },
+    {
+      "id": "10004037189",
+      "name": "DUMONTEIL NICOLAS",
+      "amount": 33000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002872454",
+      "name": "VARDON DOMINIQUE",
+      "amount": 28220.0,
+      "group": "2"
+    },
+    {
+      "id": "10001379519",
+      "name": "BONNET FRANCIS",
+      "amount": 22625.0,
+      "group": "2"
+    },
+    {
+      "id": "10002303930",
+      "name": "MODINE THOMAS",
+      "amount": 34000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003926085",
+      "name": "BOUHNIK YORAM",
+      "amount": 86145.0,
+      "group": "2"
+    },
+    {
+      "id": "10000434612",
+      "name": "CACOUB PATRICE",
+      "amount": 20100.0,
+      "group": "2"
+    },
+    {
+      "id": "10004409008",
+      "name": "FULPIN JEAN",
+      "amount": 20553.0,
+      "group": "2"
+    },
+    {
+      "id": "10003059085",
+      "name": "BONNIN MICHEL",
+      "amount": 65931.0,
+      "group": "2"
+    },
+    {
+      "id": "10000178888",
+      "name": "JUDET THIERRY",
+      "amount": 65931.0,
+      "group": "2"
+    },
+    {
+      "id": "46c091a41befb796129bcfbad22d76db",
+      "name": "VANDEVELDE Florence",
+      "amount": 1175500.0,
+      "group": "2"
+    },
+    {
+      "id": "89b700992733ab4e3a5496ed20695edd",
+      "name": "NOEL Antoine",
+      "amount": 500000.0,
+      "group": "2"
+    },
+    {
+      "id": "8f62660b2080fc0d6f426cbb4304b36b",
+      "name": "HAEBERLIN Andreas",
+      "amount": 514700.0,
+      "group": "2"
+    },
+    {
+      "id": "10001350981",
+      "name": "MOINI CYRUS",
+      "amount": 57888.0,
+      "group": "2"
+    },
+    {
+      "id": "10001919421",
+      "name": "ANSELME FREDERIC",
+      "amount": 21888.0,
+      "group": "2"
+    },
+    {
+      "id": "10002621380",
+      "name": "MANSOURATI JACQUES",
+      "amount": 3698000.0,
+      "group": "2"
+    },
+    {
+      "id": "10101046901",
+      "name": "DELFANNE CORINNE",
+      "amount": 6320300.0,
+      "group": "2"
+    },
+    {
+      "id": "10101251642",
+      "name": "BELIN VINCENT CASSANDRE",
+      "amount": 4716300.0,
+      "group": "2"
+    },
+    {
+      "id": "10101692837",
+      "name": "OUAZANA VICTORIA",
+      "amount": 1175500.0,
+      "group": "2"
+    },
+    {
+      "id": "10001229938",
+      "name": "DECQ PHILIPPE",
+      "amount": 20665.0,
+      "group": "2"
+    },
+    {
+      "id": "10002396934",
+      "name": "MONTAGNE SERGE",
+      "amount": 60000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001534865",
+      "name": "TOUZEAU-DEYROLLE CAROLINE",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100032795",
+      "name": "GORPHE PHILIPPE",
+      "amount": 33750.0,
+      "group": "2"
+    },
+    {
+      "id": "10002726494",
+      "name": "JAYLE CHRISTOPHE",
+      "amount": 23750.0,
+      "group": "2"
+    },
+    {
+      "id": "10002673373",
+      "name": "VINCENDEAU SEBASTIEN",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10002722444",
+      "name": "FAURE JEAN PIERRE",
+      "amount": 26250.0,
+      "group": "2"
+    },
+    {
+      "id": "10002561172",
+      "name": "BELAS MICHEL",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10004609284",
+      "name": "ROCHE JEAN BAPTISTE",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10002776267",
+      "name": "JANELLE DENIS",
+      "amount": 35000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001066967",
+      "name": "DESFOURNEAUX-DENIS VERONIQUE",
+      "amount": 30000.0,
+      "group": "2"
+    },
+    {
+      "id": "10100082766",
+      "name": "FLAMAND VINCENT",
+      "amount": 45000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002993417",
+      "name": "MUET FRANCOIS",
+      "amount": 40000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003806931",
+      "name": "BRESLER LAURENT",
+      "amount": 26250.0,
+      "group": "2"
+    },
+    {
+      "id": "10003412326",
+      "name": "LELONG BERNARD",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001158145",
+      "name": "SANTELMO NICOLA",
+      "amount": 60000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003133617",
+      "name": "PAPAREL PHILIPPE",
+      "amount": 35000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002988805",
+      "name": "MONOD PIERRE",
+      "amount": 23750.0,
+      "group": "2"
+    },
+    {
+      "id": "10002183837",
+      "name": "KUPERAS CYRILLE",
+      "amount": 45000.0,
+      "group": "2"
+    },
+    {
+      "id": "10001970226",
+      "name": "MARTIN FRANCOISE SANDRINE",
+      "amount": 40000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002090792",
+      "name": "ABOU MRAD FRICQUEGNON ADEL",
+      "amount": 25000.0,
+      "group": "2"
+    },
+    {
+      "id": "10003781035",
+      "name": "SAINT MARC OLIVIER",
+      "amount": 45000.0,
+      "group": "2"
+    },
+    {
+      "id": "10002306198",
+      "name": "LAMBAUDIE ERIC",
+      "amount": 22500.0,
+      "group": "2"
+    },
+    {
+      "id": "10100392397",
+      "name": "PAGES PIERRE BENOIT",
+      "amount": 23750.0,
+      "group": "2"
+    },
+    {
+      "id": "10003760831",
+      "name": "ESCHARD JEAN PAUL",
+      "amount": 20811.0,
+      "group": "2"
+    },
+    {
+      "id": "10003758207",
+      "name": "DERAMOND HERVE",
+      "amount": 21270.0,
+      "group": "2"
+    },
+    {
+      "id": "400011177",
+      "name": "MANOILA Vasile",
+      "amount": 44883.0,
+      "group": "2"
+    },
+    {
+      "id": "10001492130",
+      "name": "LEBOULLEUX SOPHIE",
+      "amount": 42967.0,
+      "group": "2"
+    },
+    {
+      "id": "10002038841",
+      "name": "BENBOUBKER LOTFI",
+      "amount": 23193.0,
+      "group": "2"
+    },
+    {
+      "id": "10002645942",
+      "name": "LECLERCQ CHRISTOPHE",
+      "amount": 27411.0,
+      "group": "2"
+    }
+  ]
+}

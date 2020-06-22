@@ -309,7 +309,6 @@ namespace Adex.Business
                                             var link = new Link
                                             {
                                                 Id = entity.Id,
-                                                //Amount = Convert.ToDecimal(amount, _cultureFr),
                                                 Kind = kind,
                                                 Date = Convert.ToDateTime(date, _cultureFr),
                                                 From = company,
@@ -349,56 +348,63 @@ namespace Adex.Business
         {
             var retour = new GraphDataSet() { ForceDirectedData = new ForceDirectedData() };
 
-            string query = @"select *
+            string query = 
+@"select a.Reference as Company, am.Value as Designation, p.Reference as Beneficiary, pm1.Value + ' ' + pm2.Value as SocialDenomination, b.Kind, b.NumberOfLinks, b.Date, b.Amount
 from
 	(
-	select a.Reference as Company, am.Value as Designation, b.Reference as Beneficiary, bm1.Value + ' ' + bm2.Value as SocialDenomination, count(*) as NumberOfLinks, SUM(CONVERT(decimal, lm.Value)) as Amount
+	select
+		l.From_Id, l.To_Id, l.Kind, l.Date, count(*) as NumberOfLinks, SUM(CONVERT(decimal, lm.Value)) as Amount
 	from
-		Entities a
-		inner join Metadatas am on am.Entity_Id = a.Id
-		inner join Members amb on amb.Id = am.Member_Id and amb.Name = 'denomination_sociale'
-
-		inner join Links l on l.From_Id = a.Id
+		Links l
 		inner join Metadatas lm on lm.Entity_Id = l.Id
 		inner join Members lmb on lmb.Id = lm.Member_Id and lmb.Name like '%_montant_ttc'
+	group by
+		l.From_Id, l.To_Id, l.Kind, l.Date
+	having
+		SUM(CONVERT(decimal, lm.Value)) > 20000
+	) b
 
-		inner join Entities b on b.Id = l.To_Id
-		inner join Metadatas bm1 on bm1.Entity_Id = b.Id
-		inner join Members bmb1 on bmb1.Id = bm1.Member_Id and bmb1.Name = 'benef_nom'
-		inner join Metadatas bm2 on bm2.Entity_Id = b.Id
-		inner join Members bmb2 on bmb2.Id = bm2.Member_Id and bmb2.Name = 'benef_prenom'
-	Group by
-		a.Reference, am.Value, b.Reference, bm1.Value, bm2.Value
-	Having
-		count(*) > 10
+	inner join Entities a on a.Id = b.From_Id
+	inner join Metadatas am on am.Entity_Id = a.Id
+	inner join Members amb on amb.Id = am.Member_Id and amb.Name = 'denomination_sociale'
 
-	union all
+	inner join Entities p on p.Id = b.To_Id
+	inner join Metadatas pm1 on pm1.Entity_Id = p.Id
+	inner join Members pmb1 on pmb1.Id = pm1.Member_Id and pmb1.Name = 'benef_nom'
+	inner join Metadatas pm2 on pm2.Entity_Id = p.Id
+	inner join Members pmb2 on pmb2.Id = pm2.Member_Id and pmb2.Name = 'benef_prenom'";
 
-	select a.Reference, am.Value, b.Reference, bm1.Value, count(*), SUM(CONVERT(decimal, lm.Value))
-	from
-		Entities a
-		inner join Metadatas am on am.Entity_Id = a.Id
-		inner join Members amb on amb.Id = am.Member_Id and amb.Name = 'denomination_sociale'
-
-		inner join Links l on l.From_Id = a.Id
-		inner join Metadatas lm on lm.Entity_Id = l.Id
-		inner join Members lmb on lmb.Id = lm.Member_Id and lmb.Name like '%_montant_ttc'
-
-		inner join Entities b on b.Id = l.To_Id
-		inner join Metadatas bm1 on bm1.Entity_Id = b.Id
-		inner join Members bmb1 on bmb1.Id = bm1.Member_Id and bmb1.Name = 'denomination_sociale'
-	Group by
-		a.Reference, am.Value, b.Reference, bm1.Value
-	Having
-		count(*) > 10	
-	) as tbl
-order by NumberOfLinks desc";
-
-            IEnumerable<QueryResult> result = null;
+            var result = new List<QueryResult>();
 
             using (var con = new SqlConnection(DbConnectionString))
             {
-                result = con.Query<QueryResult>(query);
+                con.Open();
+
+                using (var cm = new SqlCommand(query, con))
+                {
+                    cm.CommandTimeout = 3600;
+                    cm.CommandType = System.Data.CommandType.Text;
+
+                    using (var reader = cm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var obj = new QueryResult
+                            {
+                                Company = (string)reader["Company"]
+                                , Beneficiary = (string)reader["Beneficiary"]
+                                , Designation = (string)reader["Designation"]
+                                , SocialDenomination = (string)reader["SocialDenomination"]
+                                , NumberOfLinks = (int)reader["NumberOfLinks"]
+                                , Amount = (decimal)reader["Amount"]
+                            };
+
+                            result.Add(obj);
+                        }
+                    }
+                }
+
+                //result = con.Query<QueryResult>(query);
             }
 
             retour.BundlingItems.AddRange(result.Select(x => x.Company).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));

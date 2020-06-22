@@ -42,7 +42,7 @@ namespace Adex.App
             {
                 loader.OnMessage += Loader_OnMessage;
 
-                loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;";
+                loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;Connect Timeout=3600;";
                 File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\data.json", JsonConvert.SerializeObject(loader.LinksToJson("", null).ForceDirectedData, Formatting.Indented));
 
                 loader.OnMessage -= Loader_OnMessage;
