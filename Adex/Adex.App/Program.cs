@@ -32,18 +32,18 @@ namespace Adex.App
 
             //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", JsonConvert.SerializeObject(TestCode.LoadSampleFromNormalizedDatabase(15000)));
 
-            //var txt = "EQUIPE SOIGNANTE";
-            //using (var sw = new StreamWriter(@$"E:\Temp\{txt.Replace(" ", "_")}.csv"))
-            //{
-            //    sw.Write($"date;ligne_identifiant;montant_ttc\n");
-            //    Avantages(sw, txt);
-            //    Convention(sw, txt);
-            //    Remuneration(sw, txt);
-            //}
+            var txt = "MOUNAYER";
+            using (var sw = new StreamWriter(@$"E:\Temp\{txt.Replace(" ", "_")}.csv"))
+            {
+                sw.Write($"date;ligne_identifiant;montant_ttc\n");
+                Avantages(sw, txt);
+                Convention(sw, txt);
+                Remuneration(sw, txt);
+            }
 
             //TestCode.FillAdexMetadataWithDapper();
 
-            TestCode.GetJsonAdexMetadataWithDapper();
+            //TestCode.GetJsonAdexMetadataWithDapper();
 
             //TestCode.FillAdexDb();
         }
@@ -67,7 +67,7 @@ namespace Adex.App
                     var l = sr.ReadLine();
                     if (!string.IsNullOrEmpty(l))
                     {
-                        if (l.Contains(txt))
+                        if (l.ToLower().Contains(txt.ToLower()))
                         {
                             var arr = l.Split(';');
 
@@ -125,7 +125,7 @@ namespace Adex.App
                     var l = sr.ReadLine();
                     if (!string.IsNullOrEmpty(l))
                     {
-                        if (l.Contains(txt))
+                        if (l.ToLower().Contains(txt.ToLower()))
                         {
                             var arr = l.Split(';');
 
@@ -183,7 +183,7 @@ namespace Adex.App
                     var l = sr.ReadLine();
                     if (!string.IsNullOrEmpty(l))
                     {
-                        if (l.Contains(txt))
+                        if (l.ToLower().Contains(txt.ToLower()))
                         {
                             var arr = l.Split(';');
 

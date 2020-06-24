@@ -333,5 +333,10 @@ namespace Adex.Business
                 disposedValue = true;
             }
         }
+
+        public Dictionary<string, string> GetBeneficiary(string reference)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

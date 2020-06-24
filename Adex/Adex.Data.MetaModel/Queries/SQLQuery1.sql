@@ -107,17 +107,17 @@ truncate table Links
 delete from Entities
 */
 
-select a.Reference as Company, am.Value as Designation, p.Reference as Beneficiary, pm1.Value + ' ' + pm2.Value as SocialDenomination, b.Date, b.Amount
+select a.Reference as Company, am.Value as Designation, p.Reference as Beneficiary, pm1.Value + ' ' + pm2.Value as SocialDenomination, b.NumberOfLinks, b.Amount
 from
 	(
 	select
-		l.From_Id, l.To_Id, l.Kind, l.Date, SUM(CONVERT(decimal, lm.Value)) as Amount
+		l.From_Id, l.To_Id, count(*) as NumberOfLinks, SUM(CONVERT(decimal, lm.Value)) as Amount
 	from
 		Links l
 		inner join Metadatas lm on lm.Entity_Id = l.Id
 		inner join Members lmb on lmb.Id = lm.Member_Id and lmb.Name like '%_montant_ttc'
 	group by
-		l.From_Id, l.To_Id, l.Kind, l.Date
+		l.From_Id, l.To_Id
 	having
 		SUM(CONVERT(decimal, lm.Value)) > 30000
 	) b

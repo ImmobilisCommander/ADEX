@@ -44,5 +44,8 @@ namespace Adex.Common
         /// <param name="take">Number of records to return</param>
         /// <returns></returns>
         GraphDataSet LinksToJson(string txt, int? take);
+
+
+        Dictionary<string, string> GetBeneficiary(string reference);
     }
 }

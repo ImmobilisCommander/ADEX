@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -22,18 +21,6 @@ using System.Timers;
 
 namespace Adex.Business
 {
-    internal class NodeComparer : IEqualityComparer<ForceDirectedNodeItem>
-    {
-        public bool Equals([AllowNull] ForceDirectedNodeItem x, [AllowNull] ForceDirectedNodeItem y)
-        {
-            return x.Id == y.Id;
-        }
-
-        public int GetHashCode([DisallowNull] ForceDirectedNodeItem obj)
-        {
-            return obj.Id.GetHashCode();
-        }
-    }
 
     public class CvsLoaderMetadata : IDisposable, ICsvLoader
     {
@@ -348,20 +335,22 @@ namespace Adex.Business
         {
             var retour = new GraphDataSet() { ForceDirectedData = new ForceDirectedData() };
 
-            string query = 
-@"select a.Reference as Company, am.Value as Designation, p.Reference as Beneficiary, pm1.Value + ' ' + pm2.Value as SocialDenomination, b.Kind, b.NumberOfLinks, b.Date, b.Amount
+            string query =
+@"select a.Reference as Company, am.Value as Designation, p.Reference as Beneficiary, pm1.Value + ' ' + pm2.Value as SocialDenomination, b.NumberOfLinks, b.Amount
 from
 	(
 	select
-		l.From_Id, l.To_Id, l.Kind, l.Date, count(*) as NumberOfLinks, SUM(CONVERT(decimal, lm.Value)) as Amount
+		l.From_Id, l.To_Id, count(*) as NumberOfLinks, SUM(CONVERT(decimal, lm.Value)) as Amount
 	from
 		Links l
 		inner join Metadatas lm on lm.Entity_Id = l.Id
-		inner join Members lmb on lmb.Id = lm.Member_Id and lmb.Name like '%_montant_ttc'
+		inner join Members lmb on lmb.Id = lm.Member_Id
+	where
+		lmb.Name like '%_montant_ttc'
 	group by
-		l.From_Id, l.To_Id, l.Kind, l.Date
+		l.From_Id, l.To_Id
 	having
-		SUM(CONVERT(decimal, lm.Value)) > 20000
+		SUM(CONVERT(decimal, lm.Value)) > 30000
 	) b
 
 	inner join Entities a on a.Id = b.From_Id
@@ -373,7 +362,6 @@ from
 	inner join Members pmb1 on pmb1.Id = pm1.Member_Id and pmb1.Name = 'benef_nom'
 	inner join Metadatas pm2 on pm2.Entity_Id = p.Id
 	inner join Members pmb2 on pmb2.Id = pm2.Member_Id and pmb2.Name = 'benef_prenom'";
-
             var result = new List<QueryResult>();
 
             using (var con = new SqlConnection(DbConnectionString))
@@ -392,11 +380,16 @@ from
                             var obj = new QueryResult
                             {
                                 Company = (string)reader["Company"]
-                                , Beneficiary = (string)reader["Beneficiary"]
-                                , Designation = (string)reader["Designation"]
-                                , SocialDenomination = (string)reader["SocialDenomination"]
-                                , NumberOfLinks = (int)reader["NumberOfLinks"]
-                                , Amount = (decimal)reader["Amount"]
+                                ,
+                                Beneficiary = (string)reader["Beneficiary"]
+                                ,
+                                Designation = (string)reader["Designation"]
+                                ,
+                                SocialDenomination = (string)reader["SocialDenomination"]
+                                ,
+                                NumberOfLinks = (int)reader["NumberOfLinks"]
+                                ,
+                                Amount = (decimal)reader["Amount"]
                             };
 
                             result.Add(obj);
@@ -407,8 +400,8 @@ from
                 //result = con.Query<QueryResult>(query);
             }
 
-            retour.BundlingItems.AddRange(result.Select(x => x.Company).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));
-            retour.BundlingItems.AddRange(result.Select(x => x.Beneficiary).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));
+            //retour.BundlingItems.AddRange(result.Select(x => x.Company).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));
+            //retour.BundlingItems.AddRange(result.Select(x => x.Beneficiary).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));
 
             foreach (var grp in result.GroupBy(x => new { company = x.Company, designation = x.Designation }))
             {
@@ -424,11 +417,49 @@ from
             {
                 Source = a.Company,
                 Target = a.Beneficiary,
-                Size = Convert.ToInt32(a.NumberOfLinks) + Convert.ToInt32(result.Where(b => b.Company == a.Company).Select(c => c.Amount).Sum())
+                NbLinks = Convert.ToInt32(a.NumberOfLinks),
+                Amount = Convert.ToInt32(a.Amount),
+                Size = 1
             }));
 
             return retour;
         }
+
+        public Dictionary<string, string> GetBeneficiary(string reference)
+        {
+            var retour = new Dictionary<string, string>();
+
+            var query = $@"select
+	c.Name as [Key], b.Value
+from
+	Metadatas b
+	inner join Members c on c.Id = b.Member_Id
+where
+	b.Entity_Id = (select Id from Entities where Reference = @reference)";
+
+            using (var con = new SqlConnection(DbConnectionString))
+            {
+                con.Open();
+
+                using (var cm = new SqlCommand(query, con))
+                {
+                    cm.CommandTimeout = 3600;
+                    cm.CommandType = System.Data.CommandType.Text;
+                    cm.Parameters.AddWithValue("reference", reference);
+
+                    using (var reader = cm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            retour.Add(reader[0].ToString(), reader[1].ToString());
+                        }
+                    }
+                }
+            }
+
+            return retour;
+        }
+
 
         public void Save()
         {
