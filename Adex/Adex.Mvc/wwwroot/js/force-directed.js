@@ -151,20 +151,25 @@ function color(d) {
     return scale(d.group);
 }
 
+var nodeInfo = null;
+
 function popupInfos(d, i) {
-    d3.select(this)
-        .attr("fill", "orange")
-        //.attr("r", getEmphasisedRadius(d))
-        ;
-    d3.json("Home/Information/" + d.id).then(function (obj) {
-        d3.select("#info").text("");
-        var counter = 1;
-        Object.entries(obj).map(item => {
-            var info = d3.select("#info");
-            info.append("tspan").attr("x", 20).attr("y", 30 + 20 * counter).text(item[0] + ': ' + item[1]);
-            counter++;
-        })
-    });
+    if (!nodeInfo || nodeInfo.id != d.id) {
+        nodeInfo = d;
+        d3.select(this)
+            .attr("fill", "orange")
+            //.attr("r", getEmphasisedRadius(d))
+            ;
+        d3.json("api/Beneficiary/Read/" + d.id).then(function (obj) {
+            d3.select("#info").text("");
+            var counter = 1;
+            Object.entries(obj).map(item => {
+                var info = d3.select("#info");
+                info.append("tspan").attr("x", 20).attr("y", 30 + 20 * counter).text(item[0] + ': ' + item[1]);
+                counter++;
+            })
+        });
+    }
 }
 
 function handleMouseOut(d, i) {
