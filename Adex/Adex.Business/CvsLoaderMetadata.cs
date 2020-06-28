@@ -460,7 +460,40 @@ where
             return retour;
         }
 
+        public Dictionary<string, string> Search(string txt)
+        {
+            var retour = new Dictionary<string, string>();
 
+            var query = $@"select
+	c.Name as [Key], b.Value
+from
+	Metadatas b
+	inner join Members c on c.Id = b.Member_Id
+where
+	b.Entity_Id = (select Id from Entities where Reference = @reference)";
+
+            using (var con = new SqlConnection(DbConnectionString))
+            {
+                con.Open();
+
+                using (var cm = new SqlCommand(query, con))
+                {
+                    cm.CommandTimeout = 3600;
+                    cm.CommandType = System.Data.CommandType.Text;
+                    cm.Parameters.AddWithValue("reference", reference);
+
+                    using (var reader = cm.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            retour.Add(reader[0].ToString(), reader[1].ToString());
+                        }
+                    }
+                }
+            }
+
+            return retour;
+        }
         public void Save()
         {
             throw new NotImplementedException();

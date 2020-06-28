@@ -5,6 +5,7 @@
 
 using Adex.Common;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Adex.Data.MetaModel
@@ -22,6 +23,8 @@ namespace Adex.Data.MetaModel
 
         public Entity To { get; set; }
 
+        [Index(IsClustered = false, IsUnique = false)]
+        [MaxLength(1000)]
         public string Kind { get; set; }
 
         public DateTime Date { get; set; }

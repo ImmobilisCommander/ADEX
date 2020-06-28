@@ -20,6 +20,8 @@ namespace Adex.Data.MetaModel
         [Required]
         public Member Member { get; set; }
 
+        [Index(IsClustered = false, IsUnique = false)]
+        [MaxLength(1000)]
         public string Value { get; set; }
     }
 }

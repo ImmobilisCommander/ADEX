@@ -32,10 +32,10 @@ namespace Adex.App
 
             //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", JsonConvert.SerializeObject(TestCode.LoadSampleFromNormalizedDatabase(15000)));
 
-            var txt = "MOUNAYER";
-            using (var sw = new StreamWriter(@$"E:\Temp\{txt.Replace(" ", "_")}.csv"))
+            var txt = "10001466357";
+            using (var sw = new StreamWriter(@$"E:\Temp\{txt.Replace(" ", "_")}_Data.csv", false, Encoding.UTF8))
             {
-                sw.Write($"date;ligne_identifiant;montant_ttc\n");
+                sw.Write($"date;denomination;ligne_identifiant;nature;montant_ttc\n");
                 Avantages(sw, txt);
                 Convention(sw, txt);
                 Remuneration(sw, txt);
@@ -55,11 +55,16 @@ namespace Adex.App
                 var cult = CultureInfo.CreateSpecificCulture("fr-FR");
                 int records = 0;
                 var header = sr.ReadLine().Split(';');
+                var idx_denomination_sociale = Array.IndexOf(header, "denomination_sociale");
                 var idx_ligne_identifiant = Array.IndexOf(header, "ligne_identifiant");
+                var idx_nature = Array.IndexOf(header, "avant_nature");
                 var idx_date = Array.IndexOf(header, "avant_date_signature");
                 var idx_montant_ttc = Array.IndexOf(header, "avant_montant_ttc");
 
                 string record1 = string.Empty;
+
+                var sb = new StringBuilder();
+                sb.AppendLine(string.Join(';', header));
 
                 while (!sr.EndOfStream)
                 {
@@ -69,26 +74,13 @@ namespace Adex.App
                     {
                         if (l.ToLower().Contains(txt.ToLower()))
                         {
+                            sb.AppendLine(l);
                             var arr = l.Split(';');
 
                             if (arr.Length == header.Length)
                             {
-                                var date = arr[idx_date]?.Trim();
-                                try
-                                {
-                                    var dateSignature = default(DateTime);
-
-                                    if (DateTime.TryParse(date, cult, DateTimeStyles.None, out dateSignature))
-                                        if (dateSignature.Year == 2019)
-                                        {
-                                            sw.Write($"{arr[idx_date]};{arr[idx_ligne_identifiant]};{arr[idx_montant_ttc]}\n");
-                                            _logger.Debug(l);
-                                        }
-                                }
-                                catch (Exception e)
-                                {
-                                    _logger.Error(e.Message);
-                                }
+                                sw.Write($"{arr[idx_date]};{arr[idx_denomination_sociale]};{arr[idx_ligne_identifiant]};{arr[idx_nature]};{arr[idx_montant_ttc]}\n");
+                                _logger.Debug(l);
                             }
                             else
                             {
@@ -103,6 +95,8 @@ namespace Adex.App
 
                     record1 = l;
                 }
+
+                File.WriteAllText(@$"E:\Temp\{txt.Replace(" ", "_")}_Avantages_Raw.csv", sb.ToString());
             }
         }
 
@@ -113,11 +107,15 @@ namespace Adex.App
                 var cult = CultureInfo.CreateSpecificCulture("fr-FR");
                 int records = 0;
                 var header = sr.ReadLine().Split(';');
+                var idx_denomination_sociale = Array.IndexOf(header, "denomination_sociale");
                 var idx_ligne_identifiant = Array.IndexOf(header, "ligne_identifiant");
                 var idx_date = Array.IndexOf(header, "conv_date_signature");
+                var idx_nature = Array.IndexOf(header, "conv_objet");
                 var idx_montant_ttc = Array.IndexOf(header, "conv_montant_ttc");
 
                 string record1 = string.Empty;
+                var sb = new StringBuilder();
+                sb.AppendLine(string.Join(';', header));
 
                 while (!sr.EndOfStream)
                 {
@@ -127,26 +125,13 @@ namespace Adex.App
                     {
                         if (l.ToLower().Contains(txt.ToLower()))
                         {
+                            sb.AppendLine(l);
                             var arr = l.Split(';');
 
                             if (arr.Length == header.Length)
                             {
-                                var date = arr[idx_date]?.Trim();
-                                try
-                                {
-                                    var dateSignature = default(DateTime);
-
-                                    if (DateTime.TryParse(date, cult, DateTimeStyles.None, out dateSignature))
-                                        if (dateSignature.Year == 2019)
-                                        {
-                                            sw.Write($"{arr[idx_date]};{arr[idx_ligne_identifiant]};{arr[idx_montant_ttc]}\n");
-                                            _logger.Debug(l);
-                                        }
-                                }
-                                catch (Exception e)
-                                {
-                                    _logger.Error(e.Message);
-                                }
+                                sw.Write($"{arr[idx_date]};{arr[idx_denomination_sociale]};{arr[idx_ligne_identifiant]};{arr[idx_nature]};{arr[idx_montant_ttc]}\n");
+                                _logger.Debug(l);
                             }
                             else
                             {
@@ -161,6 +146,8 @@ namespace Adex.App
 
                     record1 = l;
                 }
+
+                File.WriteAllText(@$"E:\Temp\{txt.Replace(" ", "_")}_Convention_Raw.csv", sb.ToString());
             }
         }
 
@@ -171,11 +158,14 @@ namespace Adex.App
                 var cult = CultureInfo.CreateSpecificCulture("fr-FR");
                 int records = 0;
                 var header = sr.ReadLine().Split(';');
+                var idx_denomination_sociale = Array.IndexOf(header, "denomination_sociale");
                 var idx_ligne_identifiant = Array.IndexOf(header, "ligne_identifiant");
                 var idx_date = Array.IndexOf(header, "remu_date");
                 var idx_montant_ttc = Array.IndexOf(header, "remu_montant_ttc");
 
                 string record1 = string.Empty;
+                var sb = new StringBuilder();
+                sb.AppendLine(string.Join(';', header));
 
                 while (!sr.EndOfStream)
                 {
@@ -185,26 +175,13 @@ namespace Adex.App
                     {
                         if (l.ToLower().Contains(txt.ToLower()))
                         {
+                            sb.AppendLine(l);
                             var arr = l.Split(';');
 
                             if (arr.Length == header.Length)
                             {
-                                var date = arr[idx_date]?.Trim();
-                                try
-                                {
-                                    var dateSignature = default(DateTime);
-
-                                    if (DateTime.TryParse(date, cult, DateTimeStyles.None, out dateSignature))
-                                        if (dateSignature.Year == 2019)
-                                        {
-                                            sw.Write($"{arr[idx_date]};{arr[idx_ligne_identifiant]};{arr[idx_montant_ttc]}\n");
-                                            _logger.Debug(l);
-                                        }
-                                }
-                                catch (Exception e)
-                                {
-                                    _logger.Error(e.Message);
-                                }
+                                sw.Write($"{arr[idx_date]};{arr[idx_denomination_sociale]};{arr[idx_ligne_identifiant]};remuneration;{arr[idx_montant_ttc]}\n");
+                                _logger.Debug(l);
                             }
                             else
                             {
@@ -219,6 +196,7 @@ namespace Adex.App
 
                     record1 = l;
                 }
+                File.WriteAllText(@$"E:\Temp\{txt.Replace(" ", "_")}_Remunetation_Raw.csv", sb.ToString());
             }
         }
     }
