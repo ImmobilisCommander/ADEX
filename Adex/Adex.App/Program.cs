@@ -28,22 +28,24 @@ namespace Adex.App
 
         static void Main(string[] args)
         {
+            // https://www.data.gouv.fr/fr/datasets/transparence-sante-1/
+
             _logger.Info("Starting ********************************");
 
             //File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\sample.json", JsonConvert.SerializeObject(TestCode.LoadSampleFromNormalizedDatabase(15000)));
 
-            var txt = "10001466357";
-            using (var sw = new StreamWriter(@$"E:\Temp\{txt.Replace(" ", "_")}_Data.csv", false, Encoding.UTF8))
-            {
-                sw.Write($"date;denomination;ligne_identifiant;nature;montant_ttc\n");
-                Avantages(sw, txt);
-                Convention(sw, txt);
-                Remuneration(sw, txt);
-            }
+            //var txt = "10001466357";
+            //using (var sw = new StreamWriter(@$"E:\Temp\{txt.Replace(" ", "_")}_Data.csv", false, Encoding.UTF8))
+            //{
+            //    sw.Write($"date;denomination;ligne_identifiant;nature;montant_ttc\n");
+            //    Avantages(sw, txt);
+            //    Convention(sw, txt);
+            //    Remuneration(sw, txt);
+            //}
 
             //TestCode.FillAdexMetadataWithDapper();
 
-            //TestCode.GetJsonAdexMetadataWithDapper();
+            TestCode.GetJsonAdexMetadataWithDapper();
 
             //TestCode.FillAdexDb();
         }

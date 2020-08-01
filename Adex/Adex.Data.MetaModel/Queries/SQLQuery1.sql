@@ -115,7 +115,9 @@ from
 	from
 		Links l
 		inner join Metadatas lm on lm.Entity_Id = l.Id
-		inner join Members lmb on lmb.Id = lm.Member_Id and lmb.Name like '%_montant_ttc'
+		inner join Members lmb on lmb.Id = lm.Member_Id
+	where
+		lmb.Name like '%_montant_ttc'
 	group by
 		l.From_Id, l.To_Id
 	having

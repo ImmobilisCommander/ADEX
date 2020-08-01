@@ -11,6 +11,7 @@ using log4net;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 
@@ -22,6 +23,12 @@ namespace Adex.App
     internal static class TestCode
     {
         private static readonly ILog _logger = LogManager.GetLogger(typeof(TestCode));
+        private static readonly string _dataRootPath;
+
+        static TestCode()
+        {
+            _dataRootPath = ConfigurationManager.AppSettings["DataRootPath"];
+        }
 
         public static void FillAdexDb()
         {
@@ -43,7 +50,7 @@ namespace Adex.App
                 loader.OnMessage += Loader_OnMessage;
 
                 loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;Connect Timeout=3600;";
-                File.WriteAllText(@"C:\Users\julien.lefevre\Documents\Visual Studio 2015\Projects\Tests\EdgeBundling\data.json", JsonConvert.SerializeObject(loader.LinksToJson("", null).ForceDirectedData, Formatting.Indented));
+                File.WriteAllText(@"C:\Users\julie\source\repos\ImmobilisCommander\ADEX\Adex\Adex.Mvc\wwwroot\data\data.json", JsonConvert.SerializeObject(loader.LinksToJson("", null).ForceDirectedData, Formatting.Indented));
 
                 loader.OnMessage -= Loader_OnMessage;
             }
@@ -118,10 +125,10 @@ namespace Adex.App
                 loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;";
                 loader.LoadReferences();
 
-                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\big_entreprise_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_avantage_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_convention_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\big_declaration_remuneration_2020_05_13_04_00.csv");
+                loader.LoadProviders(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\big_entreprise_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\big_declaration_avantage_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\big_declaration_convention_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\big_declaration_remuneration_2020_08_01_04_00.csv"));
 
                 loader.OnMessage -= Loader_OnMessage;
             }
@@ -140,10 +147,10 @@ namespace Adex.App
                 loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;";
                 loader.LoadReferences();
 
-                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv");
+                loader.LoadProviders(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\entreprise_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\declaration_avantage_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\declaration_convention_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_08_01_04_00.csv"));
 
                 retour = loader.LinksToJson(null, size);
 
@@ -164,10 +171,10 @@ namespace Adex.App
                 loader.OnMessage += Loader_OnMessage;
                 loader.LoadReferences();
 
-                loader.LoadProviders(@"E:\Git\ImmobilisCommander\ADEX\Data\entreprise_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_avantage_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_convention_2020_05_13_04_00.csv");
-                loader.LoadLinks(@"E:\Git\ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_05_13_04_00.csv");
+                loader.LoadProviders(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\entreprise_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\declaration_avantage_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\declaration_convention_2020_08_01_04_00.csv"));
+                loader.LoadLinks(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data\declaration_remuneration_2020_08_01_04_00.csv"));
 
                 loader.Save();
 
@@ -181,10 +188,10 @@ namespace Adex.App
 
         private static void RewriteSampleFiles(int? size)
         {
-            var files = Directory.GetFiles(@"E:\Git\ImmobilisCommander\ADEX\exports-etalab", "*.csv");
+            var files = Directory.GetFiles(Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\exports-etalab"), "*.csv");
             foreach (var f in files)
             {
-                FileHelper.ReWriteToUTF8(f, @"E:\Git\ImmobilisCommander\ADEX\Data", size);
+                FileHelper.ReWriteToUTF8(f, Path.Combine(_dataRootPath, @"ImmobilisCommander\ADEX\Data"), size);
             }
         }
 

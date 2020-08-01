@@ -302,7 +302,7 @@ namespace Adex.Business
                                                 To = benef,
                                             };
                                             con.InsertLink(link);
-                                            con.InsertMetadata(link.Id, _existingMembers[headerAmountName].Id, amount);
+                                            con.InsertMetadata(link.Id, _existingMembers[headerAmountName].Id, Convert.ToDecimal(amount, _cultureFr).ToString());
 
                                             counterBonds++;
                                         }
@@ -480,7 +480,7 @@ where
                 {
                     cm.CommandTimeout = 3600;
                     cm.CommandType = System.Data.CommandType.Text;
-                    cm.Parameters.AddWithValue("reference", reference);
+                    cm.Parameters.AddWithValue("reference", txt);
 
                     using (var reader = cm.ExecuteReader())
                     {
