@@ -2,46 +2,46 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Adex.Mvc.Models
 {
     public class BeneficiaryViewModel
     {
-        [JsonProperty("identifiant")]
+        [JsonPropertyName("identifiant")]
         public string Identifier { get; set; }
 
-        [JsonProperty("pays_code")]
+        [JsonPropertyName("pays_code")]
         public string CountryCode { get; set; }
 
-        [JsonProperty("pays")]
+        [JsonPropertyName("pays")]
         public string Country { get; set; }
 
-        [JsonProperty("secteur_activite_code")]
+        [JsonPropertyName("secteur_activite_code")]
         public string ActivityCode { get; set; }
 
-        [JsonProperty("secteur")]
+        [JsonPropertyName("secteur")]
         public string Activity { get; set; }
 
-        [JsonProperty("denomination_sociale")]
+        [JsonPropertyName("denomination_sociale")]
         public string SocialDenomination { get; set; }
 
-        [JsonProperty("adresse_1")]
+        [JsonPropertyName("adresse_1")]
         public string Adress1 { get; set; }
 
-        [JsonProperty("adresse_2")]
+        [JsonPropertyName("adresse_2")]
         public string Adress2 { get; set; }
 
-        [JsonProperty("adresse_3")]
+        [JsonPropertyName("adresse_3")]
         public string Adress3 { get; set; }
 
-        [JsonProperty("adresse_4")]
+        [JsonPropertyName("adresse_4")]
         public string Adress4 { get; set; }
 
-        [JsonProperty("code_postal")]
+        [JsonPropertyName("code_postal")]
         public string ZipCode { get; set; }
 
-        [JsonProperty("ville")]
+        [JsonPropertyName("ville")]
         public string Town { get; set; }
     }
 }

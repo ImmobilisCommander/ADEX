@@ -6,6 +6,8 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Adex.Data.MetaModel;
 using CsvHelper;
 using Dapper;
@@ -15,45 +17,70 @@ namespace Adex.Business
 {
     internal static class Extensions
     {
-        public static int InsertEntity(this NpgsqlConnection connection, Entity obj)
+        public static Task<int> InsertEntityAsync(
+            this NpgsqlConnection connection,
+            Entity obj,
+            CancellationToken cancellationToken
+        )
         {
-            return connection.ExecuteScalar<int>(
-                "insert into \"Entities\" (\"Reference\") values (@Reference) returning \"Id\"",
-                obj
+            return connection.ExecuteScalarAsync<int>(
+                new CommandDefinition(
+                    "insert into \"Entities\" (\"Reference\") values (@Reference) returning \"Id\"",
+                    obj,
+                    cancellationToken: cancellationToken
+                )
             );
         }
 
-        public static int InsertMetadata(
+        public static Task<int> InsertMetadataAsync(
             this NpgsqlConnection connection,
             int entityId,
             int memberId,
-            string value
+            string value,
+            CancellationToken cancellationToken
         )
         {
-            return connection.ExecuteScalar<int>(
-                "insert into \"Metadatas\" (\"Entity_Id\", \"Member_Id\", \"Value\") values (@Entity_Id, @Member_Id, @Value) returning \"Id\"",
-                new
-                {
-                    Entity_Id = entityId,
-                    Member_Id = memberId,
-                    Value = value,
-                }
+            return connection.ExecuteScalarAsync<int>(
+                new CommandDefinition(
+                    "insert into \"Metadatas\" (\"Entity_Id\", \"Member_Id\", \"Value\") values (@Entity_Id, @Member_Id, @Value) returning \"Id\"",
+                    new
+                    {
+                        Entity_Id = entityId,
+                        Member_Id = memberId,
+                        Value = value,
+                    },
+                    cancellationToken: cancellationToken
+                )
             );
         }
 
-        public static int InsertMember(this NpgsqlConnection connection, Member obj)
+        public static Task<int> InsertMemberAsync(
+            this NpgsqlConnection connection,
+            Member obj,
+            CancellationToken cancellationToken
+        )
         {
-            return connection.ExecuteScalar<int>(
-                "insert into \"Members\" (\"Name\", \"Alias\") values (@Name, @Alias) returning \"Id\"",
-                obj
+            return connection.ExecuteScalarAsync<int>(
+                new CommandDefinition(
+                    "insert into \"Members\" (\"Name\", \"Alias\") values (@Name, @Alias) returning \"Id\"",
+                    obj,
+                    cancellationToken: cancellationToken
+                )
             );
         }
 
-        public static void InsertLink(this NpgsqlConnection connection, Link obj)
+        public static Task InsertLinkAsync(
+            this NpgsqlConnection connection,
+            Link obj,
+            CancellationToken cancellationToken
+        )
         {
-            connection.Execute(
-                "insert into \"Links\" (\"Id\", \"From_Id\", \"To_Id\", \"Kind\", \"Date\") values (@Id, @From_Id, @To_Id, @Kind, @Date)",
-                obj
+            return connection.ExecuteAsync(
+                new CommandDefinition(
+                    "insert into \"Links\" (\"Id\", \"From_Id\", \"To_Id\", \"Kind\", \"Date\") values (@Id, @From_Id, @To_Id, @Kind, @Date)",
+                    obj,
+                    cancellationToken: cancellationToken
+                )
             );
         }
 

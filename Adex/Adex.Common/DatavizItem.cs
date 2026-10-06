@@ -4,19 +4,19 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Adex.Common
 {
     public class EdgeBundlingItem
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("size")]
+        [JsonPropertyName("size")]
         public int Size { get; set; }
 
-        [JsonProperty("imports")]
+        [JsonPropertyName("imports")]
         public List<string> Imports { get; set; }
 
         public override string ToString()

@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Nouveau profil",
+    "Projects": [
+      {
+        "Path": "Adex.WebApi\\Adex.WebApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Adex.Mvc\\Adex.Mvc.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

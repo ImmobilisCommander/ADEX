@@ -14,6 +14,8 @@ L’API utilise maintenant le modèle d’hébergement minimal. En environnement
 
 Serilog est configuré dans les `appsettings.json` des deux hôtes et a été vérifié : les requêtes HTTP apparaissent dans leurs fichiers séparés sous `D:\Logs`, et une requête Dapper produit un événement Npgsql contenant le SQL sans valeurs de paramètres. Le test SQL a volontairement ciblé une base locale sans schéma et a reçu une erreur de relation absente ; il valide la journalisation, pas le parcours métier. La rotation de taille/rétention doit être surveillée en exploitation, où les processus doivent aussi disposer de droits d’écriture sur `D:\Logs`.
 
+Les points d’entrée utilisent `Main` asynchrone. Les opérations de persistance EF Core et Dapper exposées aux services sont asynchrones et reçoivent le token de la requête ; la solution utilise `System.Text.Json`, sans référence directe à Newtonsoft.Json.
+
 ## Scénarios à couvrir
 
 Avant une mise en service, créer une suite automatisée couvrant au minimum :

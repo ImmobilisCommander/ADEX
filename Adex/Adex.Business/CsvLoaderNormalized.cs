@@ -9,6 +9,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using Adex.Common;
 using Adex.Data.Model;
@@ -21,7 +23,7 @@ namespace Adex.Business
     public partial class CsvLoaderNormalized : IDisposable, ICsvLoader, ILinkSearchService
     {
         private CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
-        private Timer _timer = null;
+        private System.Timers.Timer _timer = null;
         private Dictionary<string, Company> _companies = null;
         private Dictionary<string, Person> _beneficiaries = null;
         private Dictionary<string, Link> _links = null;
@@ -60,7 +62,7 @@ namespace Adex.Business
         public CsvLoaderNormalized(IDbContextFactory<AdexContext> contextFactory)
         {
             _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
-            _timer = new Timer(10000);
+            _timer = new System.Timers.Timer(10000);
             _timer.Elapsed += delegate(object sender, ElapsedEventArgs e)
             {
                 OnMessage?.Invoke(
@@ -81,15 +83,17 @@ namespace Adex.Business
             Dispose(false);
         }
 
-        public void LoadReferences()
+        public async Task LoadReferencesAsync(CancellationToken cancellationToken)
         {
-            using (var db = _contextFactory.CreateDbContext())
+            await using (var db = await _contextFactory.CreateDbContextAsync(cancellationToken))
             {
-                _existingReferences = new HashSet<string>(db.Entities.Select(x => x.Reference));
+                _existingReferences = new HashSet<string>(
+                    await db.Entities.Select(x => x.Reference).ToListAsync(cancellationToken)
+                );
             }
         }
 
-        public void LoadProviders(string path)
+        public async Task LoadProvidersAsync(string path, CancellationToken cancellationToken)
         {
             OnMessage?.Invoke(
                 this,
@@ -101,11 +105,13 @@ namespace Adex.Business
             {
                 using (var csv = new CustomCsvReader(sr, CreateConfiguration()))
                 {
-                    csv.Read();
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await csv.ReadAsync();
                     csv.ReadHeader();
 
-                    while (csv.Read())
+                    while (await csv.ReadAsync())
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         var externalId = csv.GetField("identifiant");
                         if (!_existingReferences.Contains(externalId))
                         {
@@ -142,7 +148,7 @@ namespace Adex.Business
             );
         }
 
-        public void LoadLinks(string path)
+        public async Task LoadLinksAsync(string path, CancellationToken cancellationToken)
         {
             OnMessage?.Invoke(
                 this,
@@ -158,7 +164,8 @@ namespace Adex.Business
             {
                 using (var csv = new CustomCsvReader(sr, CreateConfiguration(";")))
                 {
-                    csv.Read();
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await csv.ReadAsync();
                     csv.ReadHeader();
 
                     var idx_entreprise_identifiant = csv.GetFieldIndex("entreprise_identifiant");
@@ -172,8 +179,9 @@ namespace Adex.Business
 
                     var idx_ligne_identifiant = csv.GetFieldIndex("ligne_identifiant");
 
-                    while (csv.Read())
+                    while (await csv.ReadAsync())
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         try
                         {
                             var date = csv.GetField(
@@ -304,19 +312,19 @@ namespace Adex.Business
             );
         }
 
-        public void Save()
+        public async Task SaveAsync(CancellationToken cancellationToken)
         {
-            using (var db = _contextFactory.CreateDbContext())
+            await using (var db = await _contextFactory.CreateDbContextAsync(cancellationToken))
             {
-                using (var t = db.Database.BeginTransaction())
+                await using (var t = await db.Database.BeginTransactionAsync(cancellationToken))
                 {
                     try
                     {
                         db.Companies.AddRange(_companies.Select(x => x.Value));
                         db.Persons.AddRange(_beneficiaries.Select(x => x.Value));
                         db.Links.AddRange(_links.Select(x => x.Value));
-                        db.SaveChanges();
-                        t.Commit();
+                        await db.SaveChangesAsync(cancellationToken);
+                        await t.CommitAsync(cancellationToken);
 
                         OnMessage?.Invoke(
                             this,
@@ -344,6 +352,11 @@ namespace Adex.Business
                             }
                         );
                     }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        await t.RollbackAsync(CancellationToken.None);
+                        throw;
+                    }
                     catch (Exception e)
                     {
                         OnMessage?.Invoke(
@@ -354,7 +367,7 @@ namespace Adex.Business
                                 Level = Level.Error,
                             }
                         );
-                        t.Rollback();
+                        await t.RollbackAsync(CancellationToken.None);
                     }
                 }
             }
@@ -364,32 +377,40 @@ namespace Adex.Business
             _links.Clear();
         }
 
-        public GraphDataSet LinksToJson(string txt, int? take)
+        public async Task<GraphDataSet> LinksToJsonAsync(
+            string txt,
+            int take,
+            CancellationToken cancellationToken
+        )
         {
             var retour = new GraphDataSet();
 
             var links = new List<Link>();
-            using (var db = _contextFactory.CreateDbContext())
+            await using (var db = await _contextFactory.CreateDbContextAsync(cancellationToken))
             {
                 if (!string.IsNullOrEmpty(txt))
                 {
-                    if (db.Entities.Any(x => x.Reference.Contains(txt)))
+                    if (await db.Entities.AnyAsync(x => x.Reference.Contains(txt), cancellationToken))
                     {
                         links.AddRange(
-                            db.Links.Include(link => link.From)
+                            await db.Links.Include(link => link.From)
                                 .Include(link => link.To)
                                 .Where(x => x.From.Reference.Contains(txt))
+                                .ToListAsync(cancellationToken)
                         );
                         links.AddRange(
-                            db.Links.Include(link => link.From)
+                            await db.Links.Include(link => link.From)
                                 .Include(link => link.To)
                                 .Where(x => x.To.Reference.Contains(txt))
+                                .ToListAsync(cancellationToken)
                         );
                     }
                 }
                 else
                 {
-                    links = db.Links.Include(link => link.From).Include(link => link.To).ToList();
+                    links = await db.Links.Include(link => link.From)
+                        .Include(link => link.To)
+                        .ToListAsync(cancellationToken);
                 }
             }
             var all = links
@@ -401,7 +422,7 @@ namespace Adex.Business
             );
 
             foreach (
-                var item in all.Where(x => !string.IsNullOrEmpty(x.id)).Take(take ?? all.Count)
+                var item in all.Where(x => !string.IsNullOrEmpty(x.id)).Take(take)
             )
             {
                 var temp = links
@@ -450,9 +471,5 @@ namespace Adex.Business
             }
         }
 
-        public Dictionary<string, string> GetBeneficiary(string reference)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

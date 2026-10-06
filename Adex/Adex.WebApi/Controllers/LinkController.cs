@@ -3,6 +3,8 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Adex.Business;
 
@@ -26,9 +28,11 @@ namespace Adex.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("search/{txt}")]
-        public ActionResult Search(string txt)
+        public async Task<ActionResult> Search(string txt, CancellationToken cancellationToken)
         {
-            return new JsonResult(_linkSearchService.LinksToJson(txt, 1000));
+            return new JsonResult(
+                await _linkSearchService.LinksToJsonAsync(txt, 1000, cancellationToken)
+            );
         }
     }
 }

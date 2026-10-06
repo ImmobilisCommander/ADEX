@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Adex.Business;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,9 +23,14 @@ namespace Adex.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("info/{reference}")]
-        public ActionResult GetInformation(string reference)
+        public async Task<ActionResult> GetInformation(
+            string reference,
+            CancellationToken cancellationToken
+        )
         {
-            return new JsonResult(_metadataLookupService.GetBeneficiary(reference));
+            return new JsonResult(
+                await _metadataLookupService.GetBeneficiaryAsync(reference, cancellationToken)
+            );
         }
     }
 }

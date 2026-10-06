@@ -2,7 +2,6 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="Dapper" />
-    <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Npgsql" />
   </ItemGroup>
 

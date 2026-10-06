@@ -3,22 +3,22 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Adex.Common
 {
     public class ForceDirectedNodeItem
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("amount")]
+        [JsonPropertyName("amount")]
         public decimal Amount { get; set; }
 
-        [JsonProperty("group")]
+        [JsonPropertyName("group")]
         public string Group { get; set; }
     }
 }

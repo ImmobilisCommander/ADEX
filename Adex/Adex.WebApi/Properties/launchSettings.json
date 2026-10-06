@@ -3,11 +3,10 @@
   "profiles": {
     "Adex.WebApi": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:44329;http://localhost:51367"
+      "applicationUrl": "https://localhost:44330;http://localhost:51368"
     }
   }
 }

@@ -1,17 +1,29 @@
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Adex.Common;
 
 namespace Adex.Business
 {
     public interface ILinkSearchService
     {
-        GraphDataSet LinksToJson(string text, int? take);
+        Task<GraphDataSet> LinksToJsonAsync(
+            string text,
+            int take,
+            CancellationToken cancellationToken
+        );
     }
 
     public interface IMetadataLookupService
     {
-        Dictionary<string, string> Search(string text);
+        Task<Dictionary<string, string>> SearchAsync(
+            string text,
+            CancellationToken cancellationToken
+        );
 
-        Dictionary<string, string> GetBeneficiary(string reference);
+        Task<Dictionary<string, string>> GetBeneficiaryAsync(
+            string reference,
+            CancellationToken cancellationToken
+        );
     }
 }

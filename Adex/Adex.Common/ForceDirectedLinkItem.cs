@@ -3,25 +3,25 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Adex.Common
 {
     public class ForceDirectedLinkItem
     {
-        [JsonProperty("source")]
+        [JsonPropertyName("source")]
         public string Source { get; set; }
 
-        [JsonProperty("target")]
+        [JsonPropertyName("target")]
         public string Target { get; set; }
 
-        [JsonProperty("size")]
+        [JsonPropertyName("size")]
         public int Size { get; set; }
 
-        [JsonProperty("nbLinks")]
+        [JsonPropertyName("nbLinks")]
         public int NbLinks { get; set; }
 
-        [JsonProperty("amount")]
+        [JsonPropertyName("amount")]
         public int Amount { get; set; }
     }
 }

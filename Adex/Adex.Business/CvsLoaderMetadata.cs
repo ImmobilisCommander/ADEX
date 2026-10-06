@@ -18,6 +18,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Adex.Business
 {
@@ -74,22 +76,37 @@ namespace Adex.Business
             Dispose(disposing: false);
         }
 
-        public void LoadReferences()
+        public async Task LoadReferencesAsync(CancellationToken cancellationToken)
         {
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Loading reference data" });
 
-            using (var con = new NpgsqlConnection(_dbConnectionString))
+            await using (var con = new NpgsqlConnection(_dbConnectionString))
             {
-                _existingReferences = con.Query<Entity>("select * from \"Entities\"")
+                await con.OpenAsync(cancellationToken);
+                _existingReferences = (
+                    await con.QueryAsync<Entity>(
+                        new CommandDefinition(
+                            "select * from \"Entities\"",
+                            cancellationToken: cancellationToken
+                        )
+                    )
+                )
                     .ToDictionary(x => x.Reference);
-                _existingMembers = con.Query<Member>("select * from \"Members\"")
+                _existingMembers = (
+                    await con.QueryAsync<Member>(
+                        new CommandDefinition(
+                            "select * from \"Members\"",
+                            cancellationToken: cancellationToken
+                        )
+                    )
+                )
                     .ToDictionary(x => x.Name);
             }
 
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Reference data loaded" });
         }
 
-        public void LoadProviders(string path)
+        public async Task LoadProvidersAsync(string path, CancellationToken cancellationToken)
         {
             OnMessage?.Invoke(
                 this,
@@ -104,9 +121,9 @@ namespace Adex.Business
                     csv.Read();
                     csv.ReadHeader();
 
-                    using (var con = new NpgsqlConnection(_dbConnectionString))
+                    await using (var con = new NpgsqlConnection(_dbConnectionString))
                     {
-                        con.Open();
+                        await con.OpenAsync(cancellationToken);
 
                         #region AJOUT DES EN-TÊTES MANQUANTS
                         var header = csv.HeaderRecord;
@@ -118,7 +135,7 @@ namespace Adex.Business
                             foreach (var m in membersToAdd)
                             {
                                 var member = new Member { Name = m };
-                                member.Id = con.InsertMember(member);
+                                member.Id = await con.InsertMemberAsync(member, cancellationToken);
                                 _existingMembers.Add(member.Name, member);
                             }
                         }
@@ -126,19 +143,21 @@ namespace Adex.Business
 
                         while (csv.Read())
                         {
+                            cancellationToken.ThrowIfCancellationRequested();
                             var externalId = csv.GetField("identifiant");
                             if (!_existingReferences.ContainsKey(externalId))
                             {
                                 var entity = new Entity() { Reference = externalId };
-                                entity.Id = con.InsertEntity(entity);
+                                entity.Id = await con.InsertEntityAsync(entity, cancellationToken);
 
                                 for (int i = 0; i < csv.HeaderRecord.Length; i++)
                                 {
                                     var col = csv.HeaderRecord[i];
-                                    var id = con.InsertMetadata(
+                                    await con.InsertMetadataAsync(
                                         entity.Id,
                                         _existingMembers[col].Id,
-                                        csv[i].ToString()
+                                        csv[i].ToString(),
+                                        cancellationToken
                                     );
                                 }
 
@@ -170,7 +189,7 @@ namespace Adex.Business
             );
         }
 
-        public void LoadLinks(string path)
+        public async Task LoadLinksAsync(string path, CancellationToken cancellationToken)
         {
             OnMessage?.Invoke(
                 this,
@@ -222,9 +241,9 @@ namespace Adex.Business
                     idx_date_avantage = header.GetFieldIndex(CsvColumnsName.RemuDate);
                 }
 
-                using (var con = new NpgsqlConnection(_dbConnectionString))
+                await using (var con = new NpgsqlConnection(_dbConnectionString))
                 {
-                    con.Open();
+                    await con.OpenAsync(cancellationToken);
 
                     #region AJOUT DES EN-TÊTES MANQUANTS
                     var membersToAdd = header.Except(_existingMembers.Select(x => x.Key)).ToList();
@@ -234,7 +253,7 @@ namespace Adex.Business
                         foreach (var m in membersToAdd)
                         {
                             var member = new Member { Name = m };
-                            member.Id = con.InsertMember(member);
+                            member.Id = await con.InsertMemberAsync(member, cancellationToken);
                             _existingMembers.Add(member.Name, member);
                         }
                     }
@@ -243,6 +262,7 @@ namespace Adex.Business
                     string line = string.Empty;
                     while (!sr.EndOfStream)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         try
                         {
                             line = sr.ReadLine();
@@ -275,21 +295,26 @@ namespace Adex.Business
                                                     idx_denomination_sociale
                                                 );
                                                 company = new Entity() { Reference = externalId };
-                                                company.Id = con.InsertEntity(company);
+                                                company.Id = await con.InsertEntityAsync(
+                                                    company,
+                                                    cancellationToken
+                                                );
 
-                                                con.InsertMetadata(
+                                                await con.InsertMetadataAsync(
                                                     company.Id,
                                                     _existingMembers[
                                                         header[idx_entreprise_identifiant]
                                                     ].Id,
-                                                    externalId
+                                                    externalId,
+                                                    cancellationToken
                                                 );
-                                                con.InsertMetadata(
+                                                await con.InsertMetadataAsync(
                                                     company.Id,
                                                     _existingMembers[
                                                         header[idx_denomination_sociale]
                                                     ].Id,
-                                                    denomination
+                                                    denomination,
+                                                    cancellationToken
                                                 );
 
                                                 _existingReferences.Add(company.Reference, company);
@@ -314,7 +339,10 @@ namespace Adex.Business
                                             if (!_existingReferences.ContainsKey(externalId))
                                             {
                                                 benef = new Entity() { Reference = externalId };
-                                                benef.Id = con.InsertEntity(benef);
+                                                benef.Id = await con.InsertEntityAsync(
+                                                    benef,
+                                                    cancellationToken
+                                                );
 
                                                 if (
                                                     !"[etu][prs][vet]".Contains(
@@ -328,12 +356,13 @@ namespace Adex.Business
                                                         idx_benef_denomination_sociale
                                                     ]
                                                         ?.Trim();
-                                                    con.InsertMetadata(
+                                                    await con.InsertMetadataAsync(
                                                         benef.Id,
                                                         _existingMembers[
                                                             header[idx_benef_categorie_code]
                                                         ].Id,
-                                                        brandName
+                                                        brandName,
+                                                        cancellationToken
                                                     );
                                                 }
                                                 else
@@ -341,17 +370,19 @@ namespace Adex.Business
                                                     var lastName = csv[idx_benef_nom]?.Trim();
                                                     var firstName = csv[idx_benef_prenom]?.Trim();
 
-                                                    con.InsertMetadata(
+                                                    await con.InsertMetadataAsync(
                                                         benef.Id,
                                                         _existingMembers[
                                                             header[idx_benef_prenom]
                                                         ].Id,
-                                                        firstName
+                                                        firstName,
+                                                        cancellationToken
                                                     );
-                                                    con.InsertMetadata(
+                                                    await con.InsertMetadataAsync(
                                                         benef.Id,
                                                         _existingMembers[header[idx_benef_nom]].Id,
-                                                        lastName
+                                                        lastName,
+                                                        cancellationToken
                                                     );
                                                 }
 
@@ -396,7 +427,10 @@ namespace Adex.Business
                                             {
                                                 Reference = externalIdLink,
                                             };
-                                            entity.Id = con.InsertEntity(entity);
+                                            entity.Id = await con.InsertEntityAsync(
+                                                entity,
+                                                cancellationToken
+                                            );
                                             _existingReferences.Add(entity.Reference, entity);
 
                                             var link = new Link
@@ -407,11 +441,12 @@ namespace Adex.Business
                                                 From = company,
                                                 To = benef,
                                             };
-                                            con.InsertLink(link);
-                                            con.InsertMetadata(
+                                            await con.InsertLinkAsync(link, cancellationToken);
+                                            await con.InsertMetadataAsync(
                                                 link.Id,
                                                 _existingMembers[headerAmountName].Id,
-                                                Convert.ToDecimal(amount, _cultureFr).ToString()
+                                                Convert.ToDecimal(amount, _cultureFr).ToString(),
+                                                cancellationToken
                                             );
 
                                             counterBonds++;
@@ -419,6 +454,10 @@ namespace Adex.Business
                                     }
                                 }
                             }
+                        }
+                        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                        {
+                            throw;
                         }
                         catch (Exception e)
                         {
@@ -464,7 +503,11 @@ namespace Adex.Business
             );
         }
 
-        public GraphDataSet LinksToJson(string txt, int? take)
+        public async Task<GraphDataSet> LinksToJsonAsync(
+            string txt,
+            int take,
+            CancellationToken cancellationToken
+        )
         {
             var retour = new GraphDataSet() { ForceDirectedData = new ForceDirectedData() };
 
@@ -497,11 +540,18 @@ from
 	inner join ""Members"" pmb2 on pmb2.""Id"" = pm2.""Member_Id"" and pmb2.""Name"" = 'benef_prenom'";
             var result = new List<QueryResult>();
 
-            using (var con = new NpgsqlConnection(_dbConnectionString))
+            await using (var con = new NpgsqlConnection(_dbConnectionString))
             {
-                con.Open();
-
-                result = con.Query<QueryResult>(query, commandTimeout: 3600).ToList();
+                await con.OpenAsync(cancellationToken);
+                result = (
+                    await con.QueryAsync<QueryResult>(
+                        new CommandDefinition(
+                            query,
+                            commandTimeout: 3600,
+                            cancellationToken: cancellationToken
+                        )
+                    )
+                ).ToList();
             }
 
             //retour.BundlingItems.AddRange(result.Select(x => x.Company).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));
@@ -559,7 +609,10 @@ from
             return retour;
         }
 
-        public Dictionary<string, string> GetBeneficiary(string reference)
+        public async Task<Dictionary<string, string>> GetBeneficiaryAsync(
+            string reference,
+            CancellationToken cancellationToken
+        )
         {
             var retour = new Dictionary<string, string>();
 
@@ -572,12 +625,15 @@ from
 where
 	b.""Entity_Id"" = (select ""Id"" from ""Entities"" where ""Reference"" = @reference)";
 
-            using (var con = new NpgsqlConnection(_dbConnectionString))
+            await using (var con = new NpgsqlConnection(_dbConnectionString))
             {
-                var rows = con.Query<(string Key, string Value)>(
-                    query,
-                    new { reference },
-                    commandTimeout: 3600
+                var rows = await con.QueryAsync<(string Key, string Value)>(
+                    new CommandDefinition(
+                        query,
+                        new { reference },
+                        commandTimeout: 3600,
+                        cancellationToken: cancellationToken
+                    )
                 );
                 foreach (var row in rows)
                 {
@@ -588,29 +644,39 @@ where
             return retour;
         }
 
-        public Dictionary<string, string> Search(string txt)
+        public async Task<Dictionary<string, string>> SearchAsync(
+            string txt,
+            CancellationToken cancellationToken
+        )
         {
             var retour = new Dictionary<string, string>();
 
-            using (var con = new NpgsqlConnection(_dbConnectionString))
+            await using (var con = new NpgsqlConnection(_dbConnectionString))
             {
-                var entity = con.QuerySingleOrDefault<Entity>(
-                    "select * from \"Entities\" where \"Reference\" = @reference",
-                    new { reference = txt },
-                    commandTimeout: 3600
+                await con.OpenAsync(cancellationToken);
+                var entity = await con.QuerySingleOrDefaultAsync<Entity>(
+                    new CommandDefinition(
+                        "select * from \"Entities\" where \"Reference\" = @reference",
+                        new { reference = txt },
+                        commandTimeout: 3600,
+                        cancellationToken: cancellationToken
+                    )
                 );
                 if (entity is null)
                 {
                     return retour;
                 }
 
-                var rows = con.Query<(string Key, string Value)>(
-                    @"select m.""Name"" as ""Key"", d.""Value""
+                var rows = await con.QueryAsync<(string Key, string Value)>(
+                    new CommandDefinition(
+                        @"select m.""Name"" as ""Key"", d.""Value""
 from ""Metadatas"" d
 inner join ""Members"" m on m.""Id"" = d.""Member_Id""
 where d.""Entity_Id"" = @entityId",
-                    new { entityId = entity.Id },
-                    commandTimeout: 3600
+                        new { entityId = entity.Id },
+                        commandTimeout: 3600,
+                        cancellationToken: cancellationToken
+                    )
                 );
                 foreach (var row in rows)
                 {
@@ -621,7 +687,7 @@ where d.""Entity_Id"" = @entityId",
             return retour;
         }
 
-        public void Save()
+        public Task SaveAsync(CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

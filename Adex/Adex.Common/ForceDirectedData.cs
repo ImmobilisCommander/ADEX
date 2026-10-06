@@ -4,16 +4,16 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Adex.Common
 {
     public class ForceDirectedData
     {
-        [JsonProperty("links")]
+        [JsonPropertyName("links")]
         public List<ForceDirectedLinkItem> ForceDirectedLinks { get; private set; }
 
-        [JsonProperty("nodes")]
+        [JsonPropertyName("nodes")]
         public List<ForceDirectedNodeItem> ForceDirectedNodes { get; private set; }
 
         public ForceDirectedData()

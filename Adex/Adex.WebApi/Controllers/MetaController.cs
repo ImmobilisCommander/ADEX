@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Adex.Business;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,9 +23,11 @@ namespace Adex.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("search/{txt}")]
-        public ActionResult Search(string txt)
+        public async Task<ActionResult> Search(string txt, CancellationToken cancellationToken)
         {
-            return new JsonResult(_metadataLookupService.Search(txt));
+            return new JsonResult(
+                await _metadataLookupService.SearchAsync(txt, cancellationToken)
+            );
         }
     }
 }

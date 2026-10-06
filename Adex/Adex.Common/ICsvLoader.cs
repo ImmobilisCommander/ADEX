@@ -4,7 +4,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Adex.Common
 {
@@ -18,33 +19,15 @@ namespace Adex.Common
         /// <summary>
         /// Load reference data from entities table
         /// </summary>
-        void LoadReferences();
+        Task LoadReferencesAsync(CancellationToken cancellationToken);
 
-        /// <summary>
-        /// Loads interest bonds providers
-        /// </summary>
-        /// <param name="path">Path to the source data</param>
-        void LoadProviders(string path);
+        Task LoadProvidersAsync(string path, CancellationToken cancellationToken);
 
-        /// <summary>
-        /// Loads interests bonds. Adds beneficiaries and eventually adds missing providers.
-        /// </summary>
-        /// <param name="path">Path to the source data</param>
-        void LoadLinks(string path);
+        Task LoadLinksAsync(string path, CancellationToken cancellationToken);
 
         /// <summary>
         /// Save data loaded
         /// </summary>
-        void Save();
-
-        /// <summary>
-        /// Loads interest bonds and filter results with text to search passed as parameter
-        /// </summary>
-        /// <param name="txt">Text to search</param>
-        /// <param name="take">Number of records to return</param>
-        /// <returns></returns>
-        GraphDataSet LinksToJson(string txt, int? take);
-
-        Dictionary<string, string> GetBeneficiary(string reference);
+        Task SaveAsync(CancellationToken cancellationToken);
     }
 }
