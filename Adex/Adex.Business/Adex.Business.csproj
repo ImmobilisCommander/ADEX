@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="CsvHelper" />
-    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Dapper" />
     <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Npgsql" />
   </ItemGroup>
 
   <ItemGroup>

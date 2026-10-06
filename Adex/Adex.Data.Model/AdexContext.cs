@@ -21,5 +21,17 @@ namespace Adex.Data.Model
 
         public AdexContext(DbContextOptions<AdexContext> options)
             : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Entity>().HasIndex(entity => entity.Reference).IsUnique();
+
+            var link = modelBuilder.Entity<Link>();
+            link.HasOne(entity => entity.From).WithMany().HasForeignKey(entity => entity.From_Id);
+            link.HasOne(entity => entity.To).WithMany().HasForeignKey(entity => entity.To_Id);
+            link.Property(entity => entity.Date).HasColumnType("timestamp without time zone");
+        }
     }
 }

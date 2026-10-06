@@ -12,34 +12,39 @@ La solution Visual Studio `Adex/Adex.sln` contient les projets suivants :
 | `Adex.Business` | Chargement CSV, transformations et opérations de recherche. |
 | `Adex.WebApi` | API HTTP ASP.NET Core avec contrôleurs. |
 | `Adex.Mvc` | Application ASP.NET Core MVC, vues Razor et ressources statiques. |
-| `Adex.Web` | Client Vue/TypeScript et artefacts de construction Vue CLI. |
-| `Adex.App` | Projet d’application distinct référencé dans la solution. |
 
-Les projets .NET ciblent `netcoreapp3.1`. Le client `Adex.Web` utilise Node.js et Vue CLI (`Adex/Adex.Web/package.json`, `Adex/Adex.Web/Adex.Web.njsproj`).
+Les six projets .NET de la solution ciblent `net10.0` via `Adex/Directory.Build.props`. Les versions des dépendances NuGet sont centralisées dans `Adex/Directory.Packages.props`. Les projets `Adex.Web` (Vue/Node.js) et `Adex.App` ont été supprimés et ne font plus partie de la solution.
 
 ## Technologies et flux
 
 - **Import CSV :** `CsvHelper` et un lecteur personnalisé ; encodage UTF-8 déclaré par le chargeur normalisé et culture `fr-FR` pour interpréter les dates (`Adex/Adex.Business/CsvLoaderNormalized.cs`).
-- **Persistance :** Entity Framework et migrations dans les projets de données ; des opérations SQL sont également présentes dans le code métier.
-- **API :** contrôleurs ASP.NET Core et routage par attributs dans `Adex.WebApi`.
+- **Persistance :** les deux contextes utilisent Entity Framework Core avec le fournisseur PostgreSQL Npgsql. `AdexContext` gère le modèle relationnel et `AdexMetaContext` les métadonnées. Les chargements utilisant Dapper passent également par Npgsql.
+- **API :** contrôleurs ASP.NET Core et routage par attributs dans `Adex.WebApi`, initialisés via l’hébergement minimal (`WebApplication.CreateBuilder` et `builder.Services`) sans fichier `Startup`. Swagger UI est disponible à `/swagger` en environnement de développement.
 - **Interface serveur :** vues MVC ASP.NET Core et contenu statique servi depuis `wwwroot`.
-- **Interface JavaScript :** client Vue distinct, ainsi que des scripts et données JSON de graphe dans les ressources Web.
+- **Visualisation JavaScript :** scripts de graphe présents dans les ressources statiques de `Adex.Mvc`.
+- **Injection de dépendances :** les fabriques de contextes EF Core et les services de recherche sont configurés dans le démarrage API. Les contrôleurs dépendent d’interfaces métier et les services sont limités à la durée d’une requête. MVC utilise un client HTTP typé enregistré par `AddHttpClient`.
+- **Journalisation :** les deux hôtes web utilisent Serilog configuré dans leurs fichiers `appsettings.json`, avec sorties console et fichier sous `D:\Logs`. Chaque application a son propre fichier avec rotation journalière, limite de 20 Mio par fichier et conservation de 10 fichiers. Les requêtes HTTP sont journalisées par `UseSerilogRequestLogging`; Npgsql journalise les commandes SQL sans valeurs de paramètres. Le niveau général est `Information`, les catégories Microsoft bruyantes sont relevées à `Warning`, et les événements de durée de vie de l’hôte restent en `Information`.
 
-Les résultats de recherche sont modélisés par des objets de graphe partagés (`Adex/Adex.Common/GraphDataSet.cs`, `ForceDirectedData.cs`).
+Les résultats de recherche sont modélisés par des objets de graphe partagés (`Adex/Adex.Common/GraphDataSet.cs`, `ForceDirectedData.cs`). Chaque contexte possède maintenant une migration initiale EF Core et un snapshot correspondant. Ces migrations ciblent deux bases séparées et ne sont pas exécutées automatiquement au démarrage.
 
 ## Configuration et intégration
 
-Le contrôleur de métadonnées déclare `GET /api/meta/search/{txt}` au moyen de `[Route("api/[controller]")]` et `[Route("search/{txt}")]` (`Adex/Adex.WebApi/Controllers/MetaController.cs`).
+Les routes API comprennent notamment `GET /api/meta/search/{txt}`, `GET /api/link/search/{txt}` et `GET /api/beneficiary/info/{reference}`. MVC appelle les routes de liens et de bénéficiaire via `AdexApiClient`; son adresse de base est fournie par la configuration `AdexApi:BaseAddress` plutôt que construite dans les contrôleurs.
 
-L’action de recherche MVC appelle `https://localhost:44329/api/search/{txt}` (`Adex/Adex.Mvc/Controllers/HomeController.cs`). Ce chemin ne correspond pas à la route de recherche du contrôleur de métadonnées et dépend d’une URL locale codée en dur. Il existe donc un écart d’intégration à résoudre ou à expliquer avant de considérer ce parcours comme fonctionnel.
+Les chaînes `Adex` et `AdexMeta` des bases PostgreSQL sont exigées par l’hôte API et lues depuis la configuration. Les fichiers `appsettings.Development.json` précisent l’hôte, le port et les noms des bases sans mot de passe ; chaque environnement doit fournir les identifiants par une source de configuration sécurisée (variables d’environnement, User Secrets ou gestionnaire de secrets). Les fabriques de conception EF utilisent les variables `ConnectionStrings__Adex` et `ConnectionStrings__AdexMeta`.
 
-Le contrôleur de métadonnées configure aussi une connexion SQL Server LocalDB en dur (`MetaController.cs`). Il s’agit d’une configuration locale, pas d’une configuration de déploiement portable.
+Les migrations initiales ont été générées séparément pour `AdexContext` et `AdexMetaContext`. La connexion au serveur PostgreSQL local a été vérifiée en lecture seule, mais les bases `Adex` et `AdexMeta` n’y existent pas encore. Aucun schéma n’a été appliqué. Voir [Migrations PostgreSQL](007_postgresql_migrations.md) pour la génération et les précautions avant application.
 
-Les projets MVC, API et Vue coexistent, mais le dépôt ne désigne pas d’interface de référence ni ne démontre qu’ils sont tous utilisés ensemble.
+Les projets MVC et API coexistent et le client HTTP est configuré pour les relier. L’intégration de bout en bout dépend toutefois de la disponibilité de l’API et de ses bases.
+
+Le package Dapper est référencé directement par `Adex.Business`, qui contient ses appels SQL. Les projets de données ne portent plus cette dépendance.
+
+Les fichiers suivent les préfixes `Adex.Mvc-` et `Adex.WebApi-`, suivis de la date ; les fichiers roulés pour dépassement de taille reçoivent un suffixe numérique. Les processus doivent disposer des droits d’écriture sur `D:\Logs`. Les seuils et chemins sont déclaratifs dans `Adex/Adex.Mvc/appsettings.json` et `Adex/Adex.WebApi/appsettings.json`.
 
 ## Limites techniques constatées
 
-- La cible .NET Core 3.1 est ancienne ; vérifier les contraintes de support et prévoir sa mise à niveau.
-- La connexion LocalDB et l’URL API codée en dur limitent la portabilité.
-- Les données JSON statiques et les différentes interfaces peuvent constituer des prototypes, des essais ou des chemins alternatifs ; leur statut n’est pas explicité dans le dépôt.
+- La cible de la solution est désormais `net10.0`, centralisée dans `Directory.Build.props`.
+- Plusieurs versions de dépendances dans `Directory.Packages.props` utilisent des plages flottantes ; la version restaurée peut donc évoluer sans modification du fichier.
+- Les migrations initiales sont des migrations EF Core propres, sans reprise de l’historique EF6. Avant toute application à une base contenant déjà des données ou un schéma, il faut comparer les schémas et planifier leur migration ; aucune migration automatique n’est exécutée au démarrage.
+- `CsvLoaderNormalized.GetBeneficiary` et `CvsLoaderMetadata.GetBeneficiary` ne sont pas tous deux opérationnels : la version métadonnées lève encore `NotImplementedException`, malgré la route API qui l’appelle.
 - Les points incomplets et scénarios de validation sont détaillés dans [Tests](005_testing.md) et [Recommandations](006_recommendations.md).

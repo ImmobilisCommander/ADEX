@@ -1,22 +1,18 @@
-﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net;
 using System.Threading.Tasks;
 using Adex.Mvc.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Threading;
 
 namespace Adex.Mvc.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly Stopwatch _stopwatch = new Stopwatch();
+        private readonly AdexApiClient _apiClient;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(AdexApiClient apiClient)
         {
-            _logger = logger;
+            _apiClient = apiClient;
         }
 
         public IActionResult Index()
@@ -26,21 +22,9 @@ namespace Adex.Mvc.Controllers
 
         [HttpGet]
         [Route("Search/{txt}")]
-        public async Task<ActionResult> Search(string txt)
+        public async Task<ActionResult> Search(string txt, CancellationToken cancellationToken)
         {
-            _stopwatch.Restart();
-            Dictionary<string, string> data = null;
-
-            using (var c = new WebClient())
-            {
-                data = JsonConvert.DeserializeObject<Dictionary<string, string>>(
-                    await c.DownloadStringTaskAsync($"https://localhost:44329/api/search/{txt}")
-                );
-            }
-
-            _stopwatch.Stop();
-            data.Add("Elapsed time", $"{_stopwatch.Elapsed.TotalMilliseconds} ms");
-
+            var data = await _apiClient.SearchLinksAsync(txt, cancellationToken);
             return new JsonResult(data);
         }
 

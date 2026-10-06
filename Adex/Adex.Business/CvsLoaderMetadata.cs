@@ -10,7 +10,7 @@ using CsvHelper.Configuration;
 
 using Dapper;
 
-using Microsoft.Data.SqlClient;
+using Npgsql;
 
 using System;
 using System.Collections.Generic;
@@ -21,11 +21,10 @@ using System.Text;
 
 namespace Adex.Business
 {
-    public class CvsLoaderMetadata : IDisposable, ICsvLoader
+    public class CvsLoaderMetadata : IDisposable, ICsvLoader, ILinkSearchService, IMetadataLookupService
     {
         public event EventHandler<MessageEventArgs> OnMessage;
 
-        private CsvConfiguration _configuration = null;
         private CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
 
         private Dictionary<string, Entity> _existingReferences = null;
@@ -33,30 +32,38 @@ namespace Adex.Business
         private int _mainCounter = 0;
         private bool _disposedValue;
 
-        public string DbConnectionString { get; set; }
+        private readonly string _dbConnectionString;
 
-        public CvsLoaderMetadata()
+        public CvsLoaderMetadata(string dbConnectionString)
         {
-            _configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+            _dbConnectionString = string.IsNullOrWhiteSpace(dbConnectionString)
+                ? throw new ArgumentException(
+                    "A metadata database connection string is required.",
+                    nameof(dbConnectionString)
+                )
+                : dbConnectionString;
+        }
+
+        private CsvConfiguration CreateConfiguration()
+        {
+            return new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                MissingFieldFound = delegate (string[] tab, int count, ReadingContext ctxt)
-                {
+                Delimiter = ",",
+                MissingFieldFound = args =>
                     OnMessage?.Invoke(
                         this,
                         new MessageEventArgs
                         {
-                            Message = $"Missing field found at index {count}: \"{tab[count]}\"",
+                            Message =
+                                $"Missing field found at index {args.Index}: \"{string.Join(",", args.HeaderNames ?? Array.Empty<string>())}\"",
                             Level = Level.Error,
                         }
-                    );
-                },
-                BadDataFound = delegate (ReadingContext ctxt)
-                {
+                    ),
+                BadDataFound = args =>
                     OnMessage?.Invoke(
                         this,
-                        new MessageEventArgs { Message = ctxt.RawRecord, Level = Level.Error }
-                    );
-                },
+                        new MessageEventArgs { Message = args.RawRecord, Level = Level.Error }
+                    ),
                 HasHeaderRecord = true,
                 Encoding = Encoding.UTF8,
             };
@@ -71,12 +78,11 @@ namespace Adex.Business
         {
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Loading reference data" });
 
-            using (var con = new SqlConnection(DbConnectionString))
+            using (var con = new NpgsqlConnection(_dbConnectionString))
             {
-                con.Open();
-                _existingReferences = con.Query<Entity>("select * from Entities")
+                _existingReferences = con.Query<Entity>("select * from \"Entities\"")
                     .ToDictionary(x => x.Reference);
-                _existingMembers = con.Query<Member>("select * from Members")
+                _existingMembers = con.Query<Member>("select * from \"Members\"")
                     .ToDictionary(x => x.Name);
             }
 
@@ -93,18 +99,17 @@ namespace Adex.Business
             int counter = 0;
             using (var sr = new StreamReader(path, true))
             {
-                using (var csv = new CustomCsvReader(sr, _configuration))
+                using (var csv = new CustomCsvReader(sr, CreateConfiguration()))
                 {
-                    csv.Configuration.Delimiter = ",";
                     csv.Read();
                     csv.ReadHeader();
 
-                    using (var con = new SqlConnection(DbConnectionString))
+                    using (var con = new NpgsqlConnection(_dbConnectionString))
                     {
                         con.Open();
 
                         #region AJOUT DES EN-TÊTES MANQUANTS
-                        var header = csv.Context.HeaderRecord;
+                        var header = csv.HeaderRecord;
                         var membersToAdd = header
                             .Except(_existingMembers.Select(x => x.Key))
                             .ToList();
@@ -127,9 +132,9 @@ namespace Adex.Business
                                 var entity = new Entity() { Reference = externalId };
                                 entity.Id = con.InsertEntity(entity);
 
-                                for (int i = 0; i < csv.Context.HeaderRecord.Length; i++)
+                                for (int i = 0; i < csv.HeaderRecord.Length; i++)
                                 {
-                                    var col = csv.Context.HeaderRecord[i];
+                                    var col = csv.HeaderRecord[i];
                                     var id = con.InsertMetadata(
                                         entity.Id,
                                         _existingMembers[col].Id,
@@ -217,7 +222,7 @@ namespace Adex.Business
                     idx_date_avantage = header.GetFieldIndex(CsvColumnsName.RemuDate);
                 }
 
-                using (var con = new SqlConnection(DbConnectionString))
+                using (var con = new NpgsqlConnection(_dbConnectionString))
                 {
                     con.Open();
 
@@ -464,63 +469,39 @@ namespace Adex.Business
             var retour = new GraphDataSet() { ForceDirectedData = new ForceDirectedData() };
 
             string query =
-                @"select a.Reference as Company, am.Value as Designation, p.Reference as Beneficiary, pm1.Value + ' ' + pm2.Value as SocialDenomination, b.NumberOfLinks, b.Amount
+                @"select a.""Reference"" as ""Company"", am.""Value"" as ""Designation"", p.""Reference"" as ""Beneficiary"", pm1.""Value"" || ' ' || pm2.""Value"" as ""SocialDenomination"", b.""NumberOfLinks"", b.""Amount""
 from
 	(
 	select
-		l.From_Id, l.To_Id, count(*) as NumberOfLinks, SUM(CONVERT(decimal, lm.Value)) as Amount
+		l.""From_Id"", l.""To_Id"", count(*) as ""NumberOfLinks"", SUM(lm.""Value""::numeric) as ""Amount""
 	from
-		Links l
-		inner join Metadatas lm on lm.Entity_Id = l.Id
-		inner join Members lmb on lmb.Id = lm.Member_Id
+		""Links"" l
+		inner join ""Metadatas"" lm on lm.""Entity_Id"" = l.""Id""
+		inner join ""Members"" lmb on lmb.""Id"" = lm.""Member_Id""
 	where
-		lmb.Name like '%_montant_ttc'
+		lmb.""Name"" like '%_montant_ttc'
 	group by
-		l.From_Id, l.To_Id
+		l.""From_Id"", l.""To_Id""
 	having
-		SUM(CONVERT(decimal, lm.Value)) > 30000
+		SUM(lm.""Value""::numeric) > 30000
 	) b
 
-	inner join Entities a on a.Id = b.From_Id
-	inner join Metadatas am on am.Entity_Id = a.Id
-	inner join Members amb on amb.Id = am.Member_Id and amb.Name = 'denomination_sociale'
+	inner join ""Entities"" a on a.""Id"" = b.""From_Id""
+	inner join ""Metadatas"" am on am.""Entity_Id"" = a.""Id""
+	inner join ""Members"" amb on amb.""Id"" = am.""Member_Id"" and amb.""Name"" = 'denomination_sociale'
 
-	inner join Entities p on p.Id = b.To_Id
-	inner join Metadatas pm1 on pm1.Entity_Id = p.Id
-	inner join Members pmb1 on pmb1.Id = pm1.Member_Id and pmb1.Name = 'benef_nom'
-	inner join Metadatas pm2 on pm2.Entity_Id = p.Id
-	inner join Members pmb2 on pmb2.Id = pm2.Member_Id and pmb2.Name = 'benef_prenom'";
+	inner join ""Entities"" p on p.""Id"" = b.""To_Id""
+	inner join ""Metadatas"" pm1 on pm1.""Entity_Id"" = p.""Id""
+	inner join ""Members"" pmb1 on pmb1.""Id"" = pm1.""Member_Id"" and pmb1.""Name"" = 'benef_nom'
+	inner join ""Metadatas"" pm2 on pm2.""Entity_Id"" = p.""Id""
+	inner join ""Members"" pmb2 on pmb2.""Id"" = pm2.""Member_Id"" and pmb2.""Name"" = 'benef_prenom'";
             var result = new List<QueryResult>();
 
-            using (var con = new SqlConnection(DbConnectionString))
+            using (var con = new NpgsqlConnection(_dbConnectionString))
             {
                 con.Open();
 
-                using (var cm = new SqlCommand(query, con))
-                {
-                    cm.CommandTimeout = 3600;
-                    cm.CommandType = System.Data.CommandType.Text;
-
-                    using (var reader = cm.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var obj = new QueryResult
-                            {
-                                Company = (string)reader["Company"],
-                                Beneficiary = (string)reader["Beneficiary"],
-                                Designation = (string)reader["Designation"],
-                                SocialDenomination = (string)reader["SocialDenomination"],
-                                NumberOfLinks = (int)reader["NumberOfLinks"],
-                                Amount = (decimal)reader["Amount"],
-                            };
-
-                            result.Add(obj);
-                        }
-                    }
-                }
-
-                //result = con.Query<QueryResult>(query);
+                result = con.Query<QueryResult>(query, commandTimeout: 3600).ToList();
             }
 
             //retour.BundlingItems.AddRange(result.Select(x => x.Company).Distinct().Select(x => new EdgeBundlingItem { Name = x, Imports = new List<string>() }));
@@ -584,30 +565,23 @@ from
 
             var query =
                 $@"select
-	c.Name as [Key], b.Value
+	c.""Name"" as ""Key"", b.""Value""
 from
-	Metadatas b
-	inner join Members c on c.Id = b.Member_Id
+	""Metadatas"" b
+	inner join ""Members"" c on c.""Id"" = b.""Member_Id""
 where
-	b.Entity_Id = (select Id from Entities where Reference = @reference)";
+	b.""Entity_Id"" = (select ""Id"" from ""Entities"" where ""Reference"" = @reference)";
 
-            using (var con = new SqlConnection(DbConnectionString))
+            using (var con = new NpgsqlConnection(_dbConnectionString))
             {
-                con.Open();
-
-                using (var cm = new SqlCommand(query, con))
+                var rows = con.Query<(string Key, string Value)>(
+                    query,
+                    new { reference },
+                    commandTimeout: 3600
+                );
+                foreach (var row in rows)
                 {
-                    cm.CommandTimeout = 3600;
-                    cm.CommandType = System.Data.CommandType.Text;
-                    cm.Parameters.AddWithValue("reference", reference);
-
-                    using (var reader = cm.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            retour.Add(reader[0].ToString(), reader[1].ToString());
-                        }
-                    }
+                    retour.Add(row.Key, row.Value);
                 }
             }
 
@@ -618,32 +592,29 @@ where
         {
             var retour = new Dictionary<string, string>();
 
-            var query =
-                $@"select
-	c.Name as [Key], b.Value
-from
-	Metadatas b
-	inner join Members c on c.Id = b.Member_Id
-where
-	b.Entity_Id = (select Id from Entities where Reference = @reference)";
-
-            using (var con = new SqlConnection(DbConnectionString))
+            using (var con = new NpgsqlConnection(_dbConnectionString))
             {
-                con.Open();
-
-                using (var cm = new SqlCommand(query, con))
+                var entity = con.QuerySingleOrDefault<Entity>(
+                    "select * from \"Entities\" where \"Reference\" = @reference",
+                    new { reference = txt },
+                    commandTimeout: 3600
+                );
+                if (entity is null)
                 {
-                    cm.CommandTimeout = 3600;
-                    cm.CommandType = System.Data.CommandType.Text;
-                    cm.Parameters.AddWithValue("reference", txt);
+                    return retour;
+                }
 
-                    using (var reader = cm.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            retour.Add(reader[0].ToString(), reader[1].ToString());
-                        }
-                    }
+                var rows = con.Query<(string Key, string Value)>(
+                    @"select m.""Name"" as ""Key"", d.""Value""
+from ""Metadatas"" d
+inner join ""Members"" m on m.""Id"" = d.""Member_Id""
+where d.""Entity_Id"" = @entityId",
+                    new { entityId = entity.Id },
+                    commandTimeout: 3600
+                );
+                foreach (var row in rows)
+                {
+                    retour.Add(row.Key, row.Value);
                 }
             }
 
@@ -677,7 +648,6 @@ where
             {
                 if (disposing)
                 {
-                    _configuration = null;
                     _cultureFr = null;
                 }
 

@@ -4,35 +4,34 @@
 // </copyright>
 
 using System;
-using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
 using Adex.Data.MetaModel;
 using CsvHelper;
 using Dapper;
+using Npgsql;
 
 namespace Adex.Business
 {
     internal static class Extensions
     {
-        public static int InsertEntity(this SqlConnection connection, Entity obj)
+        public static int InsertEntity(this NpgsqlConnection connection, Entity obj)
         {
             return connection.ExecuteScalar<int>(
-                "insert into Entities (Reference) values (@Reference);SELECT CAST(SCOPE_IDENTITY() as int)",
+                "insert into \"Entities\" (\"Reference\") values (@Reference) returning \"Id\"",
                 obj
             );
-            ;
         }
 
         public static int InsertMetadata(
-            this SqlConnection connection,
+            this NpgsqlConnection connection,
             int entityId,
             int memberId,
             string value
         )
         {
             return connection.ExecuteScalar<int>(
-                "insert into Metadatas (Entity_Id, Member_Id, Value) values (@Entity_Id, @Member_Id, @Value);SELECT CAST(SCOPE_IDENTITY() as int)",
+                "insert into \"Metadatas\" (\"Entity_Id\", \"Member_Id\", \"Value\") values (@Entity_Id, @Member_Id, @Value) returning \"Id\"",
                 new
                 {
                     Entity_Id = entityId,
@@ -42,18 +41,18 @@ namespace Adex.Business
             );
         }
 
-        public static int InsertMember(this SqlConnection connection, Member obj)
+        public static int InsertMember(this NpgsqlConnection connection, Member obj)
         {
             return connection.ExecuteScalar<int>(
-                "insert into Members ([Name], Alias) values (@Name, @Alias);SELECT CAST(SCOPE_IDENTITY() as int)",
+                "insert into \"Members\" (\"Name\", \"Alias\") values (@Name, @Alias) returning \"Id\"",
                 obj
             );
         }
 
-        public static void InsertLink(this SqlConnection connection, Link obj)
+        public static void InsertLink(this NpgsqlConnection connection, Link obj)
         {
             connection.Execute(
-                "insert into Links (Id, From_Id, To_Id, Kind, Date) values (@Id, @From_Id, @To_Id, @Kind, @Date)",
+                "insert into \"Links\" (\"Id\", \"From_Id\", \"To_Id\", \"Kind\", \"Date\") values (@Id, @From_Id, @To_Id, @Kind, @Date)",
                 obj
             );
         }

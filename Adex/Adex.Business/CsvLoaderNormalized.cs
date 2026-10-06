@@ -5,8 +5,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -16,12 +14,12 @@ using Adex.Common;
 using Adex.Data.Model;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Adex.Business
 {
-    public partial class CsvLoaderNormalized : IDisposable, ICsvLoader
+    public partial class CsvLoaderNormalized : IDisposable, ICsvLoader, ILinkSearchService
     {
-        private CsvConfiguration _configuration = null;
         private CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
         private Timer _timer = null;
         private Dictionary<string, Company> _companies = null;
@@ -30,35 +28,38 @@ namespace Adex.Business
         private HashSet<string> _existingReferences = null;
         private bool disposedValue = false;
         private int _mainCounter = 0;
+        private readonly IDbContextFactory<AdexContext> _contextFactory;
 
         public event EventHandler<MessageEventArgs> OnMessage;
 
-        public CsvLoaderNormalized()
+        private CsvConfiguration CreateConfiguration(string delimiter = ",")
         {
-            _configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+            return new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                MissingFieldFound = delegate(string[] tab, int count, ReadingContext ctxt)
-                {
+                Delimiter = delimiter,
+                MissingFieldFound = args =>
                     OnMessage?.Invoke(
                         this,
                         new MessageEventArgs
                         {
-                            Message = $"Missing field found at index {count}: \"{tab[count]}\"",
+                            Message =
+                                $"Missing field found at index {args.Index}: \"{string.Join(",", args.HeaderNames ?? Array.Empty<string>())}\"",
                             Level = Level.Error,
                         }
-                    );
-                },
-                BadDataFound = delegate(ReadingContext ctxt)
-                {
+                    ),
+                BadDataFound = args =>
                     OnMessage?.Invoke(
                         this,
-                        new MessageEventArgs { Message = ctxt.RawRecord, Level = Level.Error }
-                    );
-                },
+                        new MessageEventArgs { Message = args.RawRecord, Level = Level.Error }
+                    ),
                 HasHeaderRecord = true,
                 Encoding = Encoding.UTF8,
             };
+        }
 
+        public CsvLoaderNormalized(IDbContextFactory<AdexContext> contextFactory)
+        {
+            _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
             _timer = new Timer(10000);
             _timer.Elapsed += delegate(object sender, ElapsedEventArgs e)
             {
@@ -82,7 +83,7 @@ namespace Adex.Business
 
         public void LoadReferences()
         {
-            using (var db = new AdexContext())
+            using (var db = _contextFactory.CreateDbContext())
             {
                 _existingReferences = new HashSet<string>(db.Entities.Select(x => x.Reference));
             }
@@ -98,7 +99,7 @@ namespace Adex.Business
             int counter = 0;
             using (var sr = new StreamReader(path, true))
             {
-                using (var csv = new CustomCsvReader(sr, _configuration))
+                using (var csv = new CustomCsvReader(sr, CreateConfiguration()))
                 {
                     csv.Read();
                     csv.ReadHeader();
@@ -155,9 +156,8 @@ namespace Adex.Business
 
             using (var sr = new StreamReader(path, true))
             {
-                using (var csv = new CustomCsvReader(sr, _configuration))
+                using (var csv = new CustomCsvReader(sr, CreateConfiguration(";")))
                 {
-                    csv.Configuration.Delimiter = ";";
                     csv.Read();
                     csv.ReadHeader();
 
@@ -274,7 +274,7 @@ namespace Adex.Business
                                 this,
                                 new MessageEventArgs
                                 {
-                                    Message = $"\"{path}\" {e.Message}: {csv.Context.RawRecord}",
+                                    Message = $"\"{path}\" {e.Message}: {csv.Context.Parser.RawRecord}",
                                 }
                             );
                         }
@@ -306,7 +306,7 @@ namespace Adex.Business
 
         public void Save()
         {
-            using (var db = new AdexContext())
+            using (var db = _contextFactory.CreateDbContext())
             {
                 using (var t = db.Database.BeginTransaction())
                 {
@@ -344,32 +344,6 @@ namespace Adex.Business
                             }
                         );
                     }
-                    catch (DbEntityValidationException e)
-                    {
-                        foreach (var x in e.EntityValidationErrors)
-                        {
-                            OnMessage?.Invoke(
-                                this,
-                                new MessageEventArgs
-                                {
-                                    Message = x.Entry.Entity.GetType().Name,
-                                    Level = Level.Error,
-                                }
-                            );
-                            foreach (var y in x.ValidationErrors)
-                            {
-                                OnMessage?.Invoke(
-                                    this,
-                                    new MessageEventArgs
-                                    {
-                                        Message = $"{y.PropertyName}: {y.ErrorMessage}",
-                                        Level = Level.Error,
-                                    }
-                                );
-                            }
-                        }
-                        t.Rollback();
-                    }
                     catch (Exception e)
                     {
                         OnMessage?.Invoke(
@@ -395,35 +369,27 @@ namespace Adex.Business
             var retour = new GraphDataSet();
 
             var links = new List<Link>();
-            using (var db = new AdexContext())
+            using (var db = _contextFactory.CreateDbContext())
             {
-                db.Database.Log = (log) =>
-                {
-                    OnMessage?.Invoke(
-                        this,
-                        new MessageEventArgs { Level = Level.Debug, Message = log }
-                    );
-                };
-
                 if (!string.IsNullOrEmpty(txt))
                 {
                     if (db.Entities.Any(x => x.Reference.Contains(txt)))
                     {
                         links.AddRange(
-                            db.Links.Include("From")
-                                .Include("To")
+                            db.Links.Include(link => link.From)
+                                .Include(link => link.To)
                                 .Where(x => x.From.Reference.Contains(txt))
                         );
                         links.AddRange(
-                            db.Links.Include("From")
-                                .Include("To")
+                            db.Links.Include(link => link.From)
+                                .Include(link => link.To)
                                 .Where(x => x.To.Reference.Contains(txt))
                         );
                     }
                 }
                 else
                 {
-                    links = db.Links.Include("From").Include("To").ToList();
+                    links = db.Links.Include(link => link.From).Include(link => link.To).ToList();
                 }
             }
             var all = links
@@ -474,7 +440,6 @@ namespace Adex.Business
                     _beneficiaries = null;
                     _links = null;
 
-                    _configuration = null;
                     _cultureFr = null;
                 }
 

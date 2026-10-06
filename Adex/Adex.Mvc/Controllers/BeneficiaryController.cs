@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
 using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace Adex.Mvc.Controllers
 {
@@ -12,29 +8,19 @@ namespace Adex.Mvc.Controllers
     [ApiController]
     public class BeneficiaryController : ControllerBase
     {
-        private readonly ILogger<BeneficiaryController> _logger;
-        private readonly Stopwatch _stopwatch = new Stopwatch();
+        private readonly AdexApiClient _apiClient;
+
+        public BeneficiaryController(AdexApiClient apiClient)
+        {
+            _apiClient = apiClient;
+        }
 
         [HttpGet]
         [Route("{id}")]
         [Route("Read/{id}")]
-        public async Task<ActionResult> Read(string id)
+        public async Task<ActionResult> Read(string id, CancellationToken cancellationToken)
         {
-            _stopwatch.Restart();
-            Dictionary<string, string> data = null;
-
-            using (var c = new WebClient())
-            {
-                data = JsonConvert.DeserializeObject<Dictionary<string, string>>(
-                    await c.DownloadStringTaskAsync(
-                        $"https://localhost:44329/api/beneficiary/info/{id}"
-                    )
-                );
-            }
-
-            _stopwatch.Stop();
-            data.Add("Elapsed time", $"{_stopwatch.Elapsed.TotalMilliseconds} ms");
-
+            var data = await _apiClient.GetBeneficiaryAsync(id, cancellationToken);
             return new JsonResult(data);
         }
     }
