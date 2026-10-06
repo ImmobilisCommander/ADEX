@@ -49,3 +49,13 @@ Les fichiers suivent les préfixes `Adex.Mvc-` et `Adex.WebApi-`, suivis de la d
 - Les migrations initiales sont des migrations EF Core propres, sans reprise de l’historique EF6. Avant toute application à une base contenant déjà des données ou un schéma, il faut comparer les schémas et planifier leur migration ; aucune migration automatique n’est exécutée au démarrage.
 - `CsvLoaderNormalized.GetBeneficiary` et `CvsLoaderMetadata.GetBeneficiary` ne sont pas tous deux opérationnels : la version métadonnées lève encore `NotImplementedException`, malgré la route API qui l’appelle.
 - Les points incomplets et scénarios de validation sont détaillés dans [Tests](005_testing.md) et [Recommandations](006_recommendations.md).
+
+## Import des données CSV
+
+L’API expose un import en arrière-plan (`Adex.WebApi/Import/ImportJobService.cs`) qui alimente les deux bases : d’abord `AdexMeta` (`CvsLoaderMetadata`), puis `Adex` (`CsvLoaderNormalized`). Chaque étape est indépendante : l’échec de l’une n’interrompt pas l’autre.
+
+- `POST api/import?target=All|Metadata|Normalized` lance l’import (202), ou répond 409 s’il est déjà en cours ; `GET api/import` donne l’état et `DELETE api/import` l’annule.
+- Les routes exigent l’en-tête `X-Api-Key` égal à `Import:ApiKey`. Si cette clé est vide, les routes répondent 404 (fonction désactivée).
+- Les fichiers sont cherchés dans `Import:DataDirectory` (relatif à la racine du projet API) : `entreprise_*.csv` puis `declaration_avantage_*`, `declaration_convention_*` et `declaration_remuneration_*`, en retenant le plus récent par nom. Aucun chemin n’est accepté du client.
+- L’import est relançable : les références déjà présentes sont ignorées (vérifié par une seconde exécution sans nouvelle ligne). Il n’y a pas de transaction commune aux deux bases ; en cas d’interruption, relancer l’import.
+- Les erreurs de lecture signalées par les chargeurs sont comptées par étape (`errorCount`) ; le statut est conservé en mémoire seulement.

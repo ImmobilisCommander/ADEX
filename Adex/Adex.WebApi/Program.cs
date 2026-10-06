@@ -2,6 +2,7 @@ using Adex.Business;
 using Adex.Common;
 using Adex.Data.MetaModel;
 using Adex.Data.Model;
+using Adex.WebApi.Import;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,11 @@ namespace Adex.WebApi
                         .ReadFrom.Services(services)
             );
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(
+                    new System.Text.Json.Serialization.JsonStringEnumConverter()
+                )
+            );
             builder.Services.AddDbContextFactory<AdexContext>((serviceProvider, options) =>
                 options.UseNpgsql(
                     GetRequiredConnectionString(
@@ -80,6 +85,9 @@ namespace Adex.WebApi
             builder.Services.AddScoped<IMetadataLookupService>(provider =>
                 provider.GetRequiredService<CvsLoaderMetadata>()
             );
+
+            builder.Services.Configure<ImportOptions>(builder.Configuration.GetSection("Import"));
+            builder.Services.AddSingleton<ImportJobService>();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
