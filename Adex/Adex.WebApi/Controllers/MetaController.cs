@@ -32,7 +32,8 @@ namespace Adex.WebApi.Controllers
         {
             using (var loader = new CvsLoaderMetadata())
             {
-                loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;Connect Timeout=3600;";
+                loader.DbConnectionString =
+                    @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;Connect Timeout=3600;";
                 loader.OnMessage += Loader_OnMessage;
 
                 return new JsonResult(loader.Search(txt));

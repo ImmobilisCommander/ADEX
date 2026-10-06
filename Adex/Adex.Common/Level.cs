@@ -10,6 +10,6 @@ namespace Adex.Common
         Debug,
         Info,
         Warn,
-        Error
+        Error,
     }
 }

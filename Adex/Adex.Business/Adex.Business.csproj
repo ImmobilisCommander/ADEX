@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="15.0.5" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="CsvHelper" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -14,5 +10,4 @@
     <ProjectReference Include="..\Adex.Data.MetaModel\Adex.Data.MetaModel.csproj" />
     <ProjectReference Include="..\Adex.Data.Model\Adex.Data.Model.csproj" />
   </ItemGroup>
-
 </Project>

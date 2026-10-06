@@ -3,10 +3,10 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Adex.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Adex.Common;
 
 namespace Adex.Data.MetaModel
 {
@@ -14,10 +14,16 @@ namespace Adex.Data.MetaModel
     public class Link : Entity, ILink
     {
         [NotMapped]
-        public int From_Id { get { return From.Id; } }
+        public int From_Id
+        {
+            get { return From.Id; }
+        }
 
         [NotMapped]
-        public int To_Id { get { return To.Id; } }
+        public int To_Id
+        {
+            get { return To.Id; }
+        }
 
         public Entity From { get; set; }
 

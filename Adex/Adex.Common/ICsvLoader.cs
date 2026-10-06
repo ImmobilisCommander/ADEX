@@ -45,7 +45,6 @@ namespace Adex.Common
         /// <returns></returns>
         GraphDataSet LinksToJson(string txt, int? take);
 
-
         Dictionary<string, string> GetBeneficiary(string reference);
     }
 }

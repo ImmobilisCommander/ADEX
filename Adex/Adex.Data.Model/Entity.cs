@@ -3,9 +3,9 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Adex.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Adex.Common;
 
 namespace Adex.Data.Model
 {

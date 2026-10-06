@@ -1,11 +1,11 @@
-﻿using Adex.Mvc.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using Adex.Mvc.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Adex.Mvc.Controllers
 {
@@ -33,7 +33,9 @@ namespace Adex.Mvc.Controllers
 
             using (var c = new WebClient())
             {
-                data = JsonConvert.DeserializeObject<Dictionary<string, string>>(await c.DownloadStringTaskAsync($"https://localhost:44329/api/search/{txt}"));
+                data = JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                    await c.DownloadStringTaskAsync($"https://localhost:44329/api/search/{txt}")
+                );
             }
 
             _stopwatch.Stop();
@@ -45,7 +47,12 @@ namespace Adex.Mvc.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(
+                new ErrorViewModel
+                {
+                    RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                }
+            );
         }
     }
 }

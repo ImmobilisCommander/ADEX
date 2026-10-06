@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Adex.Mvc.Controllers
 {
@@ -25,7 +25,11 @@ namespace Adex.Mvc.Controllers
 
             using (var c = new WebClient())
             {
-                data = JsonConvert.DeserializeObject<Dictionary<string, string>>(await c.DownloadStringTaskAsync($"https://localhost:44329/api/beneficiary/info/{id}"));
+                data = JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                    await c.DownloadStringTaskAsync(
+                        $"https://localhost:44329/api/beneficiary/info/{id}"
+                    )
+                );
             }
 
             _stopwatch.Stop();

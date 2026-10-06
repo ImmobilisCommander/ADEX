@@ -3,8 +3,8 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Adex.Common
 {

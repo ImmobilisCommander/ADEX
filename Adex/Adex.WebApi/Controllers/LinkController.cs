@@ -3,11 +3,11 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Adex.Business;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace Adex.WebApi.Controllers
 {

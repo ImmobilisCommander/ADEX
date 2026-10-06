@@ -3,13 +3,13 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.TypeConversion;
 using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 
 namespace Adex.Business
 {
@@ -24,9 +24,7 @@ namespace Adex.Business
         /// <param name="sr">Stream of the file</param>
         /// <param name="inf">Culture of the file</param>
         public CustomCsvReader(StreamReader sr, CsvConfiguration configuration)
-            : base(sr, configuration)
-        {
-        }
+            : base(sr, configuration) { }
 
         /// <summary>
         /// Get the filed by index if index greater than or equal to 0

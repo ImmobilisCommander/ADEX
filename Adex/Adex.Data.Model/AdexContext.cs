@@ -3,7 +3,7 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Adex.Data.Model
 {
@@ -19,9 +19,7 @@ namespace Adex.Data.Model
 
         public DbSet<FinancialLink> FinancialLinks { get; set; }
 
-        public AdexContext()
-            : base("Adex")
-        {
-        }
+        public AdexContext(DbContextOptions<AdexContext> options)
+            : base(options) { }
     }
 }

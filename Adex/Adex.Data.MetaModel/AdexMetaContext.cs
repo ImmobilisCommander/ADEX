@@ -3,7 +3,7 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Adex.Data.MetaModel
 {
@@ -17,9 +17,7 @@ namespace Adex.Data.MetaModel
 
         public DbSet<Link> Links { get; set; }
 
-        public AdexMetaContext()
-            : base("AdexMeta")
-        {
-        }
+        public AdexMetaContext(DbContextOptions<AdexMetaContext> options)
+            : base(options) { }
     }
 }
