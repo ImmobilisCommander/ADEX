@@ -1,0 +1,101 @@
+﻿@model Adex.Mvc.Models.EntityDetailsViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = Model.Name;
+    var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
+}
+
+<main class="explorer-page entity-page">
+    <a class="back-link" href="/">← Tableau de bord</a>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p class="error-state" role="alert">@Model.ErrorMessage</p>
+    }
+    else
+    {
+    <header class="entity-heading">
+        <div>
+            <p class="entity-type">@Model.Type</p>
+            <h1>@Model.Name</h1>
+            <p class="entity-reference">Référence <span>@Model.Reference</span></p>
+        </div>
+        <a class="plain-link" href="/Search?query=@Uri.EscapeDataString(Model.Reference)">Rechercher une autre entité</a>
+    </header>
+
+    <section class="summary-register entity-totals" aria-label="Synthèse des liens">
+        <div class="summary-item">
+            <span class="summary-label">Liens financiers</span>
+            <strong>@Model.FinancialLinkCount.ToString("N0", frenchCulture)</strong>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Montants vers cette entité</span>
+            <strong>@Model.IncomingAmount.ToString("C0", frenchCulture)</strong>
+        </div>
+        <div class="summary-item summary-total">
+            <span class="summary-label">Montants depuis cette entité</span>
+            <strong>@Model.OutgoingAmount.ToString("C0", frenchCulture)</strong>
+        </div>
+    </section>
+
+    <section class="register-section" aria-labelledby="attributes-title">
+        <div class="section-heading">
+            <h2 id="attributes-title">Informations disponibles</h2>
+            <span class="section-unit">@Model.Attributes.Count.ToString("N0", frenchCulture) attributs</span>
+        </div>
+        @if (Model.Attributes.Count == 0)
+        {
+            <p class="empty-state">Aucune information complémentaire n’est disponible pour cette entité.</p>
+        }
+        else
+        {
+            <dl class="attribute-list">
+            @foreach (var attribute in Model.Attributes)
+            {
+                <div class="attribute-row">
+                    <dt>@(attribute.Name)</dt>
+                    <dd>@(attribute.Value)</dd>
+                </div>
+            }
+            </dl>
+        }
+    </section>
+
+    <section class="register-section entity-links" aria-labelledby="links-title">
+        <div class="section-heading">
+            <h2 id="links-title">Liens financiers</h2>
+            <span class="section-unit">@Model.FinancialLinkCount.ToString("N0", frenchCulture) déclarations</span>
+        </div>
+        @if (Model.FinancialLinks.Count == 0)
+        {
+            <p class="empty-state">Aucun lien financier n’est associé à cette entité.</p>
+        }
+        else
+        {
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr><th scope="col">Sens</th><th scope="col">Contrepartie</th><th scope="col">Typologie</th><th scope="col">Nature / objet</th><th scope="col" class="numeric">Date</th><th scope="col" class="numeric">Montant</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var link in Model.FinancialLinks)
+                    {
+                        <tr>
+                            <td>@(link.Outgoing ? "Vers" : "Depuis")</td>
+                            <th scope="row"><a href="/@Uri.EscapeDataString(link.CounterpartyReference)">@link.CounterpartyName</a><span class="reference-cell">@link.CounterpartyReference</span></th>
+                            <td>@link.DeclarationType</td>
+                            <td>@(string.IsNullOrWhiteSpace(link.Kind) ? "—" : link.Kind)</td>
+                            <td class="numeric">@link.Date.ToString("d", frenchCulture)</td>
+                            <td class="numeric">@link.Amount.ToString("C0", frenchCulture)</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.FinancialLinksTruncated)
+            {
+                <p class="table-note">Les 100 déclarations les plus récentes sont affichées.</p>
+            }
+        }
+    </section>
+    }
+</main>

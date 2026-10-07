@@ -1,0 +1,116 @@
+using System;
+using System.Collections.Generic;
+
+namespace Adex.Mvc.Models
+{
+    public sealed class DashboardViewModel
+    {
+        public string ErrorMessage { get; set; }
+
+        public int EntityCount { get; set; }
+
+        public int FinancialLinkCount { get; set; }
+
+        public decimal TotalAmount { get; set; }
+
+        public List<EntityTypeCountViewModel> EntityTypes { get; set; } = new();
+
+        public List<FinancialLinkTypeViewModel> FinancialLinkTypes { get; set; } = new();
+
+        public List<TopEntityViewModel> TopEntities { get; set; } = new();
+    }
+
+    public sealed class EntityTypeCountViewModel
+    {
+        public string Type { get; set; } = string.Empty;
+
+        public int Count { get; set; }
+    }
+
+    public sealed class FinancialLinkTypeViewModel
+    {
+        public string Type { get; set; } = string.Empty;
+
+        public int Count { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+
+    public sealed class TopEntityViewModel
+    {
+        public string Reference { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
+
+        public string Type { get; set; } = string.Empty;
+
+        public decimal Amount { get; set; }
+    }
+
+    public sealed class EntitySearchResultViewModel
+    {
+        public string Reference { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
+
+        public string Type { get; set; } = string.Empty;
+    }
+
+    public sealed class EntitySearchPageViewModel
+    {
+        public string Query { get; set; } = string.Empty;
+
+        public string ErrorMessage { get; set; }
+
+        public List<EntitySearchResultViewModel> Results { get; set; } = new();
+    }
+
+    public sealed class EntityDetailsViewModel
+    {
+        public string ErrorMessage { get; set; }
+
+        public string Reference { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
+
+        public string Type { get; set; } = string.Empty;
+
+        public decimal OutgoingAmount { get; set; }
+
+        public decimal IncomingAmount { get; set; }
+
+        public int FinancialLinkCount { get; set; }
+
+        public bool FinancialLinksTruncated { get; set; }
+
+        public List<EntityAttributeViewModel> Attributes { get; set; } = new();
+
+        public List<FinancialLinkViewModel> FinancialLinks { get; set; } = new();
+    }
+
+    public sealed class EntityAttributeViewModel
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string Value { get; set; } = string.Empty;
+    }
+
+    public sealed class FinancialLinkViewModel
+    {
+        public string Reference { get; set; } = string.Empty;
+
+        public string CounterpartyReference { get; set; } = string.Empty;
+
+        public string CounterpartyName { get; set; } = string.Empty;
+
+        public string DeclarationType { get; set; } = string.Empty;
+
+        public string Kind { get; set; } = string.Empty;
+
+        public DateTime Date { get; set; }
+
+        public decimal Amount { get; set; }
+
+        public bool Outgoing { get; set; }
+    }
+}

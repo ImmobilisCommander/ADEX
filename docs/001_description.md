@@ -26,13 +26,15 @@ Les constantes de colonnes CSV (`Adex/Adex.Business/CsvColumnsName.cs`) décrive
 | Import de fournisseurs | Lecture d’entreprises depuis un CSV et création d’entités référencées. |
 | Import de déclarations | Lecture de lignes de déclarations, rapprochement d’entreprise et de bénéficiaire, construction de liens. |
 | Recherche | Le contrat métier comprend des opérations pour rechercher des liens et récupérer un bénéficiaire par référence ; l’API comporte des contrôleurs de liens, bénéficiaires et métadonnées. |
-| Visualisation | Des types de données de graphe et des ressources JavaScript sont présents dans le projet MVC. |
+| Tableau de bord | L’accueil présente le nombre d’entités, les liens et montants par type de déclaration, ainsi qu’un classement des dix entités par montant financier cumulé. |
+| Recherche et fiche | La recherche d’entités appelle l’API ; une référence ouvre une fiche à l’adresse `/<référence>`, avec ses attributs et ses liens financiers navigables. |
+| Visualisation | Les indicateurs et fiches sont chargés depuis l’API. L’ancien graphe de démonstration et son fichier JSON local ne sont plus utilisés. |
 
 Voir [Conception](002_design.md) pour les rôles des composants, [Architecture](003_architecture.md) pour les applications et [Règles métier](004_business_rules.md) pour les conditions précises observées.
 
 ## Interfaces présentes
 
-La solution actuelle contient une API ASP.NET Core et une application MVC avec des scripts de visualisation. Les anciens projets `Adex.Web` (Vue) et `Adex.App` ont été supprimés de la solution ; ils ne sont pas décrits ici comme composants actifs.
+La solution actuelle contient une API ASP.NET Core et une application MVC. L’API lit désormais les indicateurs et fiches dans le modèle normalisé enrichi d’attributs. Le transfert des attributs du métamodèle est une étape d’import distincte ; la base source doit être conservée jusqu’à vérification du transfert. Les anciens projets `Adex.Web` (Vue) et `Adex.App` ont été supprimés de la solution ; ils ne sont pas décrits ici comme composants actifs.
 
 ## Périmètre non établi
 

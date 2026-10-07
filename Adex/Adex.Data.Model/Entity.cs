@@ -5,6 +5,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 using Adex.Common;
 
 namespace Adex.Data.Model
@@ -24,5 +25,8 @@ namespace Adex.Data.Model
         [MaxLength(200)]
         [Required]
         public string Reference { get; set; }
+
+        public ICollection<EntityAttribute> Attributes { get; set; } =
+            new List<EntityAttribute>();
     }
 }

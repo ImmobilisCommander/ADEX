@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
+using Adex.Mvc.Models;
 
 namespace Adex.Mvc
 {
@@ -15,28 +19,54 @@ namespace Adex.Mvc
             _httpClient = httpClient;
         }
 
-        public Task<JsonElement> SearchLinksAsync(string text, CancellationToken cancellationToken)
+        public Task<DashboardViewModel> GetDashboardAsync(CancellationToken cancellationToken)
         {
-            return GetJsonAsync($"api/link/search/{Uri.EscapeDataString(text)}", cancellationToken);
+            return GetModelAsync<DashboardViewModel>("api/dashboard", cancellationToken);
         }
 
-        public Task<JsonElement> GetBeneficiaryAsync(
-            string reference,
+        public Task<List<EntitySearchResultViewModel>> SearchEntitiesAsync(
+            string query,
             CancellationToken cancellationToken
         )
         {
-            return GetJsonAsync(
-                $"api/beneficiary/info/{Uri.EscapeDataString(reference)}",
+            return GetModelAsync<List<EntitySearchResultViewModel>>(
+                $"api/entity/search?query={Uri.EscapeDataString(query)}",
                 cancellationToken
             );
         }
 
-        private async Task<JsonElement> GetJsonAsync(
-            string relativeUri,
+        public async Task<EntityDetailsViewModel> GetEntityAsync(
+            string reference,
             CancellationToken cancellationToken
         )
         {
-            using var response = await _httpClient.GetAsync(relativeUri, cancellationToken);
+            using var response = await _httpClient.GetAsync(
+                $"api/entity/{Uri.EscapeDataString(reference)}",
+                cancellationToken
+            );
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<EntityDetailsViewModel>(
+                    cancellationToken
+                )
+                ?? throw new InvalidOperationException(
+                    "The API returned an empty entity response."
+                );
+        }
+
+        public async Task<JsonElement> GetEntityJsonAsync(
+            string reference,
+            CancellationToken cancellationToken
+        )
+        {
+            using var response = await _httpClient.GetAsync(
+                $"api/entity/{Uri.EscapeDataString(reference)}",
+                cancellationToken
+            );
             response.EnsureSuccessStatusCode();
 
             await using var content = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -46,6 +76,17 @@ namespace Adex.Mvc
             );
 
             return document.RootElement.Clone();
+        }
+
+        private async Task<T> GetModelAsync<T>(
+            string relativeUri,
+            CancellationToken cancellationToken
+        )
+        {
+            using var response = await _httpClient.GetAsync(relativeUri, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<T>(cancellationToken)
+                ?? throw new InvalidOperationException("The API returned an empty response.");
         }
     }
 }

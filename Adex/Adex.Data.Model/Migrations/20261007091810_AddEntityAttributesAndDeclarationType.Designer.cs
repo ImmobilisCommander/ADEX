@@ -3,6 +3,7 @@ using System;
 using Adex.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Adex.Data.Model.Migrations
 {
     [DbContext(typeof(AdexContext))]
-    partial class AdexContextModelSnapshot : ModelSnapshot
+    [Migration("20261007091810_AddEntityAttributesAndDeclarationType")]
+    partial class AddEntityAttributesAndDeclarationType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

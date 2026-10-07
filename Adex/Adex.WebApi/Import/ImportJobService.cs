@@ -1,5 +1,6 @@
 using Adex.Business;
 using Adex.Common;
+using Adex.WebApi.Explorer;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -99,12 +100,19 @@ namespace Adex.WebApi.Import
                 };
                 if (target != ImportTarget.Normalized)
                 {
-                    _status.Steps.Add(new ImportStepStatus { Name = nameof(ImportTarget.Metadata) });
+                    _status.Steps.Add(
+                        new ImportStepStatus { Name = nameof(ImportTarget.Metadata) }
+                    );
                 }
 
                 if (target != ImportTarget.Metadata)
                 {
                     _status.Steps.Add(new ImportStepStatus { Name = nameof(ImportTarget.Normalized) });
+                }
+
+                if (target == ImportTarget.All)
+                {
+                    _status.Steps.Reverse();
                 }
 
                 var token = _cancellation.Token;
@@ -133,7 +141,9 @@ namespace Adex.WebApi.Import
         {
             try
             {
-                var files = ResolveFiles();
+                var files = run.Steps.Any(step => step.Name == nameof(ImportTarget.Normalized))
+                    ? ResolveFiles()
+                    : null;
                 foreach (var step in run.Steps.ToList())
                 {
                     await RunStepAsync(step, files, cancellationToken);
@@ -187,9 +197,25 @@ namespace Adex.WebApi.Import
             try
             {
                 await using var scope = _scopeFactory.CreateAsyncScope();
-                ICsvLoader loader = step.Name == nameof(ImportTarget.Metadata)
-                    ? scope.ServiceProvider.GetRequiredService<CvsLoaderMetadata>()
-                    : scope.ServiceProvider.GetRequiredService<CsvLoaderNormalized>();
+                if (step.Name == nameof(ImportTarget.Metadata))
+                {
+                    var transferredCount = await scope.ServiceProvider
+                        .GetRequiredService<MetadataConsolidationService>()
+                        .ConsolidateAsync(cancellationToken);
+
+                    lock (_sync)
+                    {
+                        step.State = ImportState.Completed;
+                    }
+
+                    _logger.LogInformation(
+                        "Consolidated {MetadataCount} metadata records into the normalized database",
+                        transferredCount
+                    );
+                    return;
+                }
+
+                ICsvLoader loader = scope.ServiceProvider.GetRequiredService<CsvLoaderNormalized>();
                 loader.OnMessage += (_, message) =>
                 {
                     if (message.Level == Level.Error)

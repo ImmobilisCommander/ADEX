@@ -20,7 +20,7 @@ namespace Adex.Mvc.Controllers
         [Route("Read/{id}")]
         public async Task<ActionResult> Read(string id, CancellationToken cancellationToken)
         {
-            var data = await _apiClient.GetBeneficiaryAsync(id, cancellationToken);
+            var data = await _apiClient.GetEntityJsonAsync(id, cancellationToken);
             return new JsonResult(data);
         }
     }

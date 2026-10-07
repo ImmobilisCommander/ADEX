@@ -1,0 +1,38 @@
+﻿@model Adex.Mvc.Models.EntitySearchPageViewModel
+@{
+    ViewData["Title"] = "Résultats de recherche";
+}
+
+<main class="explorer-page search-page">
+    <a class="back-link" href="/">← Tableau de bord</a>
+    <section class="register-section">
+        <div class="section-heading">
+            <h1>Résultats de recherche</h1>
+            <span class="section-unit">« @Model.Query »</span>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <p class="error-state" role="alert">@Model.ErrorMessage</p>
+        }
+        else if (Model.Results.Count == 0)
+        {
+            <p class="empty-state">Aucune entité ne correspond à cette recherche. Essayez un nom ou un identifiant différent.</p>
+        }
+        else
+        {
+            <table class="data-table result-table">
+                <thead><tr><th scope="col">Entité</th><th scope="col">Typologie</th><th scope="col">Référence</th></tr></thead>
+                <tbody>
+                @foreach (var result in Model.Results)
+                {
+                    <tr>
+                        <th scope="row"><a href="/@Uri.EscapeDataString(result.Reference)">@result.Name</a></th>
+                        <td>@result.Type</td>
+                        <td class="reference-cell">@result.Reference</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+    </section>
+</main>

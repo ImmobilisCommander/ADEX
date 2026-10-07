@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Adex.Business;
+using Adex.WebApi.Explorer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.WebApi.Controllers
@@ -9,11 +9,11 @@ namespace Adex.WebApi.Controllers
     [ApiController]
     public class BeneficiaryController : ControllerBase
     {
-        private readonly IMetadataLookupService _metadataLookupService;
+        private readonly DataExplorerService _explorer;
 
-        public BeneficiaryController(IMetadataLookupService metadataLookupService)
+        public BeneficiaryController(DataExplorerService explorer)
         {
-            _metadataLookupService = metadataLookupService;
+            _explorer = explorer;
         }
 
         /// <summary>
@@ -28,9 +28,8 @@ namespace Adex.WebApi.Controllers
             CancellationToken cancellationToken
         )
         {
-            return new JsonResult(
-                await _metadataLookupService.GetBeneficiaryAsync(reference, cancellationToken)
-            );
+            var entity = await _explorer.GetEntityAsync(reference, cancellationToken);
+            return entity is null ? NotFound() : new JsonResult(entity);
         }
     }
 }

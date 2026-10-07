@@ -2,6 +2,7 @@ using Adex.Business;
 using Adex.Common;
 using Adex.Data.MetaModel;
 using Adex.Data.Model;
+using Adex.WebApi.Explorer;
 using Adex.WebApi.Import;
 
 using Microsoft.AspNetCore.Builder;
@@ -61,6 +62,7 @@ namespace Adex.WebApi
                     )
                 )
             );
+            builder.Services.AddScoped<DataExplorerService>();
             builder.Services.AddScoped(provider =>
             {
                 var loader = new CsvLoaderNormalized(
@@ -72,19 +74,7 @@ namespace Adex.WebApi
             builder.Services.AddScoped<ILinkSearchService>(provider =>
                 provider.GetRequiredService<CsvLoaderNormalized>()
             );
-            builder.Services.AddScoped(provider =>
-            {
-                var connectionString = GetRequiredConnectionString(
-                    provider.GetRequiredService<IConfiguration>(),
-                    "AdexMeta"
-                );
-                var loader = new CvsLoaderMetadata(connectionString);
-                AttachLogging(provider.GetRequiredService<ILogger<CvsLoaderMetadata>>(), loader);
-                return loader;
-            });
-            builder.Services.AddScoped<IMetadataLookupService>(provider =>
-                provider.GetRequiredService<CvsLoaderMetadata>()
-            );
+            builder.Services.AddScoped<MetadataConsolidationService>();
 
             builder.Services.Configure<ImportOptions>(builder.Configuration.GetSection("Import"));
             builder.Services.AddSingleton<ImportJobService>();
@@ -120,7 +110,6 @@ namespace Adex.WebApi
                 };
 
                 await app.Services.GetRequiredService<IDbContextFactory<AdexContext>>().CreateDbContext().Database.MigrateAsync(app.Lifetime.ApplicationStopping);
-                await app.Services.GetRequiredService<IDbContextFactory<AdexMetaContext>>().CreateDbContext().Database.MigrateAsync(app.Lifetime.ApplicationStopping);
 
                 await app.RunAsync(shutdown.Token);
             }

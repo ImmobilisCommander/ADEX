@@ -59,6 +59,11 @@ namespace Adex.Mvc
             app.UseRouting();
             app.UseAuthorization();
             app.MapControllerRoute(
+                name: "entity",
+                pattern: "{reference:nonfile}",
+                defaults: new { controller = "Entity", action = "Details" }
+            );
+            app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}"
             );

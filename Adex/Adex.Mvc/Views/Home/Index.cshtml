@@ -1,11 +1,161 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Adex.Mvc.Models.DashboardViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Explorer les liens d’intérêt";
+    var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
+    var topAmount = Model.TopEntities.Count == 0
+        ? 0m
+        : Model.TopEntities.Max(entity => entity.Amount);
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <div id="container" class="svg-container">
+<!--
+THESIS: A civic data register makes relationships and totals inspectable, refusing an opaque global network.
+OWN-WORLD: Compact ruled modules, ink-black type, white ground and utility red reserved for active wayfinding.
+STORY: Search an actor, compare the reported totals, then follow a ranked amount into its source entity.
+FIRST VIEWPORT: Search and three headline totals lead; declaration types and the clickable top-ten ledger sit directly below.
+FORM: Dense register mosaic, assigned direction 4; staging keeps every summary attached to legible source rows.
+-->
+<main class="explorer-page">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <p class="error-state" role="alert">@Model.ErrorMessage</p>
+    }
+    <section class="explorer-intro" aria-labelledby="page-title">
+        <div class="intro-copy">
+            <h1 id="page-title">Explorer les liens d’intérêt</h1>
+            <p>Parcourez les entités et les déclarations financières qui les relient.</p>
+        </div>
+        <form class="entity-search" action="/Search" method="get" role="search" data-entity-search>
+            <label for="entity-query">Rechercher une entité</label>
+            <div class="search-controls">
+                <input id="entity-query" name="query" type="search" autocomplete="off"
+                       placeholder="Nom, identifiant…" aria-controls="search-results" />
+                <button type="submit">Rechercher</button>
+            </div>
+            <p class="search-status" aria-live="polite" data-search-status></p>
+            <ul id="search-results" class="search-results" role="listbox" hidden data-search-results></ul>
+        </form>
+    </section>
+
+    @if (string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+    <section class="summary-register" aria-label="Indicateurs généraux">
+        <div class="summary-item">
+            <span class="summary-label">Entités recensées</span>
+            <strong>@Model.EntityCount.ToString("N0", frenchCulture)</strong>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Liens financiers</span>
+            <strong>@Model.FinancialLinkCount.ToString("N0", frenchCulture)</strong>
+        </div>
+        <div class="summary-item summary-total">
+            <span class="summary-label">Montant déclaré cumulé</span>
+            <strong>@Model.TotalAmount.ToString("C0", frenchCulture)</strong>
+        </div>
+    </section>
+
+    <div class="dashboard-grid">
+        <section class="register-section entity-types" aria-labelledby="entity-types-title">
+            <div class="section-heading">
+                <h2 id="entity-types-title">Entités par typologie</h2>
+                <span class="section-unit">nombre</span>
+            </div>
+            @if (Model.EntityTypes.Count == 0 || Model.EntityCount == 0)
+            {
+                <p class="empty-state">Aucune entité n’est disponible dans la base.</p>
+            }
+            else
+            {
+                <table class="data-table">
+                    <thead>
+                        <tr><th scope="col">Typologie</th><th scope="col">Répartition</th><th scope="col" class="numeric">Entités</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var type in Model.EntityTypes)
+                    {
+                        var width = Model.EntityCount == 0 ? 0 : (int)Math.Round(type.Count * 100d / Model.EntityCount);
+                        <tr>
+                            <th scope="row">@type.Type</th>
+                            <td class="bar-cell" aria-label="@width %">
+                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @width%"></span></span>
+                            </td>
+                            <td class="numeric">@type.Count.ToString("N0", frenchCulture)</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+        </section>
+
+        <section class="register-section link-types" aria-labelledby="link-types-title">
+            <div class="section-heading">
+                <h2 id="link-types-title">Liens financiers par typologie</h2>
+                <span class="section-unit">liens · montants</span>
+            </div>
+            @if (Model.FinancialLinkTypes.Count == 0)
+            {
+                <p class="empty-state">Aucune déclaration financière n’est disponible dans la base.</p>
+            }
+            else
+            {
+                <table class="data-table">
+                    <thead>
+                        <tr><th scope="col">Typologie</th><th scope="col">Répartition</th><th scope="col" class="numeric">Liens</th><th scope="col" class="numeric">Montant</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var type in Model.FinancialLinkTypes)
+                    {
+                        var width = Model.FinancialLinkCount == 0 ? 0 : (int)Math.Round(type.Count * 100d / Model.FinancialLinkCount);
+                        <tr>
+                            <th scope="row">@type.Type</th>
+                            <td class="bar-cell" aria-label="@width %">
+                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @width%"></span></span>
+                            </td>
+                            <td class="numeric">@type.Count.ToString("N0", frenchCulture)</td>
+                            <td class="numeric">@type.Amount.ToString("C0", frenchCulture)</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+        </section>
+
+        <section class="register-section top-entities" aria-labelledby="top-entities-title">
+            <div class="section-heading">
+                <h2 id="top-entities-title">Top 10 des entités par montant cumulé</h2>
+                <span class="section-unit">montants déclarés</span>
+            </div>
+            @if (Model.TopEntities.Count == 0)
+            {
+                <p class="empty-state">Le classement apparaîtra lorsque des liens financiers seront disponibles.</p>
+            }
+            else
+            {
+                <ol class="ranking-list">
+                @for (var index = 0; index < Model.TopEntities.Count; index++)
+                {
+                    var entity = Model.TopEntities[index];
+                    var width = topAmount == 0 ? 0 : (int)Math.Round((double)(entity.Amount * 100m / topAmount));
+                    <li>
+                        <a class="ranking-link" href="/@Uri.EscapeDataString(entity.Reference)">
+                            <span class="rank-number">@((index + 1).ToString("D2", frenchCulture))</span>
+                            <span class="ranking-entity">
+                                <span class="ranking-name">@entity.Name</span>
+                                <span class="ranking-meta">@entity.Type · @entity.Reference</span>
+                            </span>
+                            <span class="ranking-bar" aria-hidden="true"><span style="width: @width%"></span></span>
+                            <span class="ranking-amount">@entity.Amount.ToString("C0", frenchCulture)</span>
+                            <span class="ranking-arrow" aria-hidden="true">↗</span>
+                        </a>
+                    </li>
+                }
+                </ol>
+            }
+        </section>
     </div>
-</div>
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="~/js/force-directed.js"></script>
+    }
+</main>
+
+@section Scripts {
+    <script src="~/js/explorer.js" asp-append-version="true"></script>
+}
