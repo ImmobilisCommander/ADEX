@@ -70,7 +70,15 @@ namespace Adex.WebApi.Explorer
 
         public int FinancialLinkCount { get; set; }
 
-        public bool FinancialLinksTruncated { get; set; }
+        public int Page { get; set; } = 1;
+
+        public string Sort { get; set; } = "date";
+
+        public bool Descending { get; set; } = true;
+
+        public int PageSize { get; set; }
+
+        public int PageCount { get; set; } = 1;
 
         public List<EntityAttributeDetails> Attributes { get; set; } = new();
 
@@ -101,6 +109,8 @@ namespace Adex.WebApi.Explorer
         public decimal Amount { get; set; }
 
         public bool Outgoing { get; set; }
+
+        internal string SortName { get; set; }
 
         public List<EntityAttributeDetails> Justification { get; set; } = new();
     }

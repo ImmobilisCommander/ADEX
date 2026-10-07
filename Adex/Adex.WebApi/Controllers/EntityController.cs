@@ -30,10 +30,14 @@ namespace Adex.WebApi.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<EntityDetails>> Get(
             Guid id,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = DataExplorerService.DefaultPageSize,
+            [FromQuery] string sort = "date",
+            [FromQuery] bool descending = true
         )
         {
-            var entity = await _explorer.GetEntityAsync(id, cancellationToken);
+            var entity = await _explorer.GetEntityAsync(id, page, pageSize, sort, descending, cancellationToken);
             return entity is null ? NotFound() : Ok(entity);
         }
     }

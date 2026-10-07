@@ -8,6 +8,7 @@ using Npgsql;
 using NpgsqlTypes;
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -17,6 +18,7 @@ using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -90,7 +92,7 @@ namespace Adex.Business
         };
 
         private const string TruncateSql = """
-            TRUNCATE TABLE "EntityTotals", "EntityAttributes", "FinancialLinks", "Links", "Persons", "Companies", "Entities"
+            TRUNCATE TABLE "FinancialLinkTypeTotals", "EntityTotals", "EntityAttributes", "FinancialLinks", "Links", "Persons", "Companies", "Entities"
             RESTART IDENTITY
             """;
 
@@ -108,20 +110,21 @@ namespace Adex.Business
         };
 
         // Same definitions as the EF migration; dropped before the load and rebuilt afterwards.
-        private static readonly (string Name, string Sql)[] Indexes =
+        // Uniqueness of the EntityAttributes key is guaranteed by the importer (one row per entity).
+        private static readonly (string Name, string Sql, string Drop)[] Indexes =
         {
-            ("IX_EntityAttributes_EntityId_Name", """CREATE UNIQUE INDEX "IX_EntityAttributes_EntityId_Name" ON "EntityAttributes" ("EntityId", "Name")"""),
-            ("IX_Links_From_Id_Date", """CREATE INDEX "IX_Links_From_Id_Date" ON "Links" ("From_Id", "Date")"""),
-            ("IX_Links_To_Id_Date", """CREATE INDEX "IX_Links_To_Id_Date" ON "Links" ("To_Id", "Date")"""),
-            ("IX_Companies_Designation", """CREATE INDEX "IX_Companies_Designation" ON "Companies" USING gin ("Designation" gin_trgm_ops)"""),
-            ("IX_Persons_LastName", """CREATE INDEX "IX_Persons_LastName" ON "Persons" USING gin ("LastName" gin_trgm_ops)"""),
-            ("IX_Persons_FirstName", """CREATE INDEX "IX_Persons_FirstName" ON "Persons" USING gin ("FirstName" gin_trgm_ops)"""),
-            ("IX_EntityTotals_Total", """CREATE INDEX "IX_EntityTotals_Total" ON "EntityTotals" ("Total")"""),
+            ("PK_EntityAttributes", """ALTER TABLE "EntityAttributes" ADD CONSTRAINT "PK_EntityAttributes" PRIMARY KEY ("EntityId")""", """ALTER TABLE "EntityAttributes" DROP CONSTRAINT IF EXISTS "PK_EntityAttributes" """),
+            ("IX_Links_From_Id_Date", """CREATE INDEX "IX_Links_From_Id_Date" ON "Links" ("From_Id", "Date")""", null),
+            ("IX_Links_To_Id_Date", """CREATE INDEX "IX_Links_To_Id_Date" ON "Links" ("To_Id", "Date")""", null),
+            ("IX_Companies_Designation", """CREATE INDEX "IX_Companies_Designation" ON "Companies" USING gin ("Designation" gin_trgm_ops)""", null),
+            ("IX_Persons_LastName", """CREATE INDEX "IX_Persons_LastName" ON "Persons" USING gin ("LastName" gin_trgm_ops)""", null),
+            ("IX_Persons_FirstName", """CREATE INDEX "IX_Persons_FirstName" ON "Persons" USING gin ("FirstName" gin_trgm_ops)""", null),
+            ("IX_EntityTotals_Total", """CREATE INDEX "IX_EntityTotals_Total" ON "EntityTotals" ("Total")""", null),
         };
 
         private static readonly string[] Tables =
         {
-            "Entities", "Companies", "Persons", "Links", "FinancialLinks", "EntityAttributes", "EntityTotals",
+            "Entities", "Companies", "Persons", "Links", "FinancialLinks", "EntityAttributes", "EntityTotals", "FinancialLinkTypeTotals",
         };
 
         private static readonly string[] DateFormats =
@@ -130,6 +133,7 @@ namespace Adex.Business
         };
 
         private const int MaxParallelMaintenance = 3;
+        private const int LinkAttributeWriters = 2;
         private static readonly TimeSpan ReportInterval = TimeSpan.FromSeconds(10);
 
         private struct Winner
@@ -160,7 +164,55 @@ namespace Adex.Business
 
         private readonly record struct FinancialRow(Guid Id, decimal Amount, string Type);
 
-        private readonly record struct AttributeRow(Guid EntityId, string Name, string Value);
+        private readonly record struct AttributeRow(Guid EntityId, string Json);
+
+        // Gathers the attributes of one entity (consecutive calls with the same id) into a single jsonb row.
+        private sealed class AttributeSink
+        {
+            private readonly ImportTableWriter<AttributeRow> _writer;
+            private readonly ArrayBufferWriter<byte> _buffer = new();
+            private Utf8JsonWriter _json;
+            private Guid _current;
+            private bool _open;
+
+            public AttributeSink(ImportTableWriter<AttributeRow> writer)
+            {
+                _writer = writer;
+            }
+
+            public void Add(Guid entityId, string name, string value)
+            {
+                if (_open && entityId != _current)
+                {
+                    Flush();
+                }
+
+                if (!_open)
+                {
+                    _buffer.Clear();
+                    _json = new Utf8JsonWriter(_buffer);
+                    _json.WriteStartObject();
+                    _current = entityId;
+                    _open = true;
+                }
+
+                _json.WriteString(name, value);
+            }
+
+            public void Flush()
+            {
+                if (!_open)
+                {
+                    return;
+                }
+
+                _json.WriteEndObject();
+                _json.Flush();
+                _writer.Add(new AttributeRow(_current, Encoding.UTF8.GetString(_buffer.WrittenSpan)));
+                _json.Dispose();
+                _open = false;
+            }
+        }
 
         private readonly record struct TotalRow(Guid Id, int Count, decimal Outgoing, decimal Incoming);
 
@@ -218,7 +270,7 @@ namespace Adex.Business
             );
 
             await ExecuteAsync(connectionString, "Suppression des clés étrangères", ForeignKeys.Select(x => $"""ALTER TABLE "{x.Table}" DROP CONSTRAINT IF EXISTS "{x.Name}" """), progress, cancellationToken);
-            await ExecuteAsync(connectionString, "Suppression des index", Indexes.Select(x => $"""DROP INDEX IF EXISTS "{x.Name}" """), progress, cancellationToken);
+            await ExecuteAsync(connectionString, "Suppression des index", Indexes.Select(x => x.Drop ?? $"""DROP INDEX IF EXISTS "{x.Name}" """), progress, cancellationToken);
             await ExecuteAsync(connectionString, "Réinitialisation des tables", new[] { TruncateSql }, progress, cancellationToken);
 
             progress?.Report("Chargement des données (passe 2/2)");
@@ -373,15 +425,18 @@ namespace Adex.Business
                 },
                 failure
             );
-            const string attributeSql = """COPY "EntityAttributes"("EntityId", "Name", "Value") FROM STDIN (FORMAT BINARY)""";
+            const string attributeSql = """COPY "EntityAttributes"("EntityId", "Data") FROM STDIN (FORMAT BINARY)""";
             Action<NpgsqlBinaryImporter, AttributeRow> writeAttribute = (w, v) =>
             {
                 w.Write(v.EntityId, NpgsqlDbType.Uuid);
-                w.Write(v.Name, NpgsqlDbType.Text);
-                w.Write(v.Value, NpgsqlDbType.Text);
+                w.Write(v.Json, NpgsqlDbType.Jsonb);
             };
-            var entityAttributes = new ImportTableWriter<AttributeRow>(connectionString, attributeSql, writeAttribute, failure);
-            var linkAttributes = new ImportTableWriter<AttributeRow>(connectionString, attributeSql, writeAttribute, failure);
+            var entityShards = Enumerable.Range(0, LinkAttributeWriters)
+                .Select(_ => new ImportTableWriter<AttributeRow>(connectionString, attributeSql, writeAttribute, failure))
+                .ToArray();
+            var linkShards = Enumerable.Range(0, LinkAttributeWriters)
+                .Select(_ => new ImportTableWriter<AttributeRow>(connectionString, attributeSql, writeAttribute, failure))
+                .ToArray();
 
             var totals = new Dictionary<Guid, Totals>();
             var salt = RandomNumberGenerator.GetBytes(10);
@@ -391,14 +446,16 @@ namespace Adex.Business
                 {
                     try
                     {
-                        Produce(path, scan, salt, totals, entities, companies, persons, links, financialLinks, entityAttributes, linkAttributes, progress, failure.Token);
+                        Produce(path, scan, salt, totals, entities, companies, persons, links, financialLinks, entityShards, linkShards, progress, failure.Token);
                         entities.Complete();
                         companies.Complete();
                         persons.Complete();
                         links.Complete();
                         financialLinks.Complete();
-                        entityAttributes.Complete();
-                        linkAttributes.Complete();
+                        foreach (var shard in entityShards.Concat(linkShards))
+                        {
+                            shard.Complete();
+                        }
                     }
                     catch
                     {
@@ -414,13 +471,14 @@ namespace Adex.Business
             var tasks = new List<Task>
             {
                 producer, entities.Completion, companies.Completion, persons.Completion, links.Completion,
-                financialLinks.Completion, entityAttributes.Completion, linkAttributes.Completion,
+                financialLinks.Completion,
             };
+                            tasks.AddRange(entityShards.Concat(linkShards).Select(x => x.Completion));
             await WhenAllRethrowRootCauseAsync(tasks);
             _logger.LogInformation(
                 "Import: données écrites (entités {Entities}, attributs {Attributes}, liens {Links}) en {Elapsed}",
                 entities.Rows,
-                entityAttributes.Rows + linkAttributes.Rows,
+                entityShards.Concat(linkShards).Sum(x => x.Rows),
                 links.Rows,
                 _total.Elapsed
             );
@@ -462,8 +520,8 @@ namespace Adex.Business
             ImportTableWriter<PersonRow> persons,
             ImportTableWriter<LinkRow> links,
             ImportTableWriter<FinancialRow> financialLinks,
-            ImportTableWriter<AttributeRow> entityAttributes,
-            ImportTableWriter<AttributeRow> linkAttributes,
+            ImportTableWriter<AttributeRow>[] entityShards,
+            ImportTableWriter<AttributeRow>[] linkShards,
             IProgress<string> progress,
             CancellationToken cancellationToken
         )
@@ -487,6 +545,8 @@ namespace Adex.Business
             }
 
             var fields = new string[ExpectedColumns.Length];
+            var entitySinks = entityShards.Select(x => new AttributeSink(x)).ToArray();
+            var linkSinks = linkShards.Select(x => new AttributeSink(x)).ToArray();
             var watch = Stopwatch.StartNew();
             var lastReport = watch.Elapsed;
             long row = 0;
@@ -513,6 +573,7 @@ namespace Adex.Business
                 }
 
                 var company = scan.Companies[Hash(companyKey)];
+                var entityAttributes = entitySinks[(int)(currentRow % entitySinks.Length)];
                 var person = scan.Persons[Hash(personKey)];
 
                 if (company.Row == currentRow)
@@ -552,6 +613,7 @@ namespace Adex.Business
                 }
 
                 var linkId = LinkGuid(currentRow, salt);
+                var linkAttributes = linkSinks[(int)(currentRow % linkSinks.Length)];
                 var amount = ParseAmount(fields[Col.Amount]);
                 var date = SafeTimestamp(fields[Col.Date])
                     ?? SafeTimestamp(fields[Col.StartDate])
@@ -580,6 +642,11 @@ namespace Adex.Business
                 to.Count++;
                 to.Incoming += amount;
             }
+
+            foreach (var sink in entitySinks.Concat(linkSinks))
+            {
+                sink.Flush();
+            }
         }
 
         private async Task RebuildStructureAsync(
@@ -589,6 +656,21 @@ namespace Adex.Business
         )
         {
             progress?.Report("Création des index");
+            var typeTotals = ExecuteAsync(
+                connectionString,
+                "Totaux par type de lien",
+                new[]
+                {
+                    """
+                    INSERT INTO "FinancialLinkTypeTotals" ("Type", "Count", "Amount")
+                    SELECT COALESCE("DeclarationType", 'Non renseigné'), COUNT(*), COALESCE(SUM("Amount"), 0)
+                    FROM "FinancialLinks"
+                    GROUP BY 1
+                    """,
+                },
+                progress,
+                cancellationToken
+            );
             using var gate = new SemaphoreSlim(MaxParallelMaintenance);
             await Task.WhenAll(
                 Indexes.Select(async index =>
@@ -599,7 +681,7 @@ namespace Adex.Business
                         await ExecuteAsync(
                             connectionString,
                             $"Création de l'index {index.Name}",
-                            new[] { "SET maintenance_work_mem = '256MB'", index.Sql },
+                            new[] { "SET maintenance_work_mem = '1GB'", "SET max_parallel_maintenance_workers = 4", index.Sql },
                             progress,
                             cancellationToken
                         );
@@ -610,6 +692,8 @@ namespace Adex.Business
                     }
                 })
             );
+
+            await typeTotals;
 
             await ExecuteAsync(
                 connectionString,
@@ -628,8 +712,8 @@ namespace Adex.Business
                     {
                         await ExecuteAsync(
                             connectionString,
-                            $"Statistiques de {table} (VACUUM ANALYZE)",
-                            new[] { $"""VACUUM (ANALYZE) "{table}" """ },
+                            $"Statistiques de {table} (ANALYZE)",
+                            new[] { $"""ANALYZE "{table}" """ },
                             progress,
                             cancellationToken
                         );
@@ -737,12 +821,12 @@ namespace Adex.Business
             }
         }
 
-        private static void AddAttribute(ImportTableWriter<AttributeRow> writer, Guid entityId, string name, string value)
+        private static void AddAttribute(AttributeSink sink, Guid entityId, string name, string value)
         {
             var cleaned = Clean(value);
             if (cleaned is not null)
             {
-                writer.Add(new AttributeRow(entityId, name, cleaned));
+                sink.Add(entityId, name, cleaned);
             }
         }
 

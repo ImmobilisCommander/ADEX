@@ -20,7 +20,6 @@ namespace Adex.Data.Model
         [Key]
         public Guid Id { get; set; }
 
-        public ICollection<EntityAttribute> Attributes { get; set; } =
-            new List<EntityAttribute>();
+        public EntityAttribute Attributes { get; set; }
     }
 }

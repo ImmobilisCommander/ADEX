@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Npgsql;
+using Microsoft.AspNetCore.Http;
 
 using Serilog;
 
@@ -47,14 +48,25 @@ namespace Adex.WebApi
                 )
             );
             builder.Services.AddMemoryCache();
-            builder.Services.AddDbContextFactory<AdexContext>((serviceProvider, options) =>
-                options
-                    .UseNpgsql(
+            builder.Services.AddSingleton(serviceProvider =>
+                new Npgsql.NpgsqlDataSourceBuilder(
+                    new Npgsql.NpgsqlConnectionStringBuilder(
                         GetRequiredConnectionString(
                             serviceProvider.GetRequiredService<IConfiguration>(),
                             "Adex"
                         )
                     )
+                    {
+                        // L'import rouvre des connexions depuis la chaîne exposée par le DbContext.
+                        PersistSecurityInfo = true,
+                    }.ConnectionString
+                )
+                    .EnableDynamicJson()
+                    .Build()
+            );
+            builder.Services.AddDbContextFactory<AdexContext>((serviceProvider, options) =>
+                options
+                    .UseNpgsql(serviceProvider.GetRequiredService<Npgsql.NpgsqlDataSource>())
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             );
             builder.Services.AddScoped<DataExplorerService>();
@@ -81,6 +93,25 @@ namespace Adex.WebApi
             }
 
             app.UseHttpsRedirection();
+            app.Use(async (context, next) =>
+            {
+                var importJob = context.RequestServices.GetRequiredService<ImportJobService>();
+                if (
+                    !context.Request.Path.StartsWithSegments("/api/import")
+                    && !context.Request.Path.StartsWithSegments("/swagger")
+                    && importJob.IsRunning
+                )
+                {
+                    context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                    context.Response.Headers.RetryAfter = "30";
+                    await context.Response.WriteAsJsonAsync(
+                        new { error = "Import en cours, les données sont indisponibles." }
+                    );
+                    return;
+                }
+
+                await next();
+            });
             app.UseAuthorization();
             app.MapControllers();
 
@@ -93,7 +124,11 @@ namespace Adex.WebApi
                     shutdown.Cancel();
                 };
 
-                await app.Services.GetRequiredService<IDbContextFactory<AdexContext>>().CreateDbContext().Database.MigrateAsync(app.Lifetime.ApplicationStopping);
+                await using (var migrationContext = app.Services.GetRequiredService<IDbContextFactory<AdexContext>>().CreateDbContext())
+                {
+                    migrationContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
+                    await migrationContext.Database.MigrateAsync(app.Lifetime.ApplicationStopping);
+                }
 
                 await app.RunAsync(shutdown.Token);
             }

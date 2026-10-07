@@ -15,7 +15,9 @@ namespace Adex.WebApi.Explorer
 
         private const int SearchResultLimit = 20;
         private const int SearchMinimumLength = 3;
-        private const int FinancialLinkLimit = 100;
+        public static readonly string[] SortKeys = { "date", "amount", "type", "kind", "direction", "name" };
+        public const int DefaultPageSize = 20;
+        public static readonly int[] PageSizes = { 10, 20, 50 };
 
         private static readonly SemaphoreSlim DashboardLock = new(1, 1);
 
@@ -56,20 +58,21 @@ namespace Adex.WebApi.Explorer
         private async Task<DashboardModel> BuildDashboardAsync(CancellationToken cancellationToken)
         {
             await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
+            // Agrégat sur toute la table des liens, mis en cache ensuite : le délai par défaut (30 s) est trop court.
+            db.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 
             var companiesCount = await db.Companies.CountAsync(cancellationToken);
             var personsCount = await db.Persons.CountAsync(cancellationToken);
 
-            var linkTypes = await db.FinancialLinks
-                .GroupBy(link => link.DeclarationType ?? "Non renseigné")
-                .Select(group => new FinancialLinkTypeSummary
+            var linkTypes = (await db.FinancialLinkTypeTotals.ToListAsync(cancellationToken))
+                .Select(total => new FinancialLinkTypeSummary
                 {
-                    Type = group.Key,
-                    Count = group.Count(),
-                    Amount = group.Sum(link => link.Amount),
+                    Type = total.Type,
+                    Count = (int)total.Count,
+                    Amount = total.Amount,
                 })
                 .OrderByDescending(summary => summary.Amount)
-                .ToListAsync(cancellationToken);
+                .ToList();
 
             var topContributors = await (
                 from total in db.EntityTotals
@@ -236,6 +239,10 @@ namespace Adex.WebApi.Explorer
 
         public async Task<EntityDetails> GetEntityAsync(
             Guid id,
+            int page,
+            int pageSize,
+            string sort,
+            bool descending,
             CancellationToken cancellationToken
         )
         {
@@ -258,15 +265,14 @@ namespace Adex.WebApi.Explorer
 
             var entity = (Entity)company ?? person ?? otherEntity;
             var entityId = entity.Id;
-            var attributes = await db.EntityAttributes
+            var attributeData = await db.EntityAttributes
                 .Where(attribute => attribute.EntityId == entityId)
-                .OrderBy(attribute => attribute.Name)
-                .Select(attribute => new EntityAttributeDetails
-                {
-                    Name = attribute.Name,
-                    Value = attribute.Value,
-                })
-                .ToListAsync(cancellationToken);
+                .Select(attribute => attribute.Data)
+                .SingleOrDefaultAsync(cancellationToken);
+            var attributes = (attributeData ?? new Dictionary<string, string>())
+                .OrderBy(pair => pair.Key, StringComparer.CurrentCulture)
+                .Select(pair => new EntityAttributeDetails { Name = pair.Key, Value = pair.Value })
+                .ToList();
             var name = company?.Designation
                 ?? (person is null
                     ? FindAttributeName(attributes)
@@ -276,36 +282,26 @@ namespace Adex.WebApi.Explorer
                 .Where(total => total.EntityId == entityId)
                 .SingleOrDefaultAsync(cancellationToken);
 
-            // One index-friendly query per direction instead of an OR over both columns.
-            var outgoingLinks = await LoadLinksAsync(db, entityId, outgoing: true, cancellationToken);
-            var incomingLinks = await LoadLinksAsync(db, entityId, outgoing: false, cancellationToken);
-            var links = outgoingLinks
-                .Concat(incomingLinks)
-                .OrderByDescending(link => link.Date)
-                .ThenBy(link => link.Id)
-                .Take(FinancialLinkLimit + 1)
-                .ToList();
-
-            var linksTruncated = links.Count > FinancialLinkLimit;
-            if (linksTruncated)
-            {
-                links.RemoveAt(links.Count - 1);
-            }
+            pageSize = Array.IndexOf(PageSizes, pageSize) >= 0 ? pageSize : DefaultPageSize;
+            sort = SortKeys.Contains(sort) ? sort : "date";
+            var linkCount = totals?.LinkCount ?? 0;
+            var pageCount = Math.Max(1, (linkCount + pageSize - 1) / pageSize);
+            page = Math.Clamp(page, 1, pageCount);
+            var skip = (page - 1) * pageSize;
+            var links = await LoadLinksPageAsync(db, entityId, sort, descending, skip, pageSize, cancellationToken);
 
             var linkIds = links.Select(link => link.Id).ToList();
             var justificationRows = await db.EntityAttributes
-                .Where(attribute => linkIds.Contains(attribute.EntityId) && JustificationNames.Contains(attribute.Name))
-                .Select(attribute => new { attribute.EntityId, attribute.Name, attribute.Value })
+                .Where(attribute => linkIds.Contains(attribute.EntityId))
+                .Select(attribute => new { attribute.EntityId, attribute.Data })
                 .ToListAsync(cancellationToken);
-            var justifications = justificationRows
-                .GroupBy(row => row.EntityId)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group
-                        .OrderBy(row => Array.IndexOf(JustificationNames, row.Name))
-                        .Select(row => new EntityAttributeDetails { Name = row.Name, Value = row.Value })
-                        .ToList()
-                );
+            var justifications = justificationRows.ToDictionary(
+                row => row.EntityId,
+                row => JustificationNames
+                    .Where(name => row.Data.ContainsKey(name))
+                    .Select(name => new EntityAttributeDetails { Name = name, Value = row.Data[name] })
+                    .ToList()
+            );
             foreach (var link in links)
             {
                 link.Justification = justifications.GetValueOrDefault(link.Id) ?? new List<EntityAttributeDetails>();
@@ -362,40 +358,103 @@ namespace Adex.WebApi.Explorer
                     : person is not null ? "Bénéficiaire" : "Entité",
                 OutgoingAmount = totals?.OutgoingAmount ?? 0m,
                 IncomingAmount = totals?.IncomingAmount ?? 0m,
-                FinancialLinkCount = totals?.LinkCount ?? 0,
-                FinancialLinksTruncated = linksTruncated,
+                FinancialLinkCount = linkCount,
+                Page = page,
+                Sort = sort,
+                Descending = descending,
+                PageSize = pageSize,
+                PageCount = pageCount,
                 Attributes = attributes,
                 FinancialLinks = links,
             };
         }
 
-        private static Task<List<FinancialLinkDetails>> LoadLinksAsync(
+        // One index-friendly query per direction (instead of an OR over both columns), merged by UNION ALL
+        // so that sorting and paging happen in the database.
+        private static async Task<List<FinancialLinkDetails>> LoadLinksPageAsync(
             AdexContext db,
             Guid entityId,
-            bool outgoing,
+            string sort,
+            bool descending,
+            int skip,
+            int take,
             CancellationToken cancellationToken
         )
         {
-            var links = outgoing
-                ? db.FinancialLinks.Where(link => link.From_Id == entityId)
-                : db.FinancialLinks.Where(link => link.To_Id == entityId);
+            var byName = sort == "name";
+            var outgoing = Project(db, db.FinancialLinks.Where(link => link.From_Id == entityId), true, byName);
+            var incoming = Project(db, db.FinancialLinks.Where(link => link.To_Id == entityId), false, byName);
 
-            return links
-                .OrderByDescending(link => link.Date)
-                .Select(link => new FinancialLinkDetails
-                {
-                    Id = link.Id,
-                    CounterpartyId = outgoing ? link.To_Id : link.From_Id,
-                    DeclarationType = link.DeclarationType ?? "Non renseigné",
-                    Kind = link.Kind ?? string.Empty,
-                    Date = link.Date,
-                    Amount = link.Amount,
-                    Outgoing = outgoing,
-                })
-                .Take(FinancialLinkLimit + 1)
+            if (sort == "date")
+            {
+                // Fast path: each branch uses its (entity, date) index for a top-N, then the two are merged.
+                var limit = skip + take;
+                var outgoingTop = await (descending
+                    ? outgoing.OrderByDescending(link => link.Date)
+                    : outgoing.OrderBy(link => link.Date))
+                    .ThenBy(link => link.Id).Take(limit).ToListAsync(cancellationToken);
+                var incomingTop = await (descending
+                    ? incoming.OrderByDescending(link => link.Date)
+                    : incoming.OrderBy(link => link.Date))
+                    .ThenBy(link => link.Id).Take(limit).ToListAsync(cancellationToken);
+                var merged = outgoingTop.Concat(incomingTop);
+                return (descending
+                    ? merged.OrderByDescending(link => link.Date)
+                    : merged.OrderBy(link => link.Date))
+                    .ThenBy(link => link.Id)
+                    .Skip(skip)
+                    .Take(take)
+                    .ToList();
+            }
+
+            var all = outgoing.Concat(incoming);
+
+            var ordered = sort switch
+            {
+                "amount" => descending ? all.OrderByDescending(link => link.Amount) : all.OrderBy(link => link.Amount),
+                "type" => descending ? all.OrderByDescending(link => link.DeclarationType) : all.OrderBy(link => link.DeclarationType),
+                "kind" => descending ? all.OrderByDescending(link => link.Kind) : all.OrderBy(link => link.Kind),
+                "direction" => descending ? all.OrderByDescending(link => link.Outgoing) : all.OrderBy(link => link.Outgoing),
+                "name" => descending ? all.OrderByDescending(link => link.SortName) : all.OrderBy(link => link.SortName),
+                _ => descending ? all.OrderByDescending(link => link.Date) : all.OrderBy(link => link.Date),
+            };
+
+            return await ordered
+                .ThenBy(link => link.Id)
+                .Skip(skip)
+                .Take(take)
                 .ToListAsync(cancellationToken);
         }
 
+        private static IQueryable<FinancialLinkDetails> Project(
+            AdexContext db,
+            IQueryable<FinancialLink> links,
+            bool outgoing,
+            bool byName
+        )
+        {
+            return links.Select(link => new FinancialLinkDetails
+            {
+                Id = link.Id,
+                CounterpartyId = outgoing ? link.To_Id : link.From_Id,
+                DeclarationType = link.DeclarationType ?? "Non renseigné",
+                Kind = link.Kind ?? string.Empty,
+                Date = link.Date,
+                Amount = link.Amount,
+                Outgoing = outgoing,
+                SortName = !byName
+                    ? null
+                    : db.Companies
+                        .Where(company => company.Id == (outgoing ? link.To_Id : link.From_Id))
+                        .Select(company => company.Designation)
+                        .FirstOrDefault()
+                        ?? db.Persons
+                            .Where(person => person.Id == (outgoing ? link.To_Id : link.From_Id))
+                            .Select(person => person.FirstName + " " + person.LastName)
+                            .FirstOrDefault()
+                        ?? string.Empty,
+            });
+        }
         private static readonly string[] JustificationNames =
         {
             "Motif",

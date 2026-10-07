@@ -23,6 +23,8 @@ namespace Adex.Data.Model
 
         public DbSet<EntityTotal> EntityTotals { get; set; }
 
+        public DbSet<FinancialLinkTypeTotal> FinancialLinkTypeTotals { get; set; }
+
         public AdexContext(DbContextOptions<AdexContext> options)
             : base(options) { }
 
@@ -51,13 +53,9 @@ namespace Adex.Data.Model
 
             modelBuilder
                 .Entity<EntityAttribute>()
-                .HasIndex(attribute => new { attribute.EntityId, attribute.Name })
-                .IsUnique();
-            modelBuilder
-                .Entity<EntityAttribute>()
                 .HasOne(attribute => attribute.Entity)
-                .WithMany(entity => entity.Attributes)
-                .HasForeignKey(attribute => attribute.EntityId);
+                .WithOne(entity => entity.Attributes)
+                .HasForeignKey<EntityAttribute>(attribute => attribute.EntityId);
 
             var link = modelBuilder.Entity<Link>();
             link.HasOne(entity => entity.From).WithMany().HasForeignKey(entity => entity.From_Id);

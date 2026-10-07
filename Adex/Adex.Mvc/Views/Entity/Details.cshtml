@@ -71,18 +71,25 @@
         else
         {
             <div class="table-scroll">
-                <table class="data-table" data-sortable>
+                @{
+                    string SortUrl(string key)
+                    {
+                        var descending = Model.Sort == key ? !Model.Descending : key is "date" or "amount";
+                        return $"/{Model.Id}?page=1&pageSize={Model.PageSize}&sort={key}&descending={descending.ToString().ToLowerInvariant()}#links-title";
+                    }
+                    string SortState(string key) => Model.Sort == key ? (Model.Descending ? "descending" : "ascending") : null;
+                }
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th scope="col" data-sort-type="text">Sens</th>
-                            <th scope="col" data-sort-type="text">Contrepartie</th>
-                            <th scope="col" data-sort-type="text">Typologie</th>
-                            <th scope="col" data-sort-type="text">Nature / objet</th>
-                            <th scope="col" data-sort-type="text">Justification</th>
-                            <th scope="col" class="numeric" data-sort-type="number">Date</th>
-                            <th scope="col" class="numeric" data-sort-type="number">Montant</th>
-                        </tr>
-                    </thead>
+                            <th scope="col" aria-sort="@SortState("direction")"><a class="sort-button" href="@SortUrl("direction")" title="Trier par sens"><span>Sens</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" aria-sort="@SortState("name")"><a class="sort-button" href="@SortUrl("name")" title="Trier par contrepartie"><span>Contrepartie</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" aria-sort="@SortState("type")"><a class="sort-button" href="@SortUrl("type")" title="Trier par typologie"><span>Typologie</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" aria-sort="@SortState("kind")"><a class="sort-button" href="@SortUrl("kind")" title="Trier par nature"><span>Nature / objet</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col">Justification</th>
+                            <th scope="col" class="numeric" aria-sort="@SortState("date")"><a class="sort-button" href="@SortUrl("date")" title="Trier par date"><span>Date</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" class="numeric" aria-sort="@SortState("amount")"><a class="sort-button" href="@SortUrl("amount")" title="Trier par montant"><span>Montant</span><i aria-hidden="true"></i></a></th>
+                        </tr></thead>
                     <tbody>
                     @foreach (var link in Model.FinancialLinks)
                     {
@@ -118,9 +125,60 @@
                 </table>
             </div>
             <p class="table-note">Cliquez sur une ligne pour voir sa justification.</p>
-            @if (Model.FinancialLinksTruncated)
+            @if (Model.FinancialLinkCount > 10)
             {
-                <p class="table-note">Les 100 déclarations les plus récentes sont affichées.</p>
+                var first = (Model.Page - 1) * Model.PageSize + 1;
+                var last = first + Model.FinancialLinks.Count - 1;
+                var pages = new List<int> { 1, Model.PageCount };
+                for (var n = Model.Page - 2; n <= Model.Page + 2; n++)
+                {
+                    pages.Add(n);
+                }
+                pages = pages.Where(n => n >= 1 && n <= Model.PageCount).Distinct().OrderBy(n => n).ToList();
+                string PageUrl(int n) => $"/{Model.Id}?page={n}&pageSize={Model.PageSize}&sort={Model.Sort}&descending={Model.Descending.ToString().ToLowerInvariant()}#links-title";
+                <div class="pager-bar">
+                    <nav class="pager" aria-label="Pagination des liens financiers">
+                        @if (Model.Page > 1)
+                        {
+                            <a class="pager-link" rel="prev" href="@PageUrl(Model.Page - 1)">Précédent</a>
+                        }
+                        @for (var i = 0; i < pages.Count; i++)
+                        {
+                            if (i > 0 && pages[i] - pages[i - 1] > 1)
+                            {
+                                <span class="pager-gap" aria-hidden="true">…</span>
+                            }
+                            if (pages[i] == Model.Page)
+                            {
+                                <span class="pager-link is-current" aria-current="page">@pages[i].ToString("N0", frenchCulture)</span>
+                            }
+                            else
+                            {
+                                <a class="pager-link" href="@PageUrl(pages[i])" aria-label="Page @pages[i]">@pages[i].ToString("N0", frenchCulture)</a>
+                            }
+                        }
+                        @if (Model.Page < Model.PageCount)
+                        {
+                            <a class="pager-link" rel="next" href="@PageUrl(Model.Page + 1)">Suivant</a>
+                        }
+                    </nav>
+                    <form method="get" action="/@Model.Id" class="pager-size">
+                        <label for="page-size">Par page</label>
+                        <input type="hidden" name="sort" value="@Model.Sort" />
+                        <input type="hidden" name="descending" value="@Model.Descending.ToString().ToLowerInvariant()" />
+                        <select id="page-size" name="pageSize" data-autosubmit>
+                            @foreach (var size in new[] { 10, 20, 50 })
+                            {
+                                <option value="@size" selected="@(size == Model.PageSize)">@size</option>
+                            }
+                        </select>
+                        <noscript><button type="submit" class="pager-link">Appliquer</button></noscript>
+                    </form>
+                </div>
+                <p class="table-note">
+                    Déclarations @first.ToString("N0", frenchCulture) à @last.ToString("N0", frenchCulture)
+                    sur @Model.FinancialLinkCount.ToString("N0", frenchCulture).
+                </p>
             }
         }
     </section>
@@ -137,5 +195,5 @@
 
 @section Scripts {
     <script src="~/js/justification.js" asp-append-version="true"></script>
-    <script src="~/js/table-sort.js" asp-append-version="true"></script>
+
 }

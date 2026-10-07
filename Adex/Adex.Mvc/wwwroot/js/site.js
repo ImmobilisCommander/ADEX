@@ -1,4 +1,4 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
 (() => {
@@ -14,3 +14,10 @@
 
     root.dataset.theme = getSavedTheme();
 })();
+
+document.addEventListener('change', (event) => {
+    const select = event.target.closest('select[data-autosubmit]');
+    if (select && select.form) {
+        select.form.submit();
+    }
+});

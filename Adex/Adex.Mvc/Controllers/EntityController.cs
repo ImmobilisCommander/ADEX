@@ -22,13 +22,17 @@ namespace Adex.Mvc.Controllers
         [HttpGet("/{id:guid}")]
         public async Task<IActionResult> Details(
             Guid id,
-            CancellationToken cancellationToken
+            CancellationToken cancellationToken,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string sort = "date",
+            [FromQuery] bool descending = true
         )
         {
             EntityDetailsViewModel entity;
             try
             {
-                entity = await _apiClient.GetEntityAsync(id, cancellationToken);
+                entity = await _apiClient.GetEntityAsync(id, page, pageSize, sort ?? "date", descending, cancellationToken);
             }
             catch (HttpRequestException exception)
             {

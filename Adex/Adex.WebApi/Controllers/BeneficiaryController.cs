@@ -29,7 +29,7 @@ namespace Adex.WebApi.Controllers
             CancellationToken cancellationToken
         )
         {
-            var entity = await _explorer.GetEntityAsync(id, cancellationToken);
+            var entity = await _explorer.GetEntityAsync(id, 1, DataExplorerService.DefaultPageSize, "date", true, cancellationToken);
             return entity is null ? NotFound() : new JsonResult(entity);
         }
     }

@@ -23,7 +23,7 @@ namespace Adex.WebApi.Import
         private readonly IWebHostEnvironment _environment;
         private readonly ImportOptions _options;
         private readonly ILogger<ImportJobService> _logger;
-        private readonly object _sync = new();
+        private readonly SemaphoreSlim _sync = new(1, 1);
 
         private ImportStatus _status = new();
         private CancellationTokenSource _cancellation;
@@ -45,6 +45,8 @@ namespace Adex.WebApi.Import
 
         public bool IsEnabled => !string.IsNullOrEmpty(_options.ApiKey);
 
+        public bool IsRunning => GetStatus().State == ImportState.Running;
+
         public bool IsAuthorized(string apiKey)
         {
             if (!IsEnabled || string.IsNullOrEmpty(apiKey))
@@ -62,7 +64,7 @@ namespace Adex.WebApi.Import
 
         public ImportStatus GetStatus()
         {
-            lock (_sync)
+            using (Acquire())
             {
                 return Snapshot(_status);
             }
@@ -70,7 +72,7 @@ namespace Adex.WebApi.Import
 
         public bool TryStart(out ImportStatus status)
         {
-            lock (_sync)
+            using (Acquire())
             {
                 if (_status.State == ImportState.Running)
                 {
@@ -99,7 +101,7 @@ namespace Adex.WebApi.Import
 
         public bool Cancel()
         {
-            lock (_sync)
+            using (Acquire())
             {
                 if (_status.State != ImportState.Running)
                 {
@@ -116,7 +118,7 @@ namespace Adex.WebApi.Import
             var step = run.Steps.Single();
             try
             {
-                lock (_sync)
+                using (Acquire())
                 {
                     step.State = ImportState.Running;
                 }
@@ -132,7 +134,7 @@ namespace Adex.WebApi.Import
                         path,
                         new Progress<string>(message =>
                         {
-                            lock (_sync)
+                            using (Acquire())
                             {
                                 step.Message = message;
                             }
@@ -144,7 +146,7 @@ namespace Adex.WebApi.Import
 
                 cache.Remove(Explorer.DataExplorerService.DashboardCacheKey);
 
-                lock (_sync)
+                using (Acquire())
                 {
                     step.ErrorCount = (int)Math.Min(result.SkippedRows, int.MaxValue);
                     step.Message =
@@ -161,7 +163,7 @@ namespace Adex.WebApi.Import
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                lock (_sync)
+                using (Acquire())
                 {
                     step.State = ImportState.Cancelled;
                     run.State = ImportState.Cancelled;
@@ -171,7 +173,7 @@ namespace Adex.WebApi.Import
             }
             catch (Exception e)
             {
-                lock (_sync)
+                using (Acquire())
                 {
                     step.State = ImportState.Failed;
                     step.FailureMessage = e.Message;
@@ -182,11 +184,22 @@ namespace Adex.WebApi.Import
             }
             finally
             {
-                lock (_sync)
+                using (Acquire())
                 {
                     run.FinishedAt = DateTimeOffset.UtcNow;
                 }
             }
+        }
+
+        private IDisposable Acquire()
+        {
+            _sync.Wait();
+            return new Releaser(_sync);
+        }
+
+        private sealed class Releaser(SemaphoreSlim semaphore) : IDisposable
+        {
+            public void Dispose() => semaphore.Release();
         }
 
         private string ResolveFile()

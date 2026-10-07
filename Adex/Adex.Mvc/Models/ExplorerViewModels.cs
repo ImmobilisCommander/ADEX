@@ -83,7 +83,15 @@ namespace Adex.Mvc.Models
 
         public int FinancialLinkCount { get; set; }
 
-        public bool FinancialLinksTruncated { get; set; }
+        public int Page { get; set; } = 1;
+
+        public string Sort { get; set; } = "date";
+
+        public bool Descending { get; set; } = true;
+
+        public int PageSize { get; set; }
+
+        public int PageCount { get; set; } = 1;
 
         public List<EntityAttributeViewModel> Attributes { get; set; } = new();
 

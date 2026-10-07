@@ -37,11 +37,15 @@ namespace Adex.Mvc
 
         public async Task<EntityDetailsViewModel> GetEntityAsync(
             Guid id,
+            int page,
+            int pageSize,
+            string sort,
+            bool descending,
             CancellationToken cancellationToken
         )
         {
             using var response = await _httpClient.GetAsync(
-                $"api/entity/{id}",
+                $"api/entity/{id}?page={page}&pageSize={pageSize}&sort={Uri.EscapeDataString(sort)}&descending={descending}",
                 cancellationToken
             );
             if (response.StatusCode == HttpStatusCode.NotFound)
