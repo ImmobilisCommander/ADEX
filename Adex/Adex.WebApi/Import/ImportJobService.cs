@@ -167,7 +167,7 @@ namespace Adex.WebApi.Import
                     run.State = ImportState.Cancelled;
                 }
 
-                _logger.LogWarning("Import cancelled, previous data left untouched");
+                _logger.LogWarning("Import cancelled, database may be partial, rerun the import");
             }
             catch (Exception e)
             {
@@ -178,7 +178,7 @@ namespace Adex.WebApi.Import
                     run.State = ImportState.Failed;
                 }
 
-                _logger.LogError(e, "Import failed, previous data left untouched");
+                _logger.LogError(e, "Import failed, database may be partial, rerun the import");
             }
             finally
             {
