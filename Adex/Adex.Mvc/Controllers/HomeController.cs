@@ -41,6 +41,18 @@ namespace Adex.Mvc.Controllers
         }
 
         [HttpGet]
+        public IActionResult Settings()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Disclaimer()
+        {
+            return View();
+        }
+
+        [HttpGet]
         [Route("/Search")]
         public async Task<ActionResult> Search(
             [FromQuery] string query,

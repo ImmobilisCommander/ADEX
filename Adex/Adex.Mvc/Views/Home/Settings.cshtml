@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Paramètres";
+}
+
+<main class="settings-page">
+    <header class="settings-intro">
+        <h1>Paramètres</h1>
+        <p>Adaptez l’apparence d’ADEX à vos préférences de lecture.</p>
+    </header>
+
+    <section class="register-section settings-section" aria-labelledby="appearance-title">
+        <h2 id="appearance-title">Apparence</h2>
+        <p class="settings-description">Choisissez le thème utilisé sur toutes les pages. Votre choix est mémorisé sur cet appareil.</p>
+        <fieldset class="theme-options">
+            <legend>Thème</legend>
+            <label class="theme-option">
+                <input type="radio" name="theme" value="light" checked />
+                <span class="theme-swatch theme-swatch-light" aria-hidden="true"></span>
+                <span class="theme-option-copy">
+                    <strong>Clair</strong>
+                    <span>Le thème actuel, avec un fond clair.</span>
+                </span>
+            </label>
+            <label class="theme-option">
+                <input type="radio" name="theme" value="dark" />
+                <span class="theme-swatch theme-swatch-dark" aria-hidden="true"></span>
+                <span class="theme-option-copy">
+                    <strong>Sombre</strong>
+                    <span>Un fond sombre pour une lecture confortable en faible luminosité.</span>
+                </span>
+            </label>
+        </fieldset>
+        <p class="settings-status" role="status" aria-live="polite"></p>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/settings.js" asp-append-version="true"></script>
+}

@@ -4,6 +4,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ADEX</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="icon" sizes="any" href="~/favicon.ico" />
+    <script>
+        try {
+            const savedTheme = localStorage.getItem("adex-theme");
+            if (savedTheme === "dark") document.documentElement.dataset.theme = "dark";
+        } catch {
+            // The light theme remains available when browser storage is disabled.
+        }
+    </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
@@ -13,6 +23,7 @@
             <a class="brand-mark" href="/" aria-label="ADEX, accueil">ADEX<span>.</span></a>
             <a class="nav-current" href="/">Explorer les données</a>
             <span class="nav-context">Liens d’intérêt · données déclaratives</span>
+            <a class="nav-settings" href="/Home/Settings" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "page" : null)">Paramètres</a>
         </nav>
     </header>
     <div class="site-shell">
@@ -22,7 +33,10 @@
     <footer class="site-footer">
         <div class="site-shell footer-inner">
             <span>ADEX · Exploration des données déclaratives</span>
-            <a href="/">Retour au tableau de bord</a>
+            <div class="footer-links">
+                <a href="/Home/Disclaimer">Source et avertissement</a>
+                <a href="/">Retour au tableau de bord</a>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
