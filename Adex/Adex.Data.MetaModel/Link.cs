@@ -1,4 +1,4 @@
-﻿// <copyright file="Link.cs" company="julien_lefevre@outlook.fr">
+// <copyright file="Link.cs" company="julien_lefevre@outlook.fr">
 //   Copyright (c) 2020 All Rights Reserved
 //   <author>Julien LEFEVRE</author>
 // </copyright>
@@ -11,7 +11,7 @@ using Adex.Common;
 namespace Adex.Data.MetaModel
 {
     [Table("Links")]
-    public class Link : Entity, ILink
+    public class Link : Entity
     {
         public int From_Id
         {

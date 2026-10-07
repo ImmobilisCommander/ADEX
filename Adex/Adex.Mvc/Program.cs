@@ -60,7 +60,7 @@ namespace Adex.Mvc
             app.UseAuthorization();
             app.MapControllerRoute(
                 name: "entity",
-                pattern: "{reference:nonfile}",
+                pattern: "{id:guid}",
                 defaults: new { controller = "Entity", action = "Details" }
             );
             app.MapControllerRoute(

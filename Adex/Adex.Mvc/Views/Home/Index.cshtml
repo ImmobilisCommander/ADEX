@@ -1,11 +1,8 @@
-﻿@model Adex.Mvc.Models.DashboardViewModel
+@model Adex.Mvc.Models.DashboardViewModel
 @using System.Globalization
 @{
     ViewData["Title"] = "Explorer les liens d’intérêt";
     var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
-    var topAmount = Model.TopEntities.Count == 0
-        ? 0m
-        : Model.TopEntities.Max(entity => entity.Amount);
 }
 
 <!--
@@ -120,38 +117,8 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
             }
         </section>
 
-        <section class="register-section top-entities" aria-labelledby="top-entities-title">
-            <div class="section-heading">
-                <h2 id="top-entities-title">Top 10 des entités par montant cumulé</h2>
-                <span class="section-unit">montants déclarés</span>
-            </div>
-            @if (Model.TopEntities.Count == 0)
-            {
-                <p class="empty-state">Le classement apparaîtra lorsque des liens financiers seront disponibles.</p>
-            }
-            else
-            {
-                <ol class="ranking-list">
-                @for (var index = 0; index < Model.TopEntities.Count; index++)
-                {
-                    var entity = Model.TopEntities[index];
-                    var width = topAmount == 0 ? 0 : (int)Math.Round((double)(entity.Amount * 100m / topAmount));
-                    <li>
-                        <a class="ranking-link" href="/@Uri.EscapeDataString(entity.Reference)">
-                            <span class="rank-number">@((index + 1).ToString("D2", frenchCulture))</span>
-                            <span class="ranking-entity">
-                                <span class="ranking-name">@entity.Name</span>
-                                <span class="ranking-meta">@entity.Type · @entity.Reference</span>
-                            </span>
-                            <span class="ranking-bar" aria-hidden="true"><span style="width: @width%"></span></span>
-                            <span class="ranking-amount">@entity.Amount.ToString("C0", frenchCulture)</span>
-                            <span class="ranking-arrow" aria-hidden="true">↗</span>
-                        </a>
-                    </li>
-                }
-                </ol>
-            }
-        </section>
+        @await Html.PartialAsync("_Ranking", new Adex.Mvc.Views.Home.RankingModel("top-beneficiaries", "Top 10 des bénéficiaires par montant reçu", Model.TopBeneficiaries))
+        @await Html.PartialAsync("_Ranking", new Adex.Mvc.Views.Home.RankingModel("top-contributors", "Top 10 des contributeurs par montant versé", Model.TopContributors))
     </div>
     }
 </main>

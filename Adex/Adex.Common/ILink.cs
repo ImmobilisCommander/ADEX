@@ -1,4 +1,4 @@
-﻿// <copyright file="ILink.cs" company="julien_lefevre@outlook.fr">
+// <copyright file="ILink.cs" company="julien_lefevre@outlook.fr">
 //   Copyright (c) 2020 All Rights Reserved
 //   <author>Julien LEFEVRE</author>
 // </copyright>
@@ -9,9 +9,9 @@ namespace Adex.Common
 {
     public interface ILink
     {
-        int From_Id { get; }
+        Guid From_Id { get; }
 
-        int To_Id { get; }
+        Guid To_Id { get; }
 
         string Kind { get; set; }
 

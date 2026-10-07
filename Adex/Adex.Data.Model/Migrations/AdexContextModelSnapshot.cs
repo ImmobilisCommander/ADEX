@@ -20,25 +20,16 @@ namespace Adex.Data.Model.Migrations
                 .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Adex.Data.Model.Entity", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Reference")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Reference")
-                        .IsUnique();
 
                     b.ToTable("Entities");
 
@@ -53,8 +44,8 @@ namespace Adex.Data.Model.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EntityId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("EntityId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -72,6 +63,31 @@ namespace Adex.Data.Model.Migrations
                     b.ToTable("EntityAttributes");
                 });
 
+            modelBuilder.Entity("Adex.Data.Model.EntityTotal", b =>
+                {
+                    b.Property<Guid>("EntityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("IncomingAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("LinkCount")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("OutgoingAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("EntityId");
+
+                    b.HasIndex("Total");
+
+                    b.ToTable("EntityTotals");
+                });
+
             modelBuilder.Entity("Adex.Data.Model.Company", b =>
                 {
                     b.HasBaseType("Adex.Data.Model.Entity");
@@ -79,6 +95,11 @@ namespace Adex.Data.Model.Migrations
                     b.Property<string>("Designation")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.HasIndex("Designation");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Designation"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Designation"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("Companies");
                 });
@@ -90,18 +111,18 @@ namespace Adex.Data.Model.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("From_Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("From_Id")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Kind")
                         .HasColumnType("text");
 
-                    b.Property<int>("To_Id")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("To_Id")
+                        .HasColumnType("uuid");
 
-                    b.HasIndex("From_Id");
+                    b.HasIndex("From_Id", "Date");
 
-                    b.HasIndex("To_Id");
+                    b.HasIndex("To_Id", "Date");
 
                     b.ToTable("Links");
                 });
@@ -117,6 +138,16 @@ namespace Adex.Data.Model.Migrations
                     b.Property<string>("LastName")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.HasIndex("FirstName");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("FirstName"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("FirstName"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("LastName");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("LastName"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("LastName"), new[] { "gin_trgm_ops" });
 
                     b.ToTable("Persons");
                 });

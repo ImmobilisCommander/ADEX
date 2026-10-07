@@ -1,4 +1,4 @@
-﻿@model Adex.Mvc.Models.EntityDetailsViewModel
+@model Adex.Mvc.Models.EntityDetailsViewModel
 @using System.Globalization
 @{
     ViewData["Title"] = Model.Name;
@@ -17,9 +17,8 @@
         <div>
             <p class="entity-type">@Model.Type</p>
             <h1>@Model.Name</h1>
-            <p class="entity-reference">Référence <span>@Model.Reference</span></p>
         </div>
-        <a class="plain-link" href="/Search?query=@Uri.EscapeDataString(Model.Reference)">Rechercher une autre entité</a>
+        <a class="plain-link" href="/Search">Rechercher une autre entité</a>
     </header>
 
     <section class="summary-register entity-totals" aria-label="Synthèse des liens">
@@ -72,25 +71,53 @@
         else
         {
             <div class="table-scroll">
-                <table class="data-table">
+                <table class="data-table" data-sortable>
                     <thead>
-                        <tr><th scope="col">Sens</th><th scope="col">Contrepartie</th><th scope="col">Typologie</th><th scope="col">Nature / objet</th><th scope="col" class="numeric">Date</th><th scope="col" class="numeric">Montant</th></tr>
+                        <tr>
+                            <th scope="col" data-sort-type="text">Sens</th>
+                            <th scope="col" data-sort-type="text">Contrepartie</th>
+                            <th scope="col" data-sort-type="text">Typologie</th>
+                            <th scope="col" data-sort-type="text">Nature / objet</th>
+                            <th scope="col" data-sort-type="text">Justification</th>
+                            <th scope="col" class="numeric" data-sort-type="number">Date</th>
+                            <th scope="col" class="numeric" data-sort-type="number">Montant</th>
+                        </tr>
                     </thead>
                     <tbody>
                     @foreach (var link in Model.FinancialLinks)
                     {
-                        <tr>
+                        var motif = link.Justification.FirstOrDefault(item => item.Name == "Motif")?.Value;
+                        var hasJustification = link.Justification.Count > 0;
+                        <tr class="@(hasJustification ? "row-detail" : null)" tabindex="@(hasJustification ? "0" : null)"
+                            aria-label="@(hasJustification ? "Voir la justification : " + link.CounterpartyName : null)"
+                            data-justification-row="@(hasJustification ? "true" : null)">
                             <td>@(link.Outgoing ? "Vers" : "Depuis")</td>
-                            <th scope="row"><a href="/@Uri.EscapeDataString(link.CounterpartyReference)">@link.CounterpartyName</a><span class="reference-cell">@link.CounterpartyReference</span></th>
+                            <th scope="row" data-sort="@link.CounterpartyName"><a href="/@link.CounterpartyId">@link.CounterpartyName</a></th>
                             <td>@link.DeclarationType</td>
                             <td>@(string.IsNullOrWhiteSpace(link.Kind) ? "—" : link.Kind)</td>
-                            <td class="numeric">@link.Date.ToString("d", frenchCulture)</td>
-                            <td class="numeric">@link.Amount.ToString("C0", frenchCulture)</td>
+                            <td data-sort="@motif">
+                                @(string.IsNullOrWhiteSpace(motif) ? "—" : motif)
+                                @if (hasJustification)
+                                {
+                                    <template>
+                                        <dl>
+                                            @foreach (var item in link.Justification)
+                                            {
+                                                <dt>@item.Name</dt>
+                                                <dd>@item.Value</dd>
+                                            }
+                                        </dl>
+                                    </template>
+                                }
+                            </td>
+                            <td class="numeric" data-sort="@link.Date.Ticks">@link.Date.ToString("d", frenchCulture)</td>
+                            <td class="numeric" data-sort="@link.Amount.ToString(CultureInfo.InvariantCulture)">@link.Amount.ToString("C0", frenchCulture)</td>
                         </tr>
                     }
                     </tbody>
                 </table>
             </div>
+            <p class="table-note">Cliquez sur une ligne pour voir sa justification.</p>
             @if (Model.FinancialLinksTruncated)
             {
                 <p class="table-note">Les 100 déclarations les plus récentes sont affichées.</p>
@@ -99,3 +126,16 @@
     </section>
     }
 </main>
+
+<dialog id="justification-dialog" class="justification-dialog" aria-labelledby="justification-title">
+    <form method="dialog" class="justification-head">
+        <h2 id="justification-title">Justification de la déclaration</h2>
+        <button type="submit" class="justification-close" aria-label="Fermer">×</button>
+    </form>
+    <div class="justification-body"></div>
+</dialog>
+
+@section Scripts {
+    <script src="~/js/justification.js" asp-append-version="true"></script>
+    <script src="~/js/table-sort.js" asp-append-version="true"></script>
+}

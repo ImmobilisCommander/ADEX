@@ -17,7 +17,9 @@ namespace Adex.Mvc.Models
 
         public List<FinancialLinkTypeViewModel> FinancialLinkTypes { get; set; } = new();
 
-        public List<TopEntityViewModel> TopEntities { get; set; } = new();
+        public List<TopEntityViewModel> TopContributors { get; set; } = new();
+
+        public List<TopEntityViewModel> TopBeneficiaries { get; set; } = new();
     }
 
     public sealed class EntityTypeCountViewModel
@@ -38,7 +40,7 @@ namespace Adex.Mvc.Models
 
     public sealed class TopEntityViewModel
     {
-        public string Reference { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
 
@@ -49,7 +51,7 @@ namespace Adex.Mvc.Models
 
     public sealed class EntitySearchResultViewModel
     {
-        public string Reference { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
 
@@ -69,7 +71,7 @@ namespace Adex.Mvc.Models
     {
         public string ErrorMessage { get; set; }
 
-        public string Reference { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
 
@@ -97,9 +99,9 @@ namespace Adex.Mvc.Models
 
     public sealed class FinancialLinkViewModel
     {
-        public string Reference { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
-        public string CounterpartyReference { get; set; } = string.Empty;
+        public Guid CounterpartyId { get; set; }
 
         public string CounterpartyName { get; set; } = string.Empty;
 
@@ -112,5 +114,7 @@ namespace Adex.Mvc.Models
         public decimal Amount { get; set; }
 
         public bool Outgoing { get; set; }
+
+        public List<EntityAttributeViewModel> Justification { get; set; } = new();
     }
 }

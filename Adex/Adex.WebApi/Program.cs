@@ -46,35 +46,19 @@ namespace Adex.WebApi
                     new System.Text.Json.Serialization.JsonStringEnumConverter()
                 )
             );
+            builder.Services.AddMemoryCache();
             builder.Services.AddDbContextFactory<AdexContext>((serviceProvider, options) =>
-                options.UseNpgsql(
-                    GetRequiredConnectionString(
-                        serviceProvider.GetRequiredService<IConfiguration>(),
-                        "Adex"
+                options
+                    .UseNpgsql(
+                        GetRequiredConnectionString(
+                            serviceProvider.GetRequiredService<IConfiguration>(),
+                            "Adex"
+                        )
                     )
-                )
-            );
-            builder.Services.AddDbContextFactory<AdexMetaContext>((serviceProvider, options) =>
-                options.UseNpgsql(
-                    GetRequiredConnectionString(
-                        serviceProvider.GetRequiredService<IConfiguration>(),
-                        "AdexMeta"
-                    )
-                )
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             );
             builder.Services.AddScoped<DataExplorerService>();
-            builder.Services.AddScoped(provider =>
-            {
-                var loader = new CsvLoaderNormalized(
-                    provider.GetRequiredService<IDbContextFactory<AdexContext>>()
-                );
-                AttachLogging(provider.GetRequiredService<ILogger<CsvLoaderNormalized>>(), loader);
-                return loader;
-            });
-            builder.Services.AddScoped<ILinkSearchService>(provider =>
-                provider.GetRequiredService<CsvLoaderNormalized>()
-            );
-            builder.Services.AddScoped<MetadataConsolidationService>();
+            builder.Services.AddScoped<DeclarationsImporter>();
 
             builder.Services.Configure<ImportOptions>(builder.Configuration.GetSection("Import"));
             builder.Services.AddSingleton<ImportJobService>();
@@ -128,28 +112,6 @@ namespace Adex.WebApi
                 ?? throw new InvalidOperationException(
                     $"The '{name}' connection string is not configured."
                 );
-        }
-
-        private static void AttachLogging<T>(ILogger<T> logger, ICsvLoader loader)
-        {
-            loader.OnMessage += (_, message) =>
-            {
-                switch (message.Level)
-                {
-                    case Level.Debug:
-                        logger.LogDebug("{LoaderMessage}", message.Message);
-                        break;
-                    case Level.Info:
-                        logger.LogInformation("{LoaderMessage}", message.Message);
-                        break;
-                    case Level.Warn:
-                        logger.LogWarning("{LoaderMessage}", message.Message);
-                        break;
-                    case Level.Error:
-                        logger.LogError("{LoaderMessage}", message.Message);
-                        break;
-                }
-            };
         }
     }
 }

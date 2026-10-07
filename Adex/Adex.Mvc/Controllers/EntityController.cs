@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
@@ -18,29 +19,29 @@ namespace Adex.Mvc.Controllers
             _logger = logger;
         }
 
-        [HttpGet("/{reference:nonfile}")]
+        [HttpGet("/{id:guid}")]
         public async Task<IActionResult> Details(
-            string reference,
+            Guid id,
             CancellationToken cancellationToken
         )
         {
             EntityDetailsViewModel entity;
             try
             {
-                entity = await _apiClient.GetEntityAsync(reference, cancellationToken);
+                entity = await _apiClient.GetEntityAsync(id, cancellationToken);
             }
             catch (HttpRequestException exception)
             {
                 _logger.LogError(
                     exception,
-                    "Unable to load entity details for {EntityReference}",
-                    reference
+                    "Unable to load entity details for {EntityId}",
+                    id
                 );
                 return View(
                     new EntityDetailsViewModel
                     {
-                        Reference = reference,
-                        Name = reference,
+                        Id = id,
+                        Name = "(entité inconnue)",
                         ErrorMessage =
                             "Les données de cette entité ne sont pas accessibles. Réessayez dans un instant."
                     }
@@ -50,7 +51,7 @@ namespace Adex.Mvc.Controllers
             if (entity is null)
             {
                 Response.StatusCode = 404;
-                return View("NotFound", reference);
+                return View("NotFound", id.ToString());
             }
 
             return View(entity);

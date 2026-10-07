@@ -1,4 +1,4 @@
-﻿// <copyright file="Link.cs" company="julien_lefevre@outlook.fr">
+// <copyright file="Link.cs" company="julien_lefevre@outlook.fr">
 //   Copyright (c) 2020 All Rights Reserved
 //   <author>Julien LEFEVRE</author>
 // </copyright>
@@ -12,20 +12,20 @@ namespace Adex.Data.Model
     [Table("Links")]
     public class Link : Entity, ILink
     {
-        public int From_Id
+        public Guid From_Id
         {
             get { return From?.Id ?? _fromId; }
             set { _fromId = value; }
         }
 
-        public int To_Id
+        public Guid To_Id
         {
             get { return To?.Id ?? _toId; }
             set { _toId = value; }
         }
 
-        private int _fromId;
-        private int _toId;
+        private Guid _fromId;
+        private Guid _toId;
 
         public Entity From { get; set; }
 
@@ -37,7 +37,7 @@ namespace Adex.Data.Model
 
         public override string ToString()
         {
-            return Reference;
+            return Id.ToString();
         }
     }
 }

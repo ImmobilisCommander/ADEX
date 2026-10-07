@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,13 +27,13 @@ namespace Adex.WebApi.Controllers
             return await _explorer.SearchEntitiesAsync(query, cancellationToken);
         }
 
-        [HttpGet("{reference}")]
+        [HttpGet("{id:guid}")]
         public async Task<ActionResult<EntityDetails>> Get(
-            string reference,
+            Guid id,
             CancellationToken cancellationToken
         )
         {
-            var entity = await _explorer.GetEntityAsync(reference, cancellationToken);
+            var entity = await _explorer.GetEntityAsync(id, cancellationToken);
             return entity is null ? NotFound() : Ok(entity);
         }
     }

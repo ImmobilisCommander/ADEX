@@ -1,8 +1,9 @@
-﻿// <copyright file="Entity.cs" company="julien_lefevre@outlook.fr">
+// <copyright file="Entity.cs" company="julien_lefevre@outlook.fr">
 //   Copyright (c) 2020 All Rights Reserved
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
@@ -17,14 +18,7 @@ namespace Adex.Data.Model
         /// Unique identifier
         /// </summary>
         [Key]
-        public int Id { get; set; }
-
-        /// <summary>
-        /// External identifier
-        /// </summary>
-        [MaxLength(200)]
-        [Required]
-        public string Reference { get; set; }
+        public Guid Id { get; set; }
 
         public ICollection<EntityAttribute> Attributes { get; set; } =
             new List<EntityAttribute>();

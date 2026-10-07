@@ -36,12 +36,12 @@ namespace Adex.Mvc
         }
 
         public async Task<EntityDetailsViewModel> GetEntityAsync(
-            string reference,
+            Guid id,
             CancellationToken cancellationToken
         )
         {
             using var response = await _httpClient.GetAsync(
-                $"api/entity/{Uri.EscapeDataString(reference)}",
+                $"api/entity/{id}",
                 cancellationToken
             );
             if (response.StatusCode == HttpStatusCode.NotFound)
@@ -59,12 +59,12 @@ namespace Adex.Mvc
         }
 
         public async Task<JsonElement> GetEntityJsonAsync(
-            string reference,
+            Guid id,
             CancellationToken cancellationToken
         )
         {
             using var response = await _httpClient.GetAsync(
-                $"api/entity/{Uri.EscapeDataString(reference)}",
+                $"api/entity/{id}",
                 cancellationToken
             );
             response.EnsureSuccessStatusCode();

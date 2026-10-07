@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,7 +11,7 @@ namespace Adex.Data.Model
         public int Id { get; set; }
 
         [Required]
-        public int EntityId { get; set; }
+        public Guid EntityId { get; set; }
 
         [Required]
         [MaxLength(200)]

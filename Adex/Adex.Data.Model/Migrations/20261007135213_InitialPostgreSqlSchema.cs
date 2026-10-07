@@ -12,13 +12,14 @@ namespace Adex.Data.Model.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:pg_trgm", ",,");
+
             migrationBuilder.CreateTable(
                 name: "Entities",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Reference = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -26,10 +27,25 @@ namespace Adex.Data.Model.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EntityTotals",
+                columns: table => new
+                {
+                    EntityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LinkCount = table.Column<int>(type: "integer", nullable: false),
+                    OutgoingAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    IncomingAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Total = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntityTotals", x => x.EntityId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Companies",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Designation = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true)
                 },
                 constraints: table =>
@@ -44,12 +60,33 @@ namespace Adex.Data.Model.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EntityAttributes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EntityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntityAttributes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EntityAttributes_Entities_EntityId",
+                        column: x => x.EntityId,
+                        principalTable: "Entities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Links",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
-                    From_Id = table.Column<int>(type: "integer", nullable: false),
-                    To_Id = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    From_Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    To_Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Kind = table.Column<string>(type: "text", nullable: true),
                     Date = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
@@ -80,7 +117,7 @@ namespace Adex.Data.Model.Migrations
                 name: "Persons",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     LastName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     FirstName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true)
                 },
@@ -99,8 +136,9 @@ namespace Adex.Data.Model.Migrations
                 name: "FinancialLinks",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    DeclarationType = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -114,20 +152,46 @@ namespace Adex.Data.Model.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Entities_Reference",
-                table: "Entities",
-                column: "Reference",
+                name: "IX_Companies_Designation",
+                table: "Companies",
+                column: "Designation")
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EntityAttributes_EntityId_Name",
+                table: "EntityAttributes",
+                columns: new[] { "EntityId", "Name" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Links_From_Id",
-                table: "Links",
-                column: "From_Id");
+                name: "IX_EntityTotals_Total",
+                table: "EntityTotals",
+                column: "Total");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Links_To_Id",
+                name: "IX_Links_From_Id_Date",
                 table: "Links",
-                column: "To_Id");
+                columns: new[] { "From_Id", "Date" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Links_To_Id_Date",
+                table: "Links",
+                columns: new[] { "To_Id", "Date" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Persons_FirstName",
+                table: "Persons",
+                column: "FirstName")
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Persons_LastName",
+                table: "Persons",
+                column: "LastName")
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
         }
 
         /// <inheritdoc />
@@ -135,6 +199,12 @@ namespace Adex.Data.Model.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Companies");
+
+            migrationBuilder.DropTable(
+                name: "EntityAttributes");
+
+            migrationBuilder.DropTable(
+                name: "EntityTotals");
 
             migrationBuilder.DropTable(
                 name: "FinancialLinks");

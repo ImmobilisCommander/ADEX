@@ -30,7 +30,7 @@ Les anciennes structures de graphe partagées restent présentes pour l’API hi
 
 ## Configuration et intégration
 
-Les routes de navigation sont `GET /api/dashboard`, `GET /api/entity/search?query=...` et `GET /api/entity/{reference}`. L’ancienne route `GET /api/beneficiary/info/{reference}` retourne désormais les détails normalisés d’une entité. MVC utilise `AdexApiClient`; son adresse de base est fournie par `AdexApi:BaseAddress`.
+Les routes de navigation sont `GET /api/dashboard`, `GET /api/entity/search?query=...` et `GET /api/entity/{id}` (Guid). L’ancienne route `GET /api/beneficiary/info/{id}` retourne désormais les détails normalisés d’une entité. MVC utilise `AdexApiClient`; son adresse de base est fournie par `AdexApi:BaseAddress`.
 
 La chaîne `Adex` est nécessaire pour le fonctionnement normal de l’API. La chaîne `AdexMeta` sert uniquement à l’étape temporaire de transfert des attributs ; elle peut être retirée après vérification complète du transfert et de la sauvegarde de la base source. Les secrets sont fournis par une source sécurisée (variables d’environnement, User Secrets ou gestionnaire de secrets). Les fabriques EF utilisent `ConnectionStrings__Adex` et `ConnectionStrings__AdexMeta`.
 
@@ -52,10 +52,10 @@ Les fichiers suivent les préfixes `Adex.Mvc-` et `Adex.WebApi-`, suivis de la d
 
 ## Import des données CSV
 
-L’API expose un import en arrière-plan (`Adex.WebApi/Import/ImportJobService.cs`). La cible `Normalized` importe les CSV dans `Adex` via `CsvLoaderNormalized`. La cible `Metadata` transfère les attributs existants d’`AdexMeta` vers `EntityAttributes` dans `Adex`. La cible `All` exécute d’abord l’import normalisé, puis le transfert d’attributs.
+L’API expose un import complet en arrière-plan (`Adex.WebApi/Import/ImportJobService.cs`, `Adex.Business/DeclarationsImporter.cs`) à partir du fichier consolidé `declarations.csv`.
 
-- `POST api/import?target=All|Metadata|Normalized` lance le traitement (202), ou répond 409 s’il est déjà en cours ; `GET api/import` donne l’état et `DELETE api/import` l’annule. Une opération `Metadata` seule n’a pas besoin des fichiers CSV, mais la base source `AdexMeta` doit rester disponible.
-- Les routes exigent l’en-tête `X-Api-Key` égal à `Import:ApiKey`. Si cette clé est vide, les routes répondent 404 (fonction désactivée).
-- Les fichiers sont cherchés dans `Import:DataDirectory` (relatif à la racine du projet API) : `entreprise_*.csv` puis `declaration_avantage_*`, `declaration_convention_*` et `declaration_remuneration_*`, en retenant le plus récent par nom. Aucun chemin n’est accepté du client.
-- Le transfert d’attributs utilise des lots et des références stables ; il peut être relancé après interruption. Il n’existe pas de transaction commune entre les deux bases. Ne supprimer `AdexMeta` qu’après comparaison des nombres d’entités et d’attributs transférés.
-- Les erreurs de lecture signalées par les chargeurs sont comptées par étape (`errorCount`) ; le statut est conservé en mémoire seulement.
+- `POST api/import` lance le traitement (202), ou répond 409 s’il est déjà en cours ; `GET api/import` donne l’état et `DELETE api/import` l’annule. Les routes exigent l’en-tête `X-Api-Key` égal à `Import:ApiKey` ; si cette clé est vide, elles répondent 404.
+- Le fichier est `Import:FileName` (défaut `declarations.csv`) dans `Import:DataDirectory` (relatif à la racine du projet API). Aucun chemin n’est accepté du client.
+- Une seule transaction PostgreSQL : `TRUNCATE` de toutes les tables, `COPY` du CSV en flux dans une table temporaire (sans chargement en mémoire), puis insertions ensemblistes (entités identifiées par un Guid généré à l’import, sans préfixe ; l’identifiant source est conservé comme attribut `Référence`). Tous les statuts sont importés. En cas d’erreur ou d’annulation, l’ancienne base reste intacte.
+- Les lignes sans identifiant d’entreprise, de bénéficiaire ou de déclaration sont ignorées et comptées (`errorCount`). Le statut est conservé en mémoire seulement.
+- La base `AdexMeta` et l’ancien import par quatre CSV ne sont plus utilisés.

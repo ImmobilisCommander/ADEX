@@ -19,11 +19,11 @@
         const name = document.createElement("span");
         const meta = document.createElement("span");
 
-        link.href = `/${encodeURIComponent(entity.reference)}`;
+        link.href = `/${encodeURIComponent(entity.id)}`;
         name.className = "search-result-name";
-        name.textContent = entity.name || entity.reference;
+        name.textContent = entity.name;
         meta.className = "search-result-meta";
-        meta.textContent = `${entity.type} · ${entity.reference}`;
+        meta.textContent = entity.type;
         link.append(name, meta);
         item.append(link);
         return item;

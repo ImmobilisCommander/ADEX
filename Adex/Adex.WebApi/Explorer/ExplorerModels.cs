@@ -15,7 +15,9 @@ namespace Adex.WebApi.Explorer
 
         public List<FinancialLinkTypeSummary> FinancialLinkTypes { get; set; } = new();
 
-        public List<TopEntity> TopEntities { get; set; } = new();
+        public List<TopEntity> TopContributors { get; set; } = new();
+
+        public List<TopEntity> TopBeneficiaries { get; set; } = new();
     }
 
     public sealed class EntityTypeCount
@@ -36,7 +38,7 @@ namespace Adex.WebApi.Explorer
 
     public sealed class TopEntity
     {
-        public string Reference { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
 
@@ -47,7 +49,7 @@ namespace Adex.WebApi.Explorer
 
     public sealed class EntitySearchResult
     {
-        public string Reference { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
 
@@ -56,7 +58,7 @@ namespace Adex.WebApi.Explorer
 
     public sealed class EntityDetails
     {
-        public string Reference { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
 
@@ -84,9 +86,9 @@ namespace Adex.WebApi.Explorer
 
     public sealed class FinancialLinkDetails
     {
-        public string Reference { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
-        public string CounterpartyReference { get; set; } = string.Empty;
+        public Guid CounterpartyId { get; set; }
 
         public string CounterpartyName { get; set; } = string.Empty;
 
@@ -99,5 +101,7 @@ namespace Adex.WebApi.Explorer
         public decimal Amount { get; set; }
 
         public bool Outgoing { get; set; }
+
+        public List<EntityAttributeDetails> Justification { get; set; } = new();
     }
 }

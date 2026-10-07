@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Adex.WebApi.Explorer;
@@ -19,16 +20,16 @@ namespace Adex.WebApi.Controllers
         /// <summary>
         /// This method enable user to search for codes of companies or beneficiaries.
         /// </summary>
-        /// <param name="reference"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("info/{reference}")]
+        [Route("info/{id:guid}")]
         public async Task<ActionResult> GetInformation(
-            string reference,
+            Guid id,
             CancellationToken cancellationToken
         )
         {
-            var entity = await _explorer.GetEntityAsync(reference, cancellationToken);
+            var entity = await _explorer.GetEntityAsync(id, cancellationToken);
             return entity is null ? NotFound() : new JsonResult(entity);
         }
     }
