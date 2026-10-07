@@ -1,13 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12224.181 stable
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adex.App", "Adex.App\Adex.App.csproj", "{7B94B0B0-1F0E-4468-80CE-6F04C393F908}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adex.Business", "Adex.Business\Adex.Business.csproj", "{A30E2C44-F100-4373-A886-D0A9110478BD}"
-EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Adex.Web", "Adex.Web\Adex.Web.njsproj", "{9656FE10-6758-437B-8DFA-1E01733AE530}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adex.WebApi", "Adex.WebApi\Adex.WebApi.csproj", "{35A46704-A4BD-4DC0-A751-AF2826BB6419}"
 EndProject
@@ -19,24 +15,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Adex.Data.MetaModel", "Adex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Adex.Mvc", "Adex.Mvc\Adex.Mvc.csproj", "{8A528AA5-C7ED-4A08-BF5E-4BBF1E80B29D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{C7FA680C-7CB1-493E-902D-EE98C6E7BC70}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7B94B0B0-1F0E-4468-80CE-6F04C393F908}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B94B0B0-1F0E-4468-80CE-6F04C393F908}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B94B0B0-1F0E-4468-80CE-6F04C393F908}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B94B0B0-1F0E-4468-80CE-6F04C393F908}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A30E2C44-F100-4373-A886-D0A9110478BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A30E2C44-F100-4373-A886-D0A9110478BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A30E2C44-F100-4373-A886-D0A9110478BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A30E2C44-F100-4373-A886-D0A9110478BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9656FE10-6758-437B-8DFA-1E01733AE530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9656FE10-6758-437B-8DFA-1E01733AE530}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9656FE10-6758-437B-8DFA-1E01733AE530}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9656FE10-6758-437B-8DFA-1E01733AE530}.Release|Any CPU.Build.0 = Release|Any CPU
 		{35A46704-A4BD-4DC0-A751-AF2826BB6419}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{35A46704-A4BD-4DC0-A751-AF2826BB6419}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35A46704-A4BD-4DC0-A751-AF2826BB6419}.Release|Any CPU.ActiveCfg = Release|Any CPU

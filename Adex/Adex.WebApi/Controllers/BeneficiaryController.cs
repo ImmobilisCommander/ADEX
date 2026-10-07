@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Adex.Business;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Adex.WebApi.Controllers
 {
@@ -14,11 +9,11 @@ namespace Adex.WebApi.Controllers
     [ApiController]
     public class BeneficiaryController : ControllerBase
     {
-        private readonly ILogger<BeneficiaryController> _logger;
+        private readonly IMetadataLookupService _metadataLookupService;
 
-        public BeneficiaryController(ILogger<BeneficiaryController> logger)
+        public BeneficiaryController(IMetadataLookupService metadataLookupService)
         {
-            _logger = logger;
+            _metadataLookupService = metadataLookupService;
         }
 
         /// <summary>
@@ -28,20 +23,14 @@ namespace Adex.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("info/{reference}")]
-        public async Task<ActionResult> GetInformation(string reference)
+        public async Task<ActionResult> GetInformation(
+            string reference,
+            CancellationToken cancellationToken
+        )
         {
-            using (var loader = new CvsLoaderMetadata())
-            {
-                loader.DbConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AdexMeta;Integrated Security=True;Connect Timeout=3600;";
-                loader.OnMessage += Loader_OnMessage;
-
-                return new JsonResult(loader.GetBeneficiary(reference));
-            }
-        }
-
-        private void Loader_OnMessage(object sender, Common.MessageEventArgs e)
-        {
-            Debug.Write(e.Message);
+            return new JsonResult(
+                await _metadataLookupService.GetBeneficiaryAsync(reference, cancellationToken)
+            );
         }
     }
 }

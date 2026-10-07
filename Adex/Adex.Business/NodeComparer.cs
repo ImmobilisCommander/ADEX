@@ -3,9 +3,9 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Adex.Common;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Adex.Common;
 
 namespace Adex.Business
 {

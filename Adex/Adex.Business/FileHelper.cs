@@ -16,7 +16,11 @@ namespace Adex.Business
         /// <param name="sourceFile"></param>
         /// <param name="destinationDirectory"></param>
         /// <param name="nbOfLines"></param>
-        public static void ReWriteToUTF8(string sourceFile, string destinationDirectory, int? nbOfLines = null)
+        public static void ReWriteToUTF8(
+            string sourceFile,
+            string destinationDirectory,
+            int? nbOfLines = null
+        )
         {
             using (var r = new StreamReader(sourceFile, true))
             {

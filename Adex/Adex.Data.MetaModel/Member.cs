@@ -15,7 +15,6 @@ namespace Adex.Data.MetaModel
         [Key]
         public int Id { get; set; }
 
-        [Index(IsUnique = true)]
         [MaxLength(200)]
         [Required]
         public string Name { get; set; }

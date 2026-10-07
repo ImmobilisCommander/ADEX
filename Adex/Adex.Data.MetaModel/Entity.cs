@@ -3,10 +3,10 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Adex.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Adex.Common;
 
 namespace Adex.Data.MetaModel
 {
@@ -22,7 +22,6 @@ namespace Adex.Data.MetaModel
         /// <summary>
         /// External identifier
         /// </summary>
-        [Index(IsUnique = true)]
         [MaxLength(200)]
         [Required]
         public string Reference { get; set; }

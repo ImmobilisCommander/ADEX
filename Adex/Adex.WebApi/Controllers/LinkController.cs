@@ -3,11 +3,10 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Adex.Business;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Adex.Business;
 
 namespace Adex.WebApi.Controllers
 {
@@ -15,11 +14,11 @@ namespace Adex.WebApi.Controllers
     [ApiController]
     public class LinkController : ControllerBase
     {
-        private readonly ILogger<LinkController> _logger;
+        private readonly ILinkSearchService _linkSearchService;
 
-        public LinkController(ILogger<LinkController> logger)
+        public LinkController(ILinkSearchService linkSearchService)
         {
-            _logger = logger;
+            _linkSearchService = linkSearchService;
         }
 
         /// <summary>
@@ -29,19 +28,11 @@ namespace Adex.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("search/{txt}")]
-        public async Task<ActionResult> Search(string txt)
+        public async Task<ActionResult> Search(string txt, CancellationToken cancellationToken)
         {
-            using (var loader = new CsvLoaderNormalized())
-            {
-                loader.OnMessage += Loader_OnMessage;
-
-                return new JsonResult(loader.LinksToJson(txt, 1000));
-            }
-        }
-
-        private void Loader_OnMessage(object sender, Common.MessageEventArgs e)
-        {
-            Debug.Write(e.Message);
+            return new JsonResult(
+                await _linkSearchService.LinksToJsonAsync(txt, 1000, cancellationToken)
+            );
         }
     }
 }

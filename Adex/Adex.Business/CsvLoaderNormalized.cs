@@ -3,56 +3,72 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Adex.Common;
-using Adex.Data.Model;
-using CsvHelper;
-using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
+using Adex.Common;
+using Adex.Data.Model;
+using CsvHelper;
+using CsvHelper.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Adex.Business
 {
-    public partial class CsvLoaderNormalized : IDisposable, ICsvLoader
+    public partial class CsvLoaderNormalized : IDisposable, ICsvLoader, ILinkSearchService
     {
-        private CsvConfiguration _configuration = null;
         private CultureInfo _cultureFr = CultureInfo.CreateSpecificCulture("fr-FR");
-        private Timer _timer = null;
+        private System.Timers.Timer _timer = null;
         private Dictionary<string, Company> _companies = null;
         private Dictionary<string, Person> _beneficiaries = null;
         private Dictionary<string, Link> _links = null;
         private HashSet<string> _existingReferences = null;
         private bool disposedValue = false;
         private int _mainCounter = 0;
+        private readonly IDbContextFactory<AdexContext> _contextFactory;
 
         public event EventHandler<MessageEventArgs> OnMessage;
 
-        public CsvLoaderNormalized()
+        private CsvConfiguration CreateConfiguration(string delimiter = ",")
         {
-            _configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+            return new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                MissingFieldFound = delegate (string[] tab, int count, ReadingContext ctxt)
-                {
-                    OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Missing field found at index {count}: \"{tab[count]}\"", Level = Level.Error });
-                },
-                BadDataFound = delegate (ReadingContext ctxt)
-                {
-                    OnMessage?.Invoke(this, new MessageEventArgs { Message = ctxt.RawRecord, Level = Level.Error });
-                },
+                Delimiter = delimiter,
+                MissingFieldFound = args =>
+                    OnMessage?.Invoke(
+                        this,
+                        new MessageEventArgs
+                        {
+                            Message =
+                                $"Missing field found at index {args.Index}: \"{string.Join(",", args.HeaderNames ?? Array.Empty<string>())}\"",
+                            Level = Level.Error,
+                        }
+                    ),
+                BadDataFound = args =>
+                    OnMessage?.Invoke(
+                        this,
+                        new MessageEventArgs { Message = args.RawRecord, Level = Level.Error }
+                    ),
                 HasHeaderRecord = true,
-                Encoding = Encoding.UTF8
+                Encoding = Encoding.UTF8,
             };
+        }
 
-            _timer = new Timer(10000);
-            _timer.Elapsed += delegate (object sender, ElapsedEventArgs e)
+        public CsvLoaderNormalized(IDbContextFactory<AdexContext> contextFactory)
+        {
+            _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
+            _timer = new System.Timers.Timer(10000);
+            _timer.Elapsed += delegate(object sender, ElapsedEventArgs e)
             {
-                OnMessage?.Invoke(this, new MessageEventArgs { Message = _mainCounter.ToString().PadLeft(10, '0') });
+                OnMessage?.Invoke(
+                    this,
+                    new MessageEventArgs { Message = _mainCounter.ToString().PadLeft(10, '0') }
+                );
             };
             _timer.Enabled = true;
             _timer.Start();
@@ -67,36 +83,46 @@ namespace Adex.Business
             Dispose(false);
         }
 
-        public void LoadReferences()
+        public async Task LoadReferencesAsync(CancellationToken cancellationToken)
         {
-            using (var db = new AdexContext())
+            await using (var db = await _contextFactory.CreateDbContextAsync(cancellationToken))
             {
-                _existingReferences = new HashSet<string>(db.Entities.Select(x => x.Reference));
+                _existingReferences = new HashSet<string>(
+                    await db.Entities.Select(x => x.Reference).ToListAsync(cancellationToken)
+                );
             }
         }
 
-        public void LoadProviders(string path)
+        public async Task LoadProvidersAsync(string path, CancellationToken cancellationToken)
         {
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing \"{path}\" file" });
+            OnMessage?.Invoke(
+                this,
+                new MessageEventArgs { Message = $"Processing \"{path}\" file" }
+            );
 
             int counter = 0;
             using (var sr = new StreamReader(path, true))
             {
-                using (var csv = new CustomCsvReader(sr, _configuration))
+                using (var csv = new CustomCsvReader(sr, CreateConfiguration()))
                 {
-                    csv.Read();
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await csv.ReadAsync();
                     csv.ReadHeader();
 
-                    while (csv.Read())
+                    while (await csv.ReadAsync())
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         var externalId = csv.GetField("identifiant");
                         if (!_existingReferences.Contains(externalId))
                         {
-                            _companies.Add(externalId, new Company()
-                            {
-                                Reference = externalId,
-                                Designation = csv.GetField("denomination_sociale")
-                            });
+                            _companies.Add(
+                                externalId,
+                                new Company()
+                                {
+                                    Reference = externalId,
+                                    Designation = csv.GetField("denomination_sociale"),
+                                }
+                            );
                             _existingReferences.Add(externalId);
                         }
                         counter++;
@@ -104,13 +130,30 @@ namespace Adex.Business
                 }
             }
 
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Found {counter} records in file \"{path}\"", Level = Level.Debug });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"There are {_companies.Count} new companies", Level = Level.Debug });
+            OnMessage?.Invoke(
+                this,
+                new MessageEventArgs
+                {
+                    Message = $"Found {counter} records in file \"{path}\"",
+                    Level = Level.Debug,
+                }
+            );
+            OnMessage?.Invoke(
+                this,
+                new MessageEventArgs
+                {
+                    Message = $"There are {_companies.Count} new companies",
+                    Level = Level.Debug,
+                }
+            );
         }
 
-        public void LoadLinks(string path)
+        public async Task LoadLinksAsync(string path, CancellationToken cancellationToken)
         {
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Processing file \"{path}\"" });
+            OnMessage?.Invoke(
+                this,
+                new MessageEventArgs { Message = $"Processing file \"{path}\"" }
+            );
 
             int records = 0;
             int counterCompanies = 0;
@@ -119,30 +162,44 @@ namespace Adex.Business
 
             using (var sr = new StreamReader(path, true))
             {
-                using (var csv = new CustomCsvReader(sr, _configuration))
+                using (var csv = new CustomCsvReader(sr, CreateConfiguration(";")))
                 {
-                    csv.Configuration.Delimiter = ";";
-                    csv.Read();
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await csv.ReadAsync();
                     csv.ReadHeader();
 
                     var idx_entreprise_identifiant = csv.GetFieldIndex("entreprise_identifiant");
                     var idx_denomination_sociale = csv.GetFieldIndex("denomination_sociale");
 
-                    var idx_benef_identifiant_valeur = csv.GetFieldIndex("benef_identifiant_valeur");
+                    var idx_benef_identifiant_valeur = csv.GetFieldIndex(
+                        "benef_identifiant_valeur"
+                    );
                     var idx_benef_nom = csv.GetFieldIndex("benef_nom");
                     var idx_benef_prenom = csv.GetFieldIndex("benef_prenom");
 
                     var idx_ligne_identifiant = csv.GetFieldIndex("ligne_identifiant");
 
-                    while (csv.Read())
+                    while (await csv.ReadAsync())
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         try
                         {
-                            var date = csv.GetField(new string[] { "avant_date_signature", "conv_date_signature", "remu_date" })?.Trim();
+                            var date = csv.GetField(
+                                    new string[]
+                                    {
+                                        "avant_date_signature",
+                                        "conv_date_signature",
+                                        "remu_date",
+                                    }
+                                )
+                                ?.Trim();
 
                             var dateSignature = Convert.ToDateTime(date, _cultureFr);
 
-                            if (dateSignature.Year == 2019 && !string.IsNullOrEmpty(csv.GetField(idx_benef_identifiant_valeur)))
+                            if (
+                                dateSignature.Year == 2019
+                                && !string.IsNullOrEmpty(csv.GetField(idx_benef_identifiant_valeur))
+                            )
                             {
                                 Company company = null;
                                 Person benef = null;
@@ -154,7 +211,7 @@ namespace Adex.Business
                                     company = new Company()
                                     {
                                         Reference = externalId,
-                                        Designation = csv.GetField(idx_denomination_sociale)
+                                        Designation = csv.GetField(idx_denomination_sociale),
                                     };
                                     _companies.Add(company.Reference, company);
                                     _existingReferences.Add(externalId);
@@ -175,7 +232,7 @@ namespace Adex.Business
                                     {
                                         Reference = externalId,
                                         FirstName = firstName,
-                                        LastName = lastName
+                                        LastName = lastName,
                                     };
                                     _beneficiaries.Add(benef.Reference, benef);
                                     _existingReferences.Add(externalId);
@@ -190,8 +247,19 @@ namespace Adex.Business
                                 if (!_existingReferences.Any(x => x == externalId))
                                 {
                                     // remu_convention_liee
-                                    var amount = csv.GetField(new string[] { "avant_montant_ttc", "conv_montant_ttc", "remu_montant_ttc" })?.Trim();
-                                    var kind = csv.GetField(new string[] { "avant_nature", "conv_objet" })?.Trim();
+                                    var amount = csv.GetField(
+                                            new string[]
+                                            {
+                                                "avant_montant_ttc",
+                                                "conv_montant_ttc",
+                                                "remu_montant_ttc",
+                                            }
+                                        )
+                                        ?.Trim();
+                                    var kind = csv.GetField(
+                                            new string[] { "avant_nature", "conv_objet" }
+                                        )
+                                        ?.Trim();
 
                                     link = new FinancialLink
                                     {
@@ -210,7 +278,13 @@ namespace Adex.Business
                         }
                         catch (Exception e)
                         {
-                            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"\"{path}\" {e.Message}: {csv.Context.RawRecord}" });
+                            OnMessage?.Invoke(
+                                this,
+                                new MessageEventArgs
+                                {
+                                    Message = $"\"{path}\" {e.Message}: {csv.Context.Parser.RawRecord}",
+                                }
+                            );
                         }
 
                         _mainCounter++;
@@ -220,44 +294,80 @@ namespace Adex.Business
             }
 
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Read {records} records" });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Added {counterCompanies} companies, {counterBenef} beneficiaries, {counterBonds} insterest bonds" });
-            OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Total {_companies.Count} companies, {_beneficiaries.Count} beneficiaries, {_links.Count} insterest links" });
+            OnMessage?.Invoke(
+                this,
+                new MessageEventArgs
+                {
+                    Message =
+                        $"Added {counterCompanies} companies, {counterBenef} beneficiaries, {counterBonds} insterest bonds",
+                }
+            );
+            OnMessage?.Invoke(
+                this,
+                new MessageEventArgs
+                {
+                    Message =
+                        $"Total {_companies.Count} companies, {_beneficiaries.Count} beneficiaries, {_links.Count} insterest links",
+                }
+            );
         }
 
-        public void Save()
+        public async Task SaveAsync(CancellationToken cancellationToken)
         {
-            using (var db = new AdexContext())
+            await using (var db = await _contextFactory.CreateDbContextAsync(cancellationToken))
             {
-                using (var t = db.Database.BeginTransaction())
+                await using (var t = await db.Database.BeginTransactionAsync(cancellationToken))
                 {
                     try
                     {
                         db.Companies.AddRange(_companies.Select(x => x.Value));
                         db.Persons.AddRange(_beneficiaries.Select(x => x.Value));
                         db.Links.AddRange(_links.Select(x => x.Value));
-                        db.SaveChanges();
-                        t.Commit();
+                        await db.SaveChangesAsync(cancellationToken);
+                        await t.CommitAsync(cancellationToken);
 
-                        OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_companies.Count()} new companies have been saved", Level = Level.Info });
-                        OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_beneficiaries.Count()} new beneficiaries have been saved", Level = Level.Info });
-                        OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{_links.Count()} new links have been saved", Level = Level.Info });
-                    }
-                    catch (DbEntityValidationException e)
-                    {
-                        foreach (var x in e.EntityValidationErrors)
-                        {
-                            OnMessage?.Invoke(this, new MessageEventArgs { Message = x.Entry.Entity.GetType().Name, Level = Level.Error });
-                            foreach (var y in x.ValidationErrors)
+                        OnMessage?.Invoke(
+                            this,
+                            new MessageEventArgs
                             {
-                                OnMessage?.Invoke(this, new MessageEventArgs { Message = $"{y.PropertyName}: {y.ErrorMessage}", Level = Level.Error });
+                                Message = $"{_companies.Count()} new companies have been saved",
+                                Level = Level.Info,
                             }
-                        }
-                        t.Rollback();
+                        );
+                        OnMessage?.Invoke(
+                            this,
+                            new MessageEventArgs
+                            {
+                                Message =
+                                    $"{_beneficiaries.Count()} new beneficiaries have been saved",
+                                Level = Level.Info,
+                            }
+                        );
+                        OnMessage?.Invoke(
+                            this,
+                            new MessageEventArgs
+                            {
+                                Message = $"{_links.Count()} new links have been saved",
+                                Level = Level.Info,
+                            }
+                        );
+                    }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        await t.RollbackAsync(CancellationToken.None);
+                        throw;
                     }
                     catch (Exception e)
                     {
-                        OnMessage?.Invoke(this, new MessageEventArgs { Message = e.GetFullErrorMessage(), Level = Level.Error });
-                        t.Rollback();
+                        OnMessage?.Invoke(
+                            this,
+                            new MessageEventArgs
+                            {
+                                Message = e.GetFullErrorMessage(),
+                                Level = Level.Error,
+                            }
+                        );
+                        await t.RollbackAsync(CancellationToken.None);
                     }
                 }
             }
@@ -267,38 +377,66 @@ namespace Adex.Business
             _links.Clear();
         }
 
-        public GraphDataSet LinksToJson(string txt, int? take)
+        public async Task<GraphDataSet> LinksToJsonAsync(
+            string txt,
+            int take,
+            CancellationToken cancellationToken
+        )
         {
             var retour = new GraphDataSet();
 
             var links = new List<Link>();
-            using (var db = new AdexContext())
+            await using (var db = await _contextFactory.CreateDbContextAsync(cancellationToken))
             {
-                db.Database.Log = (log) =>
-                {
-                    OnMessage?.Invoke(this, new MessageEventArgs { Level = Level.Debug, Message = log });
-                };
-
                 if (!string.IsNullOrEmpty(txt))
                 {
-                    if (db.Entities.Any(x => x.Reference.Contains(txt)))
+                    if (await db.Entities.AnyAsync(x => x.Reference.Contains(txt), cancellationToken))
                     {
-                        links.AddRange(db.Links.Include("From").Include("To").Where(x => x.From.Reference.Contains(txt)));
-                        links.AddRange(db.Links.Include("From").Include("To").Where(x => x.To.Reference.Contains(txt)));
+                        links.AddRange(
+                            await db.Links.Include(link => link.From)
+                                .Include(link => link.To)
+                                .Where(x => x.From.Reference.Contains(txt))
+                                .ToListAsync(cancellationToken)
+                        );
+                        links.AddRange(
+                            await db.Links.Include(link => link.From)
+                                .Include(link => link.To)
+                                .Where(x => x.To.Reference.Contains(txt))
+                                .ToListAsync(cancellationToken)
+                        );
                     }
                 }
                 else
                 {
-                    links = db.Links.Include("From").Include("To").ToList();
+                    links = await db.Links.Include(link => link.From)
+                        .Include(link => link.To)
+                        .ToListAsync(cancellationToken);
                 }
             }
-            var all = links.Select(x => new { id = x.From.Reference, name = x.From.Reference }).Distinct().ToList();
-            all.AddRange(links.Select(x => new { id = x.To.Reference, name = x.To.Reference }).Distinct());
+            var all = links
+                .Select(x => new { id = x.From.Reference, name = x.From.Reference })
+                .Distinct()
+                .ToList();
+            all.AddRange(
+                links.Select(x => new { id = x.To.Reference, name = x.To.Reference }).Distinct()
+            );
 
-            foreach (var item in all.Where(x => !string.IsNullOrEmpty(x.id)).Take(take ?? all.Count))
+            foreach (
+                var item in all.Where(x => !string.IsNullOrEmpty(x.id)).Take(take)
+            )
             {
-                var temp = links.Where(x => x.From.Reference == item.id).Where(x => !string.IsNullOrEmpty(x.To.Reference)).Select(x => x.To.Reference);
-                retour.BundlingItems.Add(new EdgeBundlingItem { Name = item.id, Size = temp.Distinct().Count(), Imports = temp.Distinct().ToList() });
+                var temp = links
+                    .Where(x => x.From.Reference == item.id)
+                    .Where(x => !string.IsNullOrEmpty(x.To.Reference))
+                    .Select(x => x.To.Reference);
+                retour.BundlingItems.Add(
+                    new EdgeBundlingItem
+                    {
+                        Name = item.id,
+                        Size = temp.Distinct().Count(),
+                        Imports = temp.Distinct().ToList(),
+                    }
+                );
             }
 
             return retour;
@@ -323,7 +461,6 @@ namespace Adex.Business
                     _beneficiaries = null;
                     _links = null;
 
-                    _configuration = null;
                     _cultureFr = null;
                 }
 
@@ -334,9 +471,5 @@ namespace Adex.Business
             }
         }
 
-        public Dictionary<string, string> GetBeneficiary(string reference)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

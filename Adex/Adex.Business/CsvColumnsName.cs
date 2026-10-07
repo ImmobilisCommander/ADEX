@@ -59,8 +59,5 @@ namespace Adex.Business
         public const string RemuDate = "remu_date";
         public const string RemuMontantTtc = "remu_montant_ttc";
         public const string RemuConventionLiee = "remu_convention_liee";
-
-
-
     }
 }

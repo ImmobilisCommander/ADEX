@@ -3,20 +3,29 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Adex.Common;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Adex.Common;
 
 namespace Adex.Data.Model
 {
     [Table("Links")]
     public class Link : Entity, ILink
     {
-        [NotMapped]
-        public int From_Id { get { return From.Id; } }
+        public int From_Id
+        {
+            get { return From?.Id ?? _fromId; }
+            set { _fromId = value; }
+        }
 
-        [NotMapped]
-        public int To_Id { get { return To.Id; } }
+        public int To_Id
+        {
+            get { return To?.Id ?? _toId; }
+            set { _toId = value; }
+        }
+
+        private int _fromId;
+        private int _toId;
 
         public Entity From { get; set; }
 

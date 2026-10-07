@@ -12,13 +12,13 @@ namespace Adex.Data.Model
     public class Person : Entity
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [MaxLength(200)]
         public string LastName { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [MaxLength(200)]
         public string FirstName { get; set; }
