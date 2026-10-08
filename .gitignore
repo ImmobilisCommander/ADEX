@@ -1,4 +1,4 @@
-﻿exports-etalab
+exports-etalab
 Adex/.vs
 Adex/Adex.*/bin
 Adex/Adex.*/obj
@@ -10,3 +10,7 @@ Data/big_declaration_convention_2020_05_13_04_00.csv
 Data/big_declaration_remuneration_2020_05_13_04_00.csv
 Data/big_entreprise_2020_05_13_04_00.csv
 Adex/packages
+Data/declarations.csv
+Data/declarations_10pct.csv
+Data/declarations_2pct.csv
+.playwright-mcp

@@ -1,6 +1,7 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Adex.Business;
+using Adex.WebApi.Explorer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.WebApi.Controllers
@@ -9,28 +10,27 @@ namespace Adex.WebApi.Controllers
     [ApiController]
     public class BeneficiaryController : ControllerBase
     {
-        private readonly IMetadataLookupService _metadataLookupService;
+        private readonly DataExplorerService _explorer;
 
-        public BeneficiaryController(IMetadataLookupService metadataLookupService)
+        public BeneficiaryController(DataExplorerService explorer)
         {
-            _metadataLookupService = metadataLookupService;
+            _explorer = explorer;
         }
 
         /// <summary>
         /// This method enable user to search for codes of companies or beneficiaries.
         /// </summary>
-        /// <param name="reference"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("info/{reference}")]
+        [Route("info/{id:guid}")]
         public async Task<ActionResult> GetInformation(
-            string reference,
+            Guid id,
             CancellationToken cancellationToken
         )
         {
-            return new JsonResult(
-                await _metadataLookupService.GetBeneficiaryAsync(reference, cancellationToken)
-            );
+            var entity = await _explorer.GetEntityAsync(id, 1, DataExplorerService.DefaultPageSize, "date", true, cancellationToken);
+            return entity is null ? NotFound() : new JsonResult(entity);
         }
     }
 }

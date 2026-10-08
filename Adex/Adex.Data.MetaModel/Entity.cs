@@ -1,4 +1,4 @@
-﻿// <copyright file="Entity.cs" company="julien_lefevre@outlook.fr">
+// <copyright file="Entity.cs" company="julien_lefevre@outlook.fr">
 //   Copyright (c) 2020 All Rights Reserved
 //   <author>Julien LEFEVRE</author>
 // </copyright>
@@ -11,7 +11,7 @@ using Adex.Common;
 namespace Adex.Data.MetaModel
 {
     [Table("Entities")]
-    public class Entity : IEntity
+    public class Entity
     {
         /// <summary>
         /// Unique identifier

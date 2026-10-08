@@ -17,17 +17,14 @@ namespace Adex.WebApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult<ImportStatus> Start(
-            [FromHeader(Name = ApiKeyHeader)] string apiKey,
-            [FromQuery] ImportTarget target = ImportTarget.All
-        )
+        public ActionResult<ImportStatus> Start([FromHeader(Name = ApiKeyHeader)] string apiKey)
         {
             if (Check(apiKey) is { } denied)
             {
                 return denied;
             }
 
-            return _importJobService.TryStart(target, out var status)
+            return _importJobService.TryStart(out var status)
                 ? AcceptedAtAction(nameof(GetStatus), status)
                 : Conflict(status);
         }

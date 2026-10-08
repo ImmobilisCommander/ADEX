@@ -1,43 +1,42 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Adex.Mvc</title>
+    <title>@ViewData["Title"] - ADEX</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="icon" sizes="any" href="~/favicon.ico" />
+    <script>
+        try {
+            const savedTheme = localStorage.getItem("adex-theme");
+            if (savedTheme === "dark") document.documentElement.dataset.theme = "dark";
+        } catch {
+            // The light theme remains available when browser storage is disabled.
+        }
+    </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Adex.Mvc</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        <nav class="site-nav" aria-label="Navigation principale">
+            <a class="brand-mark" href="/" aria-label="ADEX, accueil">ADEX<span>.</span></a>
+            <a class="nav-current" href="/">Explorer les données</a>
+            <span class="nav-context">Liens d’intérêt · données déclaratives</span>
+            <a class="nav-settings" href="/Home/Settings" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "page" : null)">Paramètres</a>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <div class="site-shell">
+        @RenderBody()
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2020 - Adex.Mvc - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="site-footer">
+        <div class="site-shell footer-inner">
+            <span>ADEX · Exploration des données déclaratives</span>
+            <div class="footer-links">
+                <a href="/Home/Disclaimer">Source et avertissement</a>
+                <a href="/">Retour au tableau de bord</a>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

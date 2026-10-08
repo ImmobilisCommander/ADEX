@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +17,11 @@ namespace Adex.Mvc.Controllers
         }
 
         [HttpGet]
-        [Route("{id}")]
-        [Route("Read/{id}")]
-        public async Task<ActionResult> Read(string id, CancellationToken cancellationToken)
+        [Route("{id:guid}")]
+        [Route("Read/{id:guid}")]
+        public async Task<ActionResult> Read(Guid id, CancellationToken cancellationToken)
         {
-            var data = await _apiClient.GetBeneficiaryAsync(id, cancellationToken);
+            var data = await _apiClient.GetEntityJsonAsync(id, cancellationToken);
             return new JsonResult(data);
         }
     }

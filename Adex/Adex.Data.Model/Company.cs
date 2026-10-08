@@ -1,4 +1,4 @@
-﻿// <copyright file="Company.cs" company="julien_lefevre@outlook.fr">
+// <copyright file="Company.cs" company="julien_lefevre@outlook.fr">
 //   Copyright (c) 2020 All Rights Reserved
 //   <author>Julien LEFEVRE</author>
 // </copyright>
@@ -19,7 +19,7 @@ namespace Adex.Data.Model
 
         public override string ToString()
         {
-            return $"{Reference} {Designation}";
+            return Designation;
         }
     }
 }

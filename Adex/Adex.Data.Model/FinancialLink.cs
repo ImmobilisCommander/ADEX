@@ -4,6 +4,7 @@
 // </copyright>
 
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Adex.Data.Model
 {
@@ -11,5 +12,8 @@ namespace Adex.Data.Model
     public class FinancialLink : Link
     {
         public decimal Amount { get; set; }
+
+        [MaxLength(100)]
+        public string DeclarationType { get; set; }
     }
 }

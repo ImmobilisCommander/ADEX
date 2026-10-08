@@ -32,3 +32,38 @@ Les éléments ci-dessous sont des propositions de travail dérivées des limite
 ## Ordre recommandé
 
 Tester l’application des deux migrations sur des bases PostgreSQL dédiées, puis ajouter des tests automatisés sur la configuration DI, les services, les routes et le parcours complet. Confirmer en parallèle les règles métier et la configuration de déploiement avant d’étendre les fonctionnalités.
+
+## À traiter ultérieurement — Page de maintenance pendant l’import
+
+Objectif : pendant un import, toutes les requêtes HTTP du site reçoivent une page de maintenance affichant l’état de l’import ; le site redevient normal à la fin.
+
+### Application web (MVC)
+
+- **Middleware de maintenance**, placé avant le routage : répond `503 Service Unavailable` avec `Retry-After` (pas de redirection, les URL restent intactes). Il laisse passer les fichiers statiques, la route d’état et la santé. Si l’API est injoignable, le comportement actuel est conservé (pas de bascule en maintenance).
+- **Page de maintenance** Razor à la charte actuelle (thème clair/sombre) : titre, étape en cours, étapes terminées/à venir, heure de début.
+- **Suivi en direct par SignalR** plutôt que par polling. Le navigateur ne se connecte pas directement à l’API : le MVC héberge un hub relais (`/hubs/maintenance`) qui rediffuse l’état reçu de l’API. À la réception de `ImportCompleted`, la page se recharge. Prévoir `signalr.js` en local (pas de CDN) et `WithAutomaticReconnect`.
+- Le blocage des requêtes ne doit pas dépendre d’une connexion WebSocket : le middleware lit un état en mémoire alimenté par un polling court (2-3 s, mis en cache) de `GET /api/import/status`.
+
+### API
+
+- `GET /api/import/status` public, sans clé, limité à des données non sensibles : `isRunning`, `step`, `percent`, `startedAt`, `message`. `GET /api/import` (avec clé) reste inchangé.
+- `ImportHub` (`/hubs/import`) alimenté par `ImportJobService` via `IHubContext`, avec envoi de l’état courant à la connexion.
+
+### Plusieurs instances (API et MVC)
+
+L’état en mémoire de `ImportJobService` ne suffit plus ; la base PostgreSQL devient la source de vérité.
+
+1. **Un seul import à la fois** : verrou consultatif `pg_try_advisory_lock(<clé fixe>)` tenu sur une connexion dédiée pendant tout l’import. `POST /api/import` répond 409 si le verrou est pris. Le verrou est libéré automatiquement si l’instance meurt.
+2. **Table `ImportRuns`** : id, début, fin, statut (`Running`/`Succeeded`/`Failed`), étape, progression, instance, `LastHeartbeat`. Un import `Running` sans heartbeat depuis plus de 30 s est considéré comme mort et passé en `Failed`.
+3. **Statut lu en base** par toutes les instances API (cache de quelques secondes).
+4. **Diffusion entre instances** : PostgreSQL `LISTEN/NOTIFY` (`import_status`, `import_completed`), sans nouvelle infrastructure. Redis backplane ou Azure SignalR Service ne sont pertinents que s’ils existent déjà.
+5. **Invalidation des caches** : `import_completed` déclenche la suppression du cache du tableau de bord sur toutes les instances (sinon cache distribué, ou identifiant du dernier import dans la clé).
+6. **Load balancer** : sessions persistantes ou WebSockets seuls (`SkipNegotiation`) pour SignalR.
+
+Ordre proposé : table `ImportRuns` et verrou, puis statut public, middleware et page de maintenance, puis SignalR et `LISTEN/NOTIFY`.
+
+À décider : site bloqué totalement, ou lecture seule avec bandeau pendant l’import.
+
+## Règle de conception — synchronisation
+
+Dans toute la solution, utiliser `SemaphoreSlim` plutôt que `lock` pour la synchronisation (sections critiques asynchrones, `WaitAsync` / `Release` dans un `try/finally`). Le code existant à migrer : `Adex.WebApi/Import/ImportJobService.cs`, qui utilise `lock (_sync)`.

@@ -2,6 +2,7 @@ using Adex.Business;
 using Adex.Common;
 using Adex.Data.MetaModel;
 using Adex.Data.Model;
+using Adex.WebApi.Explorer;
 using Adex.WebApi.Import;
 
 using Microsoft.AspNetCore.Builder;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Npgsql;
+using Microsoft.AspNetCore.Http;
 
 using Serilog;
 
@@ -45,46 +47,30 @@ namespace Adex.WebApi
                     new System.Text.Json.Serialization.JsonStringEnumConverter()
                 )
             );
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSingleton(serviceProvider =>
+                new Npgsql.NpgsqlDataSourceBuilder(
+                    new Npgsql.NpgsqlConnectionStringBuilder(
+                        GetRequiredConnectionString(
+                            serviceProvider.GetRequiredService<IConfiguration>(),
+                            "Adex"
+                        )
+                    )
+                    {
+                        // L'import rouvre des connexions depuis la chaîne exposée par le DbContext.
+                        PersistSecurityInfo = true,
+                    }.ConnectionString
+                )
+                    .EnableDynamicJson()
+                    .Build()
+            );
             builder.Services.AddDbContextFactory<AdexContext>((serviceProvider, options) =>
-                options.UseNpgsql(
-                    GetRequiredConnectionString(
-                        serviceProvider.GetRequiredService<IConfiguration>(),
-                        "Adex"
-                    )
-                )
+                options
+                    .UseNpgsql(serviceProvider.GetRequiredService<Npgsql.NpgsqlDataSource>())
+                    .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             );
-            builder.Services.AddDbContextFactory<AdexMetaContext>((serviceProvider, options) =>
-                options.UseNpgsql(
-                    GetRequiredConnectionString(
-                        serviceProvider.GetRequiredService<IConfiguration>(),
-                        "AdexMeta"
-                    )
-                )
-            );
-            builder.Services.AddScoped(provider =>
-            {
-                var loader = new CsvLoaderNormalized(
-                    provider.GetRequiredService<IDbContextFactory<AdexContext>>()
-                );
-                AttachLogging(provider.GetRequiredService<ILogger<CsvLoaderNormalized>>(), loader);
-                return loader;
-            });
-            builder.Services.AddScoped<ILinkSearchService>(provider =>
-                provider.GetRequiredService<CsvLoaderNormalized>()
-            );
-            builder.Services.AddScoped(provider =>
-            {
-                var connectionString = GetRequiredConnectionString(
-                    provider.GetRequiredService<IConfiguration>(),
-                    "AdexMeta"
-                );
-                var loader = new CvsLoaderMetadata(connectionString);
-                AttachLogging(provider.GetRequiredService<ILogger<CvsLoaderMetadata>>(), loader);
-                return loader;
-            });
-            builder.Services.AddScoped<IMetadataLookupService>(provider =>
-                provider.GetRequiredService<CvsLoaderMetadata>()
-            );
+            builder.Services.AddScoped<DataExplorerService>();
+            builder.Services.AddScoped<DeclarationsImporter>();
 
             builder.Services.Configure<ImportOptions>(builder.Configuration.GetSection("Import"));
             builder.Services.AddSingleton<ImportJobService>();
@@ -107,6 +93,25 @@ namespace Adex.WebApi
             }
 
             app.UseHttpsRedirection();
+            app.Use(async (context, next) =>
+            {
+                var importJob = context.RequestServices.GetRequiredService<ImportJobService>();
+                if (
+                    !context.Request.Path.StartsWithSegments("/api/import")
+                    && !context.Request.Path.StartsWithSegments("/swagger")
+                    && importJob.IsRunning
+                )
+                {
+                    context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                    context.Response.Headers.RetryAfter = "30";
+                    await context.Response.WriteAsJsonAsync(
+                        new { error = "Import en cours, les données sont indisponibles." }
+                    );
+                    return;
+                }
+
+                await next();
+            });
             app.UseAuthorization();
             app.MapControllers();
 
@@ -119,8 +124,11 @@ namespace Adex.WebApi
                     shutdown.Cancel();
                 };
 
-                await app.Services.GetRequiredService<IDbContextFactory<AdexContext>>().CreateDbContext().Database.MigrateAsync(app.Lifetime.ApplicationStopping);
-                await app.Services.GetRequiredService<IDbContextFactory<AdexMetaContext>>().CreateDbContext().Database.MigrateAsync(app.Lifetime.ApplicationStopping);
+                await using (var migrationContext = app.Services.GetRequiredService<IDbContextFactory<AdexContext>>().CreateDbContext())
+                {
+                    migrationContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
+                    await migrationContext.Database.MigrateAsync(app.Lifetime.ApplicationStopping);
+                }
 
                 await app.RunAsync(shutdown.Token);
             }
@@ -139,28 +147,6 @@ namespace Adex.WebApi
                 ?? throw new InvalidOperationException(
                     $"The '{name}' connection string is not configured."
                 );
-        }
-
-        private static void AttachLogging<T>(ILogger<T> logger, ICsvLoader loader)
-        {
-            loader.OnMessage += (_, message) =>
-            {
-                switch (message.Level)
-                {
-                    case Level.Debug:
-                        logger.LogDebug("{LoaderMessage}", message.Message);
-                        break;
-                    case Level.Info:
-                        logger.LogInformation("{LoaderMessage}", message.Message);
-                        break;
-                    case Level.Warn:
-                        logger.LogWarning("{LoaderMessage}", message.Message);
-                        break;
-                    case Level.Error:
-                        logger.LogError("{LoaderMessage}", message.Message);
-                        break;
-                }
-            };
         }
     }
 }

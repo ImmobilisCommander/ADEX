@@ -1,5 +1,4 @@
 using Adex.Business;
-using Adex.Common;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -18,21 +16,14 @@ namespace Adex.WebApi.Import
 {
     public class ImportJobService
     {
-        private static readonly string[] LinkFilePatterns =
-        {
-            "declaration_avantage_*.csv",
-            "declaration_convention_*.csv",
-            "declaration_remuneration_*.csv",
-        };
-
-        private const string ProviderFilePattern = "entreprise_*.csv";
+        private const string StepName = "Declarations";
 
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IHostApplicationLifetime _lifetime;
         private readonly IWebHostEnvironment _environment;
         private readonly ImportOptions _options;
         private readonly ILogger<ImportJobService> _logger;
-        private readonly object _sync = new();
+        private readonly SemaphoreSlim _sync = new(1, 1);
 
         private ImportStatus _status = new();
         private CancellationTokenSource _cancellation;
@@ -54,6 +45,8 @@ namespace Adex.WebApi.Import
 
         public bool IsEnabled => !string.IsNullOrEmpty(_options.ApiKey);
 
+        public bool IsRunning => GetStatus().State == ImportState.Running;
+
         public bool IsAuthorized(string apiKey)
         {
             if (!IsEnabled || string.IsNullOrEmpty(apiKey))
@@ -71,15 +64,15 @@ namespace Adex.WebApi.Import
 
         public ImportStatus GetStatus()
         {
-            lock (_sync)
+            using (Acquire())
             {
                 return Snapshot(_status);
             }
         }
 
-        public bool TryStart(ImportTarget target, out ImportStatus status)
+        public bool TryStart(out ImportStatus status)
         {
-            lock (_sync)
+            using (Acquire())
             {
                 if (_status.State == ImportState.Running)
                 {
@@ -94,18 +87,9 @@ namespace Adex.WebApi.Import
                 _status = new ImportStatus
                 {
                     State = ImportState.Running,
-                    Target = target,
                     StartedAt = DateTimeOffset.UtcNow,
                 };
-                if (target != ImportTarget.Normalized)
-                {
-                    _status.Steps.Add(new ImportStepStatus { Name = nameof(ImportTarget.Metadata) });
-                }
-
-                if (target != ImportTarget.Metadata)
-                {
-                    _status.Steps.Add(new ImportStepStatus { Name = nameof(ImportTarget.Normalized) });
-                }
+                _status.Steps.Add(new ImportStepStatus { Name = StepName });
 
                 var token = _cancellation.Token;
                 var run = _status;
@@ -117,7 +101,7 @@ namespace Adex.WebApi.Import
 
         public bool Cancel()
         {
-            lock (_sync)
+            using (Acquire())
             {
                 if (_status.State != ImportState.Running)
                 {
@@ -131,124 +115,94 @@ namespace Adex.WebApi.Import
 
         private async Task RunAsync(ImportStatus run, CancellationToken cancellationToken)
         {
+            var step = run.Steps.Single();
             try
             {
-                var files = ResolveFiles();
-                foreach (var step in run.Steps.ToList())
+                using (Acquire())
                 {
-                    await RunStepAsync(step, files, cancellationToken);
+                    step.State = ImportState.Running;
                 }
 
-                lock (_sync)
+                var path = ResolveFile();
+                _logger.LogInformation("Full import of {Path} started", path);
+
+                await using var scope = _scopeFactory.CreateAsyncScope();
+                var cache = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+                var result = await scope.ServiceProvider
+                    .GetRequiredService<DeclarationsImporter>()
+                    .ImportAsync(
+                        path,
+                        new Progress<string>(message =>
+                        {
+                            using (Acquire())
+                            {
+                                step.Message = message;
+                            }
+
+                            _logger.LogInformation("Import: {Message}", message);
+                        }),
+                        cancellationToken
+                    );
+
+                cache.Remove(Explorer.DataExplorerService.DashboardCacheKey);
+
+                using (Acquire())
                 {
-                    run.State = run.Steps.All(x => x.State == ImportState.Completed)
+                    step.ErrorCount = (int)Math.Min(result.SkippedRows, int.MaxValue);
+                    step.Message =
+                        $"{result.Rows} lignes lues, {result.Companies} entreprises, "
+                        + $"{result.Beneficiaries} bénéficiaires, {result.Links} liens financiers, "
+                        + $"{result.SkippedRows} lignes ignorées";
+                    step.State = step.ErrorCount == 0
                         ? ImportState.Completed
-                        : run.Steps.Any(x => x.State == ImportState.Cancelled)
-                            ? ImportState.Cancelled
-                            : run.Steps.All(x => x.State == ImportState.Failed)
-                                ? ImportState.Failed
-                                : ImportState.CompletedWithErrors;
+                        : ImportState.CompletedWithErrors;
+                    run.State = step.State;
                 }
+
+                _logger.LogInformation("Import finished: {Summary}", step.Message);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                using (Acquire())
+                {
+                    step.State = ImportState.Cancelled;
+                    run.State = ImportState.Cancelled;
+                }
+
+                _logger.LogWarning("Import cancelled, database may be partial, rerun the import");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "The import could not be started");
-                lock (_sync)
+                using (Acquire())
                 {
-                    foreach (var step in run.Steps)
-                    {
-                        step.State = ImportState.Failed;
-                        step.FailureMessage = e.Message;
-                    }
-
+                    step.State = ImportState.Failed;
+                    step.FailureMessage = e.Message;
                     run.State = ImportState.Failed;
                 }
+
+                _logger.LogError(e, "Import failed, database may be partial, rerun the import");
             }
             finally
             {
-                lock (_sync)
+                using (Acquire())
                 {
                     run.FinishedAt = DateTimeOffset.UtcNow;
                 }
             }
         }
 
-        private async Task RunStepAsync(
-            ImportStepStatus step,
-            ImportFiles files,
-            CancellationToken cancellationToken
-        )
+        private IDisposable Acquire()
         {
-            lock (_sync)
-            {
-                step.State = ImportState.Running;
-            }
-
-            try
-            {
-                await using var scope = _scopeFactory.CreateAsyncScope();
-                ICsvLoader loader = step.Name == nameof(ImportTarget.Metadata)
-                    ? scope.ServiceProvider.GetRequiredService<CvsLoaderMetadata>()
-                    : scope.ServiceProvider.GetRequiredService<CsvLoaderNormalized>();
-                loader.OnMessage += (_, message) =>
-                {
-                    if (message.Level == Level.Error)
-                    {
-                        lock (_sync)
-                        {
-                            step.ErrorCount++;
-                        }
-                    }
-                };
-
-                _logger.LogInformation("Import step {Step} started", step.Name);
-                await loader.LoadReferencesAsync(cancellationToken);
-                await loader.LoadProvidersAsync(files.Providers, cancellationToken);
-                foreach (var linkFile in files.Links)
-                {
-                    await loader.LoadLinksAsync(linkFile, cancellationToken);
-                }
-
-                if (step.Name == nameof(ImportTarget.Normalized))
-                {
-                    await loader.SaveAsync(cancellationToken);
-                }
-
-                lock (_sync)
-                {
-                    step.State = step.ErrorCount == 0
-                        ? ImportState.Completed
-                        : ImportState.CompletedWithErrors;
-                }
-
-                _logger.LogInformation(
-                    "Import step {Step} finished with {ErrorCount} errors",
-                    step.Name,
-                    step.ErrorCount
-                );
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                lock (_sync)
-                {
-                    step.State = ImportState.Cancelled;
-                }
-
-                _logger.LogWarning("Import step {Step} cancelled", step.Name);
-            }
-            catch (Exception e)
-            {
-                lock (_sync)
-                {
-                    step.State = ImportState.Failed;
-                    step.FailureMessage = e.Message;
-                }
-
-                _logger.LogError(e, "Import step {Step} failed", step.Name);
-            }
+            _sync.Wait();
+            return new Releaser(_sync);
         }
 
-        private ImportFiles ResolveFiles()
+        private sealed class Releaser(SemaphoreSlim semaphore) : IDisposable
+        {
+            public void Dispose() => semaphore.Release();
+        }
+
+        private string ResolveFile()
         {
             if (string.IsNullOrWhiteSpace(_options.DataDirectory))
             {
@@ -256,26 +210,10 @@ namespace Adex.WebApi.Import
             }
 
             var directory = Path.GetFullPath(_options.DataDirectory, _environment.ContentRootPath);
-            if (!Directory.Exists(directory))
-            {
-                throw new DirectoryNotFoundException($"Import directory '{directory}' does not exist.");
-            }
-
-            return new ImportFiles(
-                FindLatest(directory, ProviderFilePattern),
-                LinkFilePatterns.Select(x => FindLatest(directory, x)).ToList()
-            );
-        }
-
-        private static string FindLatest(string directory, string pattern)
-        {
-            return Directory
-                    .EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly)
-                    .OrderByDescending(Path.GetFileName, StringComparer.Ordinal)
-                    .FirstOrDefault()
-                ?? throw new FileNotFoundException(
-                    $"No file matching '{pattern}' in '{directory}'."
-                );
+            var path = Path.Combine(directory, Path.GetFileName(_options.FileName));
+            return File.Exists(path)
+                ? path
+                : throw new FileNotFoundException($"Import file '{path}' does not exist.");
         }
 
         private static ImportStatus Snapshot(ImportStatus source)
@@ -283,7 +221,6 @@ namespace Adex.WebApi.Import
             return new ImportStatus
             {
                 State = source.State,
-                Target = source.Target,
                 StartedAt = source.StartedAt,
                 FinishedAt = source.FinishedAt,
                 Steps = source
@@ -293,11 +230,10 @@ namespace Adex.WebApi.Import
                         State = x.State,
                         ErrorCount = x.ErrorCount,
                         FailureMessage = x.FailureMessage,
+                        Message = x.Message,
                     })
                     .ToList(),
             };
         }
-
-        private sealed record ImportFiles(string Providers, IReadOnlyList<string> Links);
     }
 }
