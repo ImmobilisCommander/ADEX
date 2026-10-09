@@ -23,7 +23,18 @@
             <a class="brand-mark" href="/" aria-label="ADEX, accueil">ADEX<span>.</span></a>
             <a class="nav-current" href="/">Explorer les données</a>
             <span class="nav-context">Liens d’intérêt · données déclaratives</span>
-            <a class="nav-settings" href="/Home/Settings" aria-current="@(ViewData["SettingsAriaCurrent"])">Paramètres</a>
+            <div class="nav-menu" data-nav-menu>
+                <button class="nav-burger" type="button" aria-expanded="false" aria-controls="nav-menu-list" aria-label="Menu" data-nav-menu-toggle>
+                    <span class="nav-burger-bar" aria-hidden="true"></span>
+                    <span class="nav-burger-bar" aria-hidden="true"></span>
+                    <span class="nav-burger-bar" aria-hidden="true"></span>
+                </button>
+                <ul class="nav-menu-list" id="nav-menu-list" hidden>
+                    <li><a class="nav-menu-item" href="/Csv">Interroger le CSV</a></li>
+                    <li><a class="nav-menu-item" href="/Home/Settings" aria-current="@(ViewData["SettingsAriaCurrent"])">Paramètres</a></li>
+                    <li><a class="nav-menu-item" href="/Home/Disclaimer">Source et avertissement</a></li>
+                </ul>
+            </div>
         </nav>
     </header>
     <div class="site-shell">
@@ -34,7 +45,6 @@
         <div class="site-shell footer-inner">
             <span>ADEX · Exploration des données déclaratives</span>
             <div class="footer-links">
-                <a href="/Home/Disclaimer">Source et avertissement</a>
                 <a href="/">Retour au tableau de bord</a>
             </div>
         </div>

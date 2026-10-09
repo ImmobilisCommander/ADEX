@@ -1,0 +1,44 @@
+@model Adex.Mvc.Models.CsvIndexViewModel
+
+<main class="csv-page">
+    <header class="settings-intro">
+        <h1>@Model.Title</h1>
+        <p>Lignes du fichier CSV, @Model.PageSize par page.</p>
+    </header>
+
+    <div data-csv-content data-content-url="@Model.ContentUrl" aria-busy="true">
+        <p class="csv-status" role="status" aria-live="polite">
+            <span class="csv-spinner" aria-hidden="true"></span>
+            Lecture du fichier en cours… Quitter la page l’interrompt.
+        </p>
+        <div class="table-scroll csv-skeleton" aria-hidden="true">
+            <table class="data-table csv-table">
+                <thead>
+                    <tr>
+                        @foreach (var column in Model.PlaceholderColumns)
+                        {
+                            <th scope="col"><span class="csv-skeleton-bar"></span></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.PlaceholderRows)
+                    {
+                        <tr>
+                            @foreach (var column in Model.PlaceholderColumns)
+                            {
+                                <td><span class="csv-skeleton-bar"></span></td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <noscript><p class="error-state">JavaScript est nécessaire pour afficher les lignes du fichier.</p></noscript>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/csv-loader.js" asp-append-version="true"></script>
+    <script src="~/js/csv-table.js" asp-append-version="true"></script>
+}

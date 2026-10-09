@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Adex.Mvc
@@ -29,17 +30,17 @@ namespace Adex.Mvc
             );
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddHttpClient<AdexApiClient>(client =>
+            builder.Services.AddOptions<AdexApiOptions>()
+                .BindConfiguration(AdexApiOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            builder.Services.AddHttpClient<AdexApiClient>((serviceProvider, client) =>
             {
-                var baseAddress = builder.Configuration["AdexApi:BaseAddress"];
-                if (!Uri.TryCreate(baseAddress, UriKind.Absolute, out var uri))
-                {
-                    throw new InvalidOperationException(
-                        "The 'AdexApi:BaseAddress' setting must be an absolute URI."
-                    );
-                }
-
-                client.BaseAddress = uri;
+                client.BaseAddress = new Uri(
+                    serviceProvider.GetRequiredService<IOptions<AdexApiOptions>>().Value.BaseAddress
+                );
+                // Scanning the whole CSV can be long; the call is cancelled when the user leaves the page.
+                client.Timeout = Timeout.InfiniteTimeSpan;
             });
 
             var app = builder.Build();

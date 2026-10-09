@@ -1,0 +1,105 @@
+@model Adex.Mvc.Models.CsvPageViewModel
+
+@if (Model.HasError)
+{
+    <p class="error-state" role="alert">@Model.ErrorMessage</p>
+}
+else
+{
+    <section class="register-section" aria-label="Lignes du fichier CSV">
+        <form id="csv-filter-form" method="get" asp-controller="Csv" asp-action="Index"></form>
+        <div class="csv-toolbar">
+            @if (Model.HasFilterableColumns)
+            {
+                <button type="submit" form="csv-filter-form" class="csv-filter-submit">Filtrer sur les valeurs saisies</button>
+            }
+            @if (Model.HasActiveFilters)
+            {
+                <a class="csv-filter-clear" href="@Model.ClearFiltersUrl">Effacer les filtres</a>
+            }
+            <div class="csv-columns">
+                <button type="button" class="csv-columns-toggle" aria-expanded="false" aria-controls="csv-columns-panel" data-csv-columns-toggle>Colonnes</button>
+                <div class="csv-columns-panel" id="csv-columns-panel" hidden data-csv-columns-panel>
+                    <div class="csv-columns-actions">
+                        <button type="button" data-csv-columns-all>Tout afficher</button>
+                        <button type="button" data-csv-columns-none>Tout masquer</button>
+                    </div>
+                    @foreach (var column in Model.Columns)
+                    {
+                        <label class="csv-column-option">
+                            <input type="checkbox" checked data-csv-column="@column.Name" />
+                            <span>@column.Name</span>
+                            @if (column.IsFilterable)
+                            {
+                                <svg class="csv-funnel" viewBox="0 0 16 16" width="14" height="14" role="img" aria-label="Filtre disponible" focusable="false"><title>Filtre disponible</title><path d="M1.5 2h13l-5 6v5l-3 1.5V8z" fill="currentColor" /></svg>
+                            }
+                        </label>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table csv-table" data-csv-table>
+                <thead>
+                    <tr>
+                        @foreach (var column in Model.Columns)
+                        {
+                            <th scope="col" aria-sort="none" data-csv-column="@column.Name"><button type="button" class="sort-button" title="Trier cette page par @column.Name"><span>@column.Name</span><i aria-hidden="true"></i></button></th>
+                        }
+                    </tr>
+                    <tr class="csv-filter-row">
+                        @foreach (var column in Model.Columns)
+                        {
+                            <td data-csv-column="@column.Name">
+                                @if (column.IsFilterable)
+                                {
+                                    <input type="text" class="csv-filter-input" form="csv-filter-form" name="filters[@column.Name]" value="@column.FilterValue" placeholder="Contient…" autocomplete="off" aria-label="Filtrer @column.Name : contient" />
+                                }
+                            </td>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr tabindex="0" title="Afficher l’enregistrement">
+                            @foreach (var cell in row)
+                            {
+                                <td title="@cell">@cell</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.HasRows)
+        {
+            <p class="table-note">Lignes @Model.FirstRowNumber à @Model.LastRowNumber. Le filtre porte sur tout le fichier, le tri uniquement sur la page affichée. Cliquez sur une ligne pour voir l’enregistrement complet.</p>
+        }
+        else
+        {
+            <p class="table-note">Aucune ligne ne correspond@(Model.HasActiveFilters ? " aux filtres saisis" : "").</p>
+        }
+        @if (Model.HasPager)
+        {
+            <nav class="pager" aria-label="Pagination du fichier CSV">
+                @if (Model.PreviousPageUrl is not null)
+                {
+                    <a class="pager-link" rel="prev" href="@Model.PreviousPageUrl">Précédent</a>
+                }
+                <span class="pager-link is-current" aria-current="page">@Model.Page</span>
+                @if (Model.NextPageUrl is not null)
+                {
+                    <a class="pager-link" rel="next" href="@Model.NextPageUrl">Suivant</a>
+                }
+            </nav>
+        }
+    </section>
+    <dialog class="csv-dialog" aria-labelledby="csv-dialog-title" data-csv-dialog>
+        <div class="csv-dialog-header">
+            <h2 id="csv-dialog-title">Enregistrement</h2>
+            <button type="button" class="csv-dialog-close" data-csv-dialog-close>Fermer</button>
+        </div>
+        <dl class="csv-record" data-csv-record></dl>
+    </dialog>
+}

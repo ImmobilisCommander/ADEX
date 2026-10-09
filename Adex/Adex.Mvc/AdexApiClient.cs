@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -7,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Adex.Mvc.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.Mvc
 {
@@ -102,6 +104,34 @@ namespace Adex.Mvc
             );
 
             return document.RootElement.Clone();
+        }
+
+        public async Task<CsvPageResponse> GetCsvPageAsync(
+            int page,
+            IReadOnlyDictionary<string, string> filters,
+            CancellationToken cancellationToken
+        )
+        {
+            var query = new List<string> { $"page={page}" };
+            query.AddRange(
+                filters.Select(x => $"filters[{Uri.EscapeDataString(x.Key)}]={Uri.EscapeDataString(x.Value)}")
+            );
+            using var response = await _httpClient.GetAsync(
+                $"api/csv?{string.Join('&', query)}",
+                cancellationToken
+            );
+            if (response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.BadRequest)
+            {
+                var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
+                return new CsvPageResponse
+                {
+                    ErrorMessage = problem?.Detail ?? "Le fichier CSV est inaccessible."
+                };
+            }
+
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<CsvPageResponse>(cancellationToken)
+                ?? throw new InvalidOperationException("The API returned an empty CSV response.");
         }
 
         private async Task<T> GetModelAsync<T>(

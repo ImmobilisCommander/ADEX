@@ -1,11 +1,10 @@
 using Adex.Business;
-using Adex.Common;
-using Adex.Data.MetaModel;
 using Adex.Data.Model;
 using Adex.WebApi.Explorer;
 using Adex.WebApi.Import;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 using Npgsql;
-using Microsoft.AspNetCore.Http;
 
 using Serilog;
 
@@ -72,7 +70,16 @@ namespace Adex.WebApi
             builder.Services.AddScoped<DataExplorerService>();
             builder.Services.AddScoped<DeclarationsImporter>();
 
-            builder.Services.Configure<ImportOptions>(builder.Configuration.GetSection("Import"));
+            builder.Services.AddOptions<Adex.WebApi.Csv.CsvOptions>()
+                .BindConfiguration(Adex.WebApi.Csv.CsvOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            builder.Services.AddSingleton<Adex.WebApi.Csv.CsvPageReader>();
+
+            builder.Services.AddOptions<ImportOptions>()
+                .BindConfiguration(ImportOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
             builder.Services.AddSingleton<ImportJobService>();
 
             builder.Services.AddEndpointsApiExplorer();

@@ -199,11 +199,6 @@ namespace Adex.WebApi.Import
 
         private string ResolveFile()
         {
-            if (string.IsNullOrWhiteSpace(_options.DataDirectory))
-            {
-                throw new InvalidOperationException("Import:DataDirectory is not configured.");
-            }
-
             var directory = Path.GetFullPath(_options.DataDirectory, _environment.ContentRootPath);
             var path = Path.Combine(directory, Path.GetFileName(_options.FileName));
             return File.Exists(path)

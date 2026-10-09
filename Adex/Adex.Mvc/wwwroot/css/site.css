@@ -102,13 +102,13 @@ input:focus-visible {
 }
 
 .site-shell {
-    width: min(calc(100% - 48px), var(--measure));
+    width: calc(100% - 48px);
     margin-inline: auto;
 }
 
 .site-nav {
     min-height: 66px;
-    padding-inline: max(24px, calc((100% - var(--measure)) / 2));
+    padding-inline: 24px;
     display: flex;
     align-items: center;
     gap: 28px;
@@ -156,19 +156,69 @@ input:focus-visible {
     font-size: 0.78rem;
 }
 
-.nav-settings {
-    padding: 7px 11px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    color: var(--ink-muted);
-    font-size: 0.84rem;
-    font-weight: 650;
-    text-decoration: none;
+.nav-menu {
+    position: relative;
 }
 
-.nav-settings:hover,
-.nav-settings[aria-current="page"] {
-    border-color: var(--line);
+.nav-burger {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.nav-burger:hover,
+.nav-burger[aria-expanded="true"] {
+    background: var(--paper-cool);
+}
+
+.nav-burger-bar {
+    width: 18px;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--ink);
+}
+
+.nav-menu-list {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1000;
+    min-width: 200px;
+    margin: 8px 0 0;
+    padding: 6px;
+    list-style: none;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper);
+    box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.12);
+}
+
+.nav-menu-list[hidden] {
+    display: none;
+}
+
+.nav-menu-item {
+    display: block;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.nav-menu-item:hover,
+.nav-menu-item:focus,
+.nav-menu-item[aria-current="page"] {
     background: var(--paper-cool);
     color: var(--ink);
 }
@@ -927,6 +977,285 @@ input:focus-visible {
     cursor: pointer;
 }
 
+.csv-page {
+    padding-block: 48px 80px;
+}
+
+.csv-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.csv-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    color: var(--ink-muted);
+    font-size: 0.88rem;
+}
+
+.csv-status[hidden] {
+    display: none;
+}
+
+.csv-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--line);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: csv-spin 0.8s linear infinite;
+}
+
+@keyframes csv-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .csv-spinner {
+        animation-duration: 3s;
+    }
+}
+
+.csv-skeleton .csv-table tbody tr {
+    cursor: default;
+}
+
+.csv-skeleton-bar {
+    display: block;
+    width: 70%;
+    height: 12px;
+    border-radius: 6px;
+    background: var(--line);
+    animation: csv-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes csv-pulse {
+    50% {
+        opacity: 0.45;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .csv-skeleton-bar {
+        animation: none;
+    }
+}
+
+.csv-columns {
+    position: relative;
+}
+
+.csv-filter-submit {
+    padding: 7px 12px;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--button-ink);
+    font-size: 0.84rem;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.csv-filter-submit:hover {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+.csv-filter-clear {
+    color: var(--ink-muted);
+    font-size: 0.84rem;
+}
+
+.csv-filter-row td {
+    height: auto;
+    padding: 4px 8px 8px;
+    border-bottom: 1px solid var(--line);
+    background: var(--paper-cool);
+}
+
+.csv-filter-input {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--ink);
+    font-size: 0.8rem;
+}
+
+.csv-filter-input::placeholder {
+    color: var(--placeholder);
+}
+
+.csv-funnel {
+    flex: none;
+    margin-left: auto;
+    color: var(--accent);
+}
+
+.csv-columns-toggle {
+    padding: 7px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 0.84rem;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.csv-columns-toggle:hover,
+.csv-columns-toggle[aria-expanded="true"] {
+    background: var(--paper-cool);
+}
+
+.csv-columns-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 20;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    max-height: 60vh;
+    margin-top: 6px;
+    padding: 10px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper);
+    box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.12);
+}
+
+.csv-columns-panel[hidden] {
+    display: none;
+}
+
+.csv-columns-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.csv-columns-actions button {
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: none;
+    color: var(--ink-muted);
+    font-size: 0.76rem;
+    cursor: pointer;
+}
+
+.csv-column-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 2px;
+    font-size: 0.84rem;
+    overflow-wrap: anywhere;
+}
+
+.csv-table {
+    table-layout: fixed;
+    min-width: 0;
+}
+
+.csv-table th,
+.csv-table td {
+    height: 40px;
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.csv-table td {
+    width: 180px;
+}
+
+.csv-table tbody tr {
+    cursor: pointer;
+}
+
+.csv-table [hidden] {
+    display: none;
+}
+
+.csv-table tbody tr:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+}
+
+.csv-dialog {
+    width: min(720px, calc(100% - 32px));
+    max-height: 85vh;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 16px 48px rgba(var(--shadow-rgb), 0.25);
+}
+
+.csv-dialog::backdrop {
+    background: rgba(var(--shadow-rgb), 0.5);
+}
+
+.csv-dialog-header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+}
+
+.csv-dialog-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.csv-dialog-close {
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.csv-record {
+    width: 100%;
+    margin: 0;
+    padding: 8px 20px 20px;
+    display: grid;
+    grid-template-columns: minmax(140px, 30%) 1fr;
+    font-size: 0.86rem;
+}
+
+.csv-record dt,
+.csv-record dd {
+    margin: 0;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line-light);
+    overflow-wrap: anywhere;
+}
+
+.csv-record dt {
+    padding-right: 16px;
+    color: var(--ink-muted);
+    font-weight: 650;
+}
+
 .data-table .sort-button:hover,
 .data-table .sort-button:focus-visible {
     color: var(--ink);
@@ -1197,7 +1526,6 @@ input:focus-visible {
 }
 
 .settings-page {
-    max-width: 860px;
     min-height: 58vh;
     padding-block: 48px 80px;
 }
@@ -1310,7 +1638,6 @@ input:focus-visible {
 }
 
 .disclaimer-page {
-    max-width: 860px;
     min-height: 58vh;
     padding-block: 48px 80px;
 }
@@ -1487,7 +1814,7 @@ input:focus-visible {
 }
 
 .search-page .register-section {
-    max-width: 920px;
+    max-width: none;
 }
 
 @keyframes register-arrive {
@@ -1497,7 +1824,7 @@ input:focus-visible {
 
 @media (max-width: 800px) {
     .site-shell {
-        width: min(calc(100% - 32px), var(--measure));
+        width: calc(100% - 32px);
     }
 
     .site-nav {
@@ -1554,10 +1881,8 @@ input:focus-visible {
         min-height: 52px;
     }
 
-    .nav-settings {
+    .nav-menu {
         margin-left: auto;
-        padding: 6px 9px;
-        font-size: 0.78rem;
     }
 
     .nav-current {

@@ -36,3 +36,6 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 - KPI d’attente non abrégés : les trois nombres s’affichent en entiers complets (« 790 000 », « 5 600 000 », « 10 000 000 000 € ») et continuent de monter lentement après avoir atteint l’estimation, tant que le chargement dure ; la taille de police s’adapte aux petits écrans.
 
 Les recommandations sont des propositions, pas des travaux déjà réalisés. Les constats décrivent les sources inspectées et devront être actualisés si l’implémentation évolue.
+- Page d'interrogation du CSV : lecture asynchrone (CsvPageReader.ReadAsync, CsvRecordCursor) annulée via le jeton de la requête HTTP, indicateur « Recherche en cours » côté MVC, filtres sur les colonnes texte et identifiants, et règle sur les méthodes asynchrones ajoutée à AGENTS.md.
+- Page CSV : affichage immédiat de la page, contenu (tableau, filtres, pagination) chargé ensuite par /Csv/Content via csv-loader.js, requête annulée quand l'utilisateur quitte la page.
+- API CSV : résultat de chaque page/combinaison de filtres conservé 1 minute dans IMemoryCache.
