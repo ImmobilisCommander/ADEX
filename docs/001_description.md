@@ -29,6 +29,8 @@ Les constantes de colonnes CSV (`Adex/Adex.Business/CsvColumnsName.cs`) décrive
 | Tableau de bord | L’accueil présente le nombre d’entités, les liens et montants par type de déclaration, le nombre de déclarations par mois (graphique en barres), la concentration et la distribution des montants, et un classement des dix entités par montant financier cumulé. Chaque fiche d’entité affiche les montants par année et la répartition de ses liens par typologie. |
 | Recherche et fiche | La recherche d’entités appelle l’API ; une référence ouvre une fiche à l’adresse `/<référence>`, avec ses attributs et ses liens financiers navigables. |
 | Visualisation | Les indicateurs et fiches sont chargés depuis l’API. L’ancien graphe de démonstration et son fichier JSON local ne sont plus utilisés. |
+| Interrogation du CSV | La page `/Csv` affiche le fichier `declarations.csv` par pages de 10 lignes. Elle s’affiche tout de suite avec un tableau fictif, puis charge les lignes. L’utilisateur peut masquer des colonnes (choix mémorisé dans le navigateur), trier la page affichée, filtrer sur tout le fichier avec un opérateur « contient » (colonnes texte et identifiants seulement, indiquées par un entonnoir) et ouvrir une ligne dans une modale libellé/valeur. |
+| Navigation | Un menu burger en haut à droite donne accès aux paramètres, à l’interrogation du CSV et à la page « Source et avertissement ». Le site occupe toute la largeur de la fenêtre. |
 
 Voir [Conception](002_design.md) pour les rôles des composants, [Architecture](003_architecture.md) pour les applications et [Règles métier](004_business_rules.md) pour les conditions précises observées.
 

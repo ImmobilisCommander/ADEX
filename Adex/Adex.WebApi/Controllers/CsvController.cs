@@ -16,31 +16,16 @@ namespace Adex.WebApi.Controllers
 {
     [ApiController]
     [Route("api/csv")]
-    public sealed class CsvController : ControllerBase
+    public sealed class CsvController(
+        CsvPageReader reader,
+        IMemoryCache cache,
+        IOptionsMonitor<CsvOptions> options,
+        IWebHostEnvironment environment,
+        ILogger<CsvController> logger
+    ) : ControllerBase
     {
         private const int PageSize = 10;
-        private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(1);
-
-        private readonly CsvPageReader _reader;
-        private readonly IMemoryCache _cache;
-        private readonly CsvOptions _options;
-        private readonly IWebHostEnvironment _environment;
-        private readonly ILogger<CsvController> _logger;
-
-        public CsvController(
-            CsvPageReader reader,
-            IMemoryCache cache,
-            IOptions<CsvOptions> options,
-            IWebHostEnvironment environment,
-            ILogger<CsvController> logger
-        )
-        {
-            _reader = reader;
-            _cache = cache;
-            _options = options.Value;
-            _environment = environment;
-            _logger = logger;
-        }
+        private static readonly SemaphoreSlim ScanLock = new(1, 1);
 
         [HttpGet]
         public async Task<ActionResult<CsvPage>> Get(
@@ -61,23 +46,40 @@ namespace Adex.WebApi.Controllers
                 );
             }
 
-            var path = Path.GetFullPath(_options.FilePath, _environment.ContentRootPath);
+            var settings = options.CurrentValue;
+            var path = Path.GetFullPath(settings.FilePath, environment.ContentRootPath);
             var key = CacheKey(path, Math.Max(page, 1), criteria);
             try
             {
-                var result = await _cache.GetOrCreateAsync(
-                    key,
-                    entry =>
-                    {
-                        entry.AbsoluteExpirationRelativeToNow = CacheDuration;
-                        return _reader.ReadAsync(path, Math.Max(page, 1), PageSize, criteria, cancellationToken);
-                    }
-                );
-                return result;
+                if (cache.TryGetValue(key, out CsvPage cached))
+                {
+                    return cached;
+                }
+
+                // One scan of the file at a time; waiting requests stop as soon as their client leaves.
+                await ScanLock.WaitAsync(cancellationToken);
+                try
+                {
+                    return await cache.GetOrCreateAsync(
+                        key,
+                        entry =>
+                        {
+                            // Read on every scan so that a configuration change applies to the next search.
+                            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(
+                                options.CurrentValue.CacheDurationSeconds
+                            );
+                            return reader.ReadAsync(path, Math.Max(page, 1), PageSize, criteria, cancellationToken);
+                        }
+                    );
+                }
+                finally
+                {
+                    ScanLock.Release();
+                }
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                _logger.LogError(exception, "Unable to read the CSV file {Path}", path);
+                logger.LogError(exception, "Unable to read the CSV file {Path}", path);
                 return Problem(
                     detail: $"Le fichier « {Path.GetFileName(path)} » est introuvable ou illisible.",
                     statusCode: StatusCodes.Status404NotFound

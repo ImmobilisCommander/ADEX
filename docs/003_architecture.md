@@ -59,3 +59,12 @@ L’API expose un import complet en arrière-plan (`Adex.WebApi/Import/ImportJob
 - COPY binaire Npgsql en deux passes sur le CSV, sans table temporaire ni transaction : la passe 1 retient, pour chaque entreprise, bénéficiaire et lien, la ligne la plus récemment publiée ; la passe 2 écrit directement les tables finales via plusieurs connexions parallèles (entités identifiées par un Guid généré à l’import, sans préfixe ; l’identifiant source est conservé comme attribut `Référence`). Les clés étrangères et index sont supprimés avant le chargement, puis recréés (clés étrangères `NOT VALID`) suivis d’un `ANALYZE`. Les attributs d’une entité tiennent dans une seule ligne `jsonb` (`EntityAttributes(EntityId, Data)`). En cas d’erreur ou d’annulation, la base peut être partielle : relancer l’import depuis le début.
 - Les lignes sans identifiant d’entreprise, de bénéficiaire ou de déclaration sont ignorées et comptées (`errorCount`). Le statut est conservé en mémoire seulement.
 - La base `AdexMeta` et l’ancien import par quatre CSV ne sont plus utilisés.
+
+## Interrogation directe du CSV
+
+- `GET api/csv?page=N&filters[colonne]=valeur` (`Adex.WebApi/Controllers/CsvController.cs`) renvoie 10 lignes (`CsvPage`). Le MVC l’appelle par `/Csv` (page immédiate) puis `/Csv/Content` (tableau chargé par `csv-loader.js`, requête annulée quand l’utilisateur quitte la page).
+- Lecture asynchrone, strictement vers l’avant (`CsvPageReader.ReadAsync`, `CsvRecordCursor`), sans repositionnement ni retour arrière ; l’arrêt a lieu dès la page lue plus une ligne correspondante. Le jeton d’annulation de la requête HTTP est transmis jusqu’à la lecture.
+- Filtres : « contient », insensible à la casse et aux accents, cumulés par « et ». Seules les colonnes de `CsvFilterableColumns` (texte et identifiants) sont acceptées ; les autres donnent 400. Le tri est fait côté client sur la page affichée uniquement.
+- Un `SemaphoreSlim` limite à une seule lecture du fichier à la fois ; les requêtes en attente sont annulables.
+- Le résultat de chaque page et combinaison de filtres est mis en cache (`IMemoryCache`) pendant `Csv:CacheDurationSeconds` secondes (60 par défaut, 0 sans cache). La valeur est lue via `IOptionsMonitor` et se modifie à chaud.
+- Configuration (`CsvOptions`, validée au démarrage) : `Csv:FilePath` (obligatoire, relatif à la racine de l’API) et `Csv:CacheDurationSeconds`. Côté MVC, `AdexApi:BaseAddress` (`AdexApiOptions`) est validée au démarrage et le délai d’attente de l’appel est infini.

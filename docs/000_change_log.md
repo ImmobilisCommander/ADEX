@@ -39,3 +39,6 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 - Page d'interrogation du CSV : lecture asynchrone (CsvPageReader.ReadAsync, CsvRecordCursor) annulée via le jeton de la requête HTTP, indicateur « Recherche en cours » côté MVC, filtres sur les colonnes texte et identifiants, et règle sur les méthodes asynchrones ajoutée à AGENTS.md.
 - Page CSV : affichage immédiat de la page, contenu (tableau, filtres, pagination) chargé ensuite par /Csv/Content via csv-loader.js, requête annulée quand l'utilisateur quitte la page.
 - API CSV : résultat de chaque page/combinaison de filtres conservé 1 minute dans IMemoryCache.
+- API CSV : un SemaphoreSlim limite à une seule lecture du fichier à la fois ; les requêtes en attente restent annulables.
+- API CSV : durée du cache (Csv:CacheDurationSeconds, 60 s par défaut, 0 = pas de cache) lue via IOptionsMonitor pour être prise en compte à chaud ; contrôleurs CSV passés au constructeur principal ; règle correspondante ajoutée à AGENTS.md.
+- Documentation : règle de mise à jour continue des documents ajoutée à AGENTS.md ;  01_description.md et  03_architecture.md complétés (menu burger, pleine largeur, page et API d'interrogation du CSV).

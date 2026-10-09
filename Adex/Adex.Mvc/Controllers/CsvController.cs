@@ -12,18 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Adex.Mvc.Controllers
 {
-    public class CsvController : Controller
+    public class CsvController(AdexApiClient apiClient, ILogger<CsvController> logger) : Controller
     {
         private const int PageSize = 10;
-
-        private readonly AdexApiClient _apiClient;
-        private readonly ILogger<CsvController> _logger;
-
-        public CsvController(AdexApiClient apiClient, ILogger<CsvController> logger)
-        {
-            _apiClient = apiClient;
-            _logger = logger;
-        }
 
         [HttpGet]
         public IActionResult Index(
@@ -66,7 +57,7 @@ namespace Adex.Mvc.Controllers
         {
             try
             {
-                var csv = await _apiClient.GetCsvPageAsync(page, filters, cancellationToken);
+                var csv = await apiClient.GetCsvPageAsync(page, filters, cancellationToken);
                 if (csv.ErrorMessage is not null)
                 {
                     return new CsvPageViewModel { ErrorMessage = csv.ErrorMessage };
@@ -93,7 +84,7 @@ namespace Adex.Mvc.Controllers
             }
             catch (HttpRequestException exception)
             {
-                _logger.LogError(exception, "Unable to load CSV data from the API");
+                logger.LogError(exception, "Unable to load CSV data from the API");
                 return new CsvPageViewModel
                 {
                     ErrorMessage = exception.StatusCode == HttpStatusCode.ServiceUnavailable
