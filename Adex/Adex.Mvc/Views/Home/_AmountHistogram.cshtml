@@ -1,70 +1,34 @@
-@model List<Adex.Mvc.Models.AmountHistogramBinViewModel>
-@using System.Globalization
-@{
-    var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
-    var inv = CultureInfo.InvariantCulture;
-    var bins = Model;
-    const double chartWidth = 480, chartHeight = 300, left = 52, right = 8, top = 12, bottom = 40;
-    var plotWidth = chartWidth - left - right;
-    var plotHeight = chartHeight - top - bottom;
-
-    string Money(decimal value) => value >= 1_000_000m
-        ? (value / 1_000_000m).ToString("0.##", frenchCulture) + " M€"
-        : value >= 1_000m ? (value / 1_000m).ToString("0.##", frenchCulture) + " k€" : value.ToString("0.##", frenchCulture) + " €";
-    string Range(Adex.Mvc.Models.AmountHistogramBinViewModel bin) => bin.UpperBound == 0m
-        ? "montant nul ou négatif"
-        : $"{Money(bin.LowerBound)} à {Money(bin.UpperBound)}";
-    bool IsDecade(Adex.Mvc.Models.AmountHistogramBinViewModel bin)
-    {
-        if (bin.LowerBound <= 0m) { return false; }
-        var log = Math.Log10((double)bin.LowerBound);
-        return Math.Abs(log - Math.Round(log)) < 0.01;
-    }
-}
+@model Adex.Mvc.Models.AmountHistogramChartViewModel
 
 <section class="register-section amount-histogram" aria-labelledby="histogram-title">
     <div class="section-heading">
         <h2 id="histogram-title">Distribution des montants</h2>
         <span class="section-unit">nombre de liens · échelle logarithmique</span>
     </div>
-    @if (bins.Count == 0)
+    @if (Model.Bars.Count == 0)
     {
         <p class="empty-state">Aucun montant n’est disponible dans la base.</p>
     }
     else
     {
-        var peak = bins.Max(bin => bin.Count);
-        var magnitude = Math.Pow(10, Math.Floor(Math.Log10(Math.Max(peak, 1))));
-        var step = magnitude / 2;
-        var axisMax = Math.Ceiling(peak / step) * step;
-        var tickCount = Math.Max((int)Math.Round(axisMax / step), 1);
-        var slot = plotWidth / bins.Count;
-        var barWidth = Math.Max(slot * 0.8, 0.6);
-        var modal = bins.First(bin => bin.Count == peak);
-        <svg class="chart-svg" viewBox="0 0 @chartWidth @chartHeight" role="img"
-             aria-label="Distribution des montants par tranche logarithmique ; tranche la plus fréquente : @Range(modal), @peak.ToString("N0", frenchCulture) liens">
-            @for (var tick = 0; tick <= tickCount; tick++)
+        <svg class="chart-svg" viewBox="@Model.ViewBox" role="img" aria-label="@Model.AccessibleLabel">
+            @foreach (var tick in Model.Ticks)
             {
-                var value = axisMax * tick / tickCount;
-                var y = top + plotHeight - plotHeight * tick / (double)tickCount;
-                <line class="chart-grid" x1="@left.ToString(inv)" x2="@((chartWidth - right).ToString(inv))" y1="@y.ToString("0.##", inv)" y2="@y.ToString("0.##", inv)" />
-                @Html.Raw($"<text class=\"chart-label\" x=\"{(left - 6).ToString(inv)}\" y=\"{(y + 4).ToString("0.##", inv)}\" text-anchor=\"end\">{value.ToString("N0", frenchCulture)}</text>")
+                <line class="chart-grid" x1="52" x2="472" y1="@tick.Y" y2="@tick.Y" />
+                @:<text class="chart-label" x="46" y="@tick.LabelY" text-anchor="end">@tick.Value</text>
             }
-            @for (var i = 0; i < bins.Count; i++)
+            @foreach (var bar in Model.Bars)
             {
-                var bin = bins[i];
-                var x = left + slot * i + (slot - barWidth) / 2;
-                var h = axisMax == 0 ? 0 : plotHeight * bin.Count / axisMax;
-                <rect class="chart-bar chart-bar-b" x="@x.ToString("0.##", inv)" y="@((top + plotHeight - h).ToString("0.##", inv))" width="@barWidth.ToString("0.##", inv)" height="@h.ToString("0.##", inv)">
-                    <title>@Range(bin) : @bin.Count.ToString("N0", frenchCulture) liens</title>
+                <rect class="chart-bar chart-bar-b" x="@bar.X" y="@bar.Y" width="@bar.Width" height="@bar.Height">
+                    <title>@bar.Title</title>
                 </rect>
-                if (IsDecade(bin) || bin.UpperBound == 0m)
+                @if (bar.ShowLabel)
                 {
-                    @Html.Raw($"<text class=\"chart-label\" x=\"{(left + slot * i).ToString("0.##", inv)}\" y=\"{(chartHeight - 20).ToString(inv)}\" text-anchor=\"middle\">{(bin.UpperBound == 0m ? "≤ 0" : Money(bin.LowerBound))}</text>")
+                    @:<text class="chart-label" x="@bar.X" y="280" text-anchor="middle">@bar.Label</text>
                 }
             }
         </svg>
-        @if (bins.Any(bin => bin.UpperBound == 0m))
+        @if (Model.HasNonPositiveBin)
         {
             <p class="chart-axis-note">La tranche « ≤ 0 » regroupe les montants nuls, très majoritaires (conventions dont le montant n’est pas renseigné), et un très petit nombre de montants négatifs (corrections ou erreurs de saisie possibles, origine non vérifiée).</p>
         }

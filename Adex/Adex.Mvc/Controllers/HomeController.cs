@@ -23,6 +23,7 @@ namespace Adex.Mvc.Controllers
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
+            ViewData["Title"] = "Explorer les liens d’intérêt";
             try
             {
                 return View(await _apiClient.GetDashboardAsync(cancellationToken));
@@ -43,13 +44,18 @@ namespace Adex.Mvc.Controllers
         [HttpGet]
         public IActionResult Settings()
         {
-            return View();
+            var model = new SettingsPageViewModel();
+            ViewData["Title"] = model.Title;
+            ViewData["SettingsAriaCurrent"] = "page";
+            return View(model);
         }
 
         [HttpGet]
         public IActionResult Disclaimer()
         {
-            return View();
+            var model = new DisclaimerPageViewModel();
+            ViewData["Title"] = model.Title;
+            return View(model);
         }
 
         [HttpGet]
@@ -60,6 +66,7 @@ namespace Adex.Mvc.Controllers
         )
         {
             query ??= string.Empty;
+            ViewData["Title"] = "Résultats de recherche";
             List<EntitySearchResultViewModel> results;
             try
             {
@@ -100,6 +107,7 @@ namespace Adex.Mvc.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+            ViewData["Title"] = "Error";
             return View(
                 new ErrorViewModel
                 {

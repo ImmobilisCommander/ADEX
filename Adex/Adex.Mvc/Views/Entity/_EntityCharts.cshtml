@@ -1,19 +1,6 @@
-@model Adex.Mvc.Models.EntityDetailsViewModel
-@using System.Globalization
-@{
-    var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
-    var inv = CultureInfo.InvariantCulture;
-    var years = Model.YearlyActivity;
-    var breakdown = Model.TypeBreakdown;
-    var totalCount = breakdown.Sum(item => item.Count);
-    var totalAmount = breakdown.Sum(item => Math.Max(item.Amount, 0m));
-    string Share(double value, double total) => total <= 0 ? "0" : (value * 100d / total).ToString("0.##", inv);
-    string Compact(double value) => value >= 1_000_000d
-        ? (value / 1_000_000d).ToString("0.##", frenchCulture) + " M€"
-        : value >= 1_000d ? (value / 1_000d).ToString("0.##", frenchCulture) + " k€" : value.ToString("0", frenchCulture) + " €";
-}
+@model Adex.Mvc.Models.EntityChartsViewModel
 
-@if (years.Count > 0 || breakdown.Count > 0)
+@if (Model.HasContent)
 {
 <div class="entity-charts">
     <section class="register-section" aria-labelledby="activity-title">
@@ -21,43 +8,26 @@
             <h2 id="activity-title">Montants par année</h2>
             <span class="section-unit">somme des montants · date du lien</span>
         </div>
-        @if (years.Count == 0)
+        @if (!Model.HasYearlyActivity)
         {
             <p class="empty-state">Aucune déclaration datée n’est disponible pour cette entité.</p>
         }
         else
         {
-            const double chartWidth = 480, chartHeight = 220, left = 64, right = 8, top = 12, bottom = 28;
-            var plotWidth = chartWidth - left - right;
-            var plotHeight = chartHeight - top - bottom;
-            var peak = (double)years.Max(item => Math.Max(item.Amount, 0m));
-            var magnitude = Math.Pow(10, Math.Floor(Math.Log10(Math.Max(peak, 1))));
-            var step = magnitude / 2;
-            var axisMax = Math.Max(Math.Ceiling(peak / step) * step, step);
-            var tickCount = Math.Max((int)Math.Round(axisMax / step), 1);
-            var slot = plotWidth / years.Count;
-            var barWidth = Math.Min(Math.Max(slot * 0.7, 2), 40);
-            var labelEvery = Math.Max(1, (int)Math.Ceiling(years.Count / 8d));
-            <svg class="chart-svg" viewBox="0 0 @chartWidth @chartHeight" role="img"
-                 aria-label="Montants déclarés par année, de @years.First().Year à @years.Last().Year">
-                @for (var tick = 0; tick <= tickCount; tick++)
+            <svg class="chart-svg" viewBox="@Model.YearlyChartViewBox" role="img" aria-label="@Model.YearlyChartLabel">
+                @foreach (var tick in Model.YearTicks)
                 {
-                    var value = axisMax * tick / tickCount;
-                    var y = top + plotHeight - plotHeight * tick / (double)tickCount;
-                    <line class="chart-grid" x1="@left.ToString(inv)" x2="@((chartWidth - right).ToString(inv))" y1="@y.ToString("0.##", inv)" y2="@y.ToString("0.##", inv)" />
-                    @Html.Raw($"<text class=\"chart-label\" x=\"{(left - 6).ToString(inv)}\" y=\"{(y + 4).ToString("0.##", inv)}\" text-anchor=\"end\">{Compact(value)}</text>")
+                    <line class="chart-grid" x1="64" x2="472" y1="@tick.Y" y2="@tick.Y" />
+                    @:<text class="chart-label" x="58" y="@tick.LabelY" text-anchor="end">@tick.Value</text>
                 }
-                @for (var i = 0; i < years.Count; i++)
+                @foreach (var bar in Model.YearBars)
                 {
-                    var item = years[i];
-                    var x = left + slot * i + (slot - barWidth) / 2;
-                    var h = plotHeight * (double)Math.Max(item.Amount, 0m) / axisMax;
-                    <rect class="chart-bar" x="@x.ToString("0.##", inv)" y="@((top + plotHeight - h).ToString("0.##", inv))" width="@barWidth.ToString("0.##", inv)" height="@h.ToString("0.##", inv)">
-                        <title>@item.Year : @item.Amount.ToString("C0", frenchCulture) · @item.Count.ToString("N0", frenchCulture) liens</title>
+                    <rect class="chart-bar" x="@bar.X" y="@bar.Y" width="@bar.Width" height="@bar.Height">
+                        <title>@bar.Title</title>
                     </rect>
-                    if (i % labelEvery == 0)
+                    @if (bar.Year is not null)
                     {
-                        @Html.Raw($"<text class=\"chart-label\" x=\"{(left + slot * i + slot / 2).ToString("0.##", inv)}\" y=\"{(chartHeight - 8).ToString(inv)}\" text-anchor=\"middle\">{item.Year}</text>")
+                        @:<text class="chart-label" x="@bar.LabelX" y="212" text-anchor="middle">@bar.Year</text>
                     }
                 }
             </svg>
@@ -69,33 +39,33 @@
             <h2 id="breakdown-title">Répartition par typologie</h2>
             <span class="section-unit">liens · montants</span>
         </div>
-        @if (breakdown.Count == 0)
+        @if (!Model.HasTypeBreakdown)
         {
             <p class="empty-state">Aucun lien financier n’est associé à cette entité.</p>
         }
         else
         {
             <div class="stacked-bar" role="img" aria-label="Répartition des liens par typologie">
-                @for (var i = 0; i < breakdown.Count; i++)
+                @foreach (var item in Model.TypeBreakdown)
                 {
-                    <span class="stacked-segment segment-@(i % 4)" style="width: @Share(breakdown[i].Count, totalCount)%" title="@breakdown[i].Type : @breakdown[i].Count.ToString("N0", frenchCulture) liens"></span>
+                    <span class="stacked-segment @item.CssClass" style="width: @item.CountShare%" title="@item.CountTitle"></span>
                 }
             </div>
             <p class="chart-axis-note">Nombre de liens</p>
             <div class="stacked-bar" role="img" aria-label="Répartition des montants par typologie">
-                @for (var i = 0; i < breakdown.Count; i++)
+                @foreach (var item in Model.TypeBreakdown)
                 {
-                    <span class="stacked-segment segment-@(i % 4)" style="width: @Share((double)Math.Max(breakdown[i].Amount, 0m), (double)totalAmount)%" title="@breakdown[i].Type : @breakdown[i].Amount.ToString("C0", frenchCulture)"></span>
+                    <span class="stacked-segment @item.CssClass" style="width: @item.AmountShare%" title="@item.AmountTitle"></span>
                 }
             </div>
             <p class="chart-axis-note">Montants</p>
             <ul class="chart-legend">
-                @for (var i = 0; i < breakdown.Count; i++)
+                @foreach (var item in Model.TypeBreakdown)
                 {
                     <li>
-                        <span class="legend-swatch segment-@(i % 4)" aria-hidden="true"></span>
-                        <span><strong>@breakdown[i].Type</strong> : @breakdown[i].Count.ToString("N0", frenchCulture) liens
-                            (@Share(breakdown[i].Count, totalCount) %) · @breakdown[i].Amount.ToString("C0", frenchCulture)</span>
+                        <span class="legend-swatch @item.CssClass" aria-hidden="true"></span>
+                        <span><strong>@item.Item.Type</strong> : @item.Item.CountDisplay liens
+                            (@item.CountShare %) · @item.Item.AmountDisplay</span>
                     </li>
                 }
             </ul>

@@ -5,14 +5,6 @@ using Adex.Common;
 
 namespace Adex.Business
 {
-    public interface ILinkSearchService
-    {
-        Task<GraphDataSet> LinksToJsonAsync(
-            string text,
-            int take,
-            CancellationToken cancellationToken
-        );
-    }
 
     public interface IMetadataLookupService
     {

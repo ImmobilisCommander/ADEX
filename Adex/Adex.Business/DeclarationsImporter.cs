@@ -33,47 +33,6 @@ namespace Adex.Business
     /// </summary>
     public sealed class DeclarationsImporter
     {
-        private static class Col
-        {
-            public const int Id = 0;
-            public const int CompanyId = 2;
-            public const int Kind = 3;
-            public const int UniqueId = 4;
-            public const int LinkedConvention = 5;
-            public const int Reason = 7;
-            public const int OtherReason = 8;
-            public const int EventInfo = 9;
-            public const int Amount = 10;
-            public const int Date = 11;
-            public const int StartDate = 12;
-            public const int EndDate = 13;
-            public const int PersonId = 14;
-            public const int LastName = 15;
-            public const int FirstName = 16;
-            public const int Category = 18;
-            public const int PersonType = 20;
-            public const int PersonIdentifier = 21;
-            public const int Profession = 23;
-            public const int Structure = 24;
-            public const int Address = 26;
-            public const int PersonZip = 27;
-            public const int PersonCity = 28;
-            public const int Status = 30;
-            public const int PublicationDate = 31;
-            public const int CompanyName = 33;
-            public const int Siren = 34;
-            public const int Sector = 35;
-            public const int Parent = 36;
-            public const int CompanyCity = 37;
-            public const int CompanyDepartment = 38;
-            public const int CompanyRegion = 39;
-            public const int CompanyCountry = 40;
-            public const int CompanyZip = 41;
-            public const int Semester = 48;
-            public const int CountryLabel = 49;
-            public const int PersonCountry = 50;
-        }
-
         private static readonly string[] ExpectedColumns =
         {
             "id", "token", "entreprise_id", "lien_interet", "identifiant_unique",
@@ -136,19 +95,6 @@ namespace Adex.Business
         private const int LinkAttributeWriters = 2;
         private static readonly TimeSpan ReportInterval = TimeSpan.FromSeconds(10);
 
-        private struct Winner
-        {
-            public long Row;
-            public long Date;
-            public Guid Id;
-        }
-
-        private struct LinkWinner
-        {
-            public long Row;
-            public long Date;
-        }
-
         private struct Totals
         {
             public int Count;
@@ -164,70 +110,7 @@ namespace Adex.Business
 
         private readonly record struct FinancialRow(Guid Id, decimal Amount, string Type);
 
-        private readonly record struct AttributeRow(Guid EntityId, string Json);
-
-        // Gathers the attributes of one entity (consecutive calls with the same id) into a single jsonb row.
-        private sealed class AttributeSink
-        {
-            private readonly ImportTableWriter<AttributeRow> _writer;
-            private readonly ArrayBufferWriter<byte> _buffer = new();
-            private Utf8JsonWriter _json;
-            private Guid _current;
-            private bool _open;
-
-            public AttributeSink(ImportTableWriter<AttributeRow> writer)
-            {
-                _writer = writer;
-            }
-
-            public void Add(Guid entityId, string name, string value)
-            {
-                if (_open && entityId != _current)
-                {
-                    Flush();
-                }
-
-                if (!_open)
-                {
-                    _buffer.Clear();
-                    _json = new Utf8JsonWriter(_buffer);
-                    _json.WriteStartObject();
-                    _current = entityId;
-                    _open = true;
-                }
-
-                _json.WriteString(name, value);
-            }
-
-            public void Flush()
-            {
-                if (!_open)
-                {
-                    return;
-                }
-
-                _json.WriteEndObject();
-                _json.Flush();
-                _writer.Add(new AttributeRow(_current, Encoding.UTF8.GetString(_buffer.WrittenSpan)));
-                _json.Dispose();
-                _open = false;
-            }
-        }
-
         private readonly record struct TotalRow(Guid Id, int Count, decimal Outgoing, decimal Incoming);
-
-        private sealed class ScanResult
-        {
-            public Dictionary<long, Winner> Companies { get; } = new();
-
-            public Dictionary<long, Winner> Persons { get; } = new();
-
-            public Dictionary<long, LinkWinner> Links { get; } = new();
-
-            public long Rows { get; set; }
-
-            public long Skipped { get; set; }
-        }
 
         private readonly IDbContextFactory<AdexContext> _contextFactory;
         private readonly ILogger<DeclarationsImporter> _logger;
@@ -972,16 +855,4 @@ namespace Adex.Business
         }
     }
 
-    public sealed class DeclarationsImportResult
-    {
-        public long Rows { get; set; }
-
-        public long SkippedRows { get; set; }
-
-        public long Companies { get; set; }
-
-        public long Beneficiaries { get; set; }
-
-        public long Links { get; set; }
-    }
 }

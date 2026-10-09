@@ -1,9 +1,4 @@
 @model Adex.Mvc.Views.Home.RankingModel
-@using System.Globalization
-@{
-    var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
-    var topAmount = Model.Entities.Count == 0 ? 0m : Model.Entities.Max(entity => entity.Amount);
-}
 <section class="register-section top-entities" aria-labelledby="@Model.Id-title">
     <div class="section-heading">
         <h2 id="@Model.Id-title">@Model.Title</h2>
@@ -16,18 +11,16 @@
     else
     {
         <ol class="ranking-list">
-        @for (var index = 0; index < Model.Entities.Count; index++)
+        @foreach (var item in Model.Items)
         {
-            var entity = Model.Entities[index];
-            var width = topAmount == 0 ? 0 : (int)Math.Round((double)(entity.Amount * 100m / topAmount));
             <li>
-                <a class="ranking-link" href="/@entity.Id">
-                    <span class="rank-number">@((index + 1).ToString("D2", frenchCulture))</span>
+                <a class="ranking-link" href="/@item.Entity.Id">
+                    <span class="rank-number">@item.Rank</span>
                     <span class="ranking-entity">
-                        <span class="ranking-name">@entity.Name</span>
+                        <span class="ranking-name">@item.Entity.Name</span>
                     </span>
-                    <span class="ranking-bar" aria-hidden="true"><span style="width: @width%"></span></span>
-                    <span class="ranking-amount">@entity.Amount.ToString("C0", frenchCulture)</span>
+                    <span class="ranking-bar" aria-hidden="true"><span style="width: @item.Width%"></span></span>
+                    <span class="ranking-amount">@item.Amount</span>
                     <span class="ranking-arrow" aria-hidden="true">↗</span>
                 </a>
             </li>

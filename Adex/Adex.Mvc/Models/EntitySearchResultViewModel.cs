@@ -1,0 +1,15 @@
+using System;
+using System.Collections.Generic;
+
+namespace Adex.Mvc.Models
+{
+
+    public sealed class EntitySearchResultViewModel
+    {
+        public Guid Id { get; set; }
+
+        public string Name { get; set; } = string.Empty;
+
+        public string Type { get; set; } = string.Empty;
+    }
+}

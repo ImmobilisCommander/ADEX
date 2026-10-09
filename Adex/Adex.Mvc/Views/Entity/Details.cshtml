@@ -1,9 +1,4 @@
 @model Adex.Mvc.Models.EntityDetailsViewModel
-@using System.Globalization
-@{
-    ViewData["Title"] = Model.Name;
-    var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
-}
 
 <main class="explorer-page entity-page">
     <a class="back-link" href="/">← Tableau de bord</a>
@@ -24,24 +19,24 @@
     <section class="summary-register entity-totals" aria-label="Synthèse des liens">
         <div class="summary-item">
             <span class="summary-label">Liens financiers</span>
-            <strong>@Model.FinancialLinkCount.ToString("N0", frenchCulture)</strong>
+            <strong>@Model.FinancialLinkCountDisplay</strong>
         </div>
         <div class="summary-item">
             <span class="summary-label">Montants vers cette entité</span>
-            <strong>@Model.IncomingAmount.ToString("C0", frenchCulture)</strong>
+            <strong>@Model.IncomingAmountDisplay</strong>
         </div>
         <div class="summary-item summary-total">
             <span class="summary-label">Montants depuis cette entité</span>
-            <strong>@Model.OutgoingAmount.ToString("C0", frenchCulture)</strong>
+            <strong>@Model.OutgoingAmountDisplay</strong>
         </div>
     </section>
 
-    <partial name="_EntityCharts" model="Model" />
+    <partial name="_EntityCharts" model="Model.EntityCharts" />
 
     <section class="register-section" aria-labelledby="attributes-title">
         <div class="section-heading">
             <h2 id="attributes-title">Informations disponibles</h2>
-            <span class="section-unit">@Model.Attributes.Count.ToString("N0", frenchCulture) attributs</span>
+            <span class="section-unit">@Model.AttributeCountDisplay attributs</span>
         </div>
         @if (Model.Attributes.Count == 0)
         {
@@ -64,7 +59,7 @@
     <section class="register-section entity-links" aria-labelledby="links-title">
         <div class="section-heading">
             <h2 id="links-title">Liens financiers</h2>
-            <span class="section-unit">@Model.FinancialLinkCount.ToString("N0", frenchCulture) déclarations</span>
+            <span class="section-unit">@Model.FinancialLinkCountDisplay déclarations</span>
         </div>
         @if (Model.FinancialLinks.Count == 0)
         {
@@ -73,40 +68,30 @@
         else
         {
             <div class="table-scroll">
-                @{
-                    string SortUrl(string key)
-                    {
-                        var descending = Model.Sort == key ? !Model.Descending : key is "date" or "amount";
-                        return $"/{Model.Id}?page=1&pageSize={Model.PageSize}&sort={key}&descending={descending.ToString().ToLowerInvariant()}#links-title";
-                    }
-                    string SortState(string key) => Model.Sort == key ? (Model.Descending ? "descending" : "ascending") : null;
-                }
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th scope="col" aria-sort="@SortState("direction")"><a class="sort-button" href="@SortUrl("direction")" title="Trier par sens"><span>Sens</span><i aria-hidden="true"></i></a></th>
-                            <th scope="col" aria-sort="@SortState("name")"><a class="sort-button" href="@SortUrl("name")" title="Trier par contrepartie"><span>Contrepartie</span><i aria-hidden="true"></i></a></th>
-                            <th scope="col" aria-sort="@SortState("type")"><a class="sort-button" href="@SortUrl("type")" title="Trier par typologie"><span>Typologie</span><i aria-hidden="true"></i></a></th>
-                            <th scope="col" aria-sort="@SortState("kind")"><a class="sort-button" href="@SortUrl("kind")" title="Trier par nature"><span>Nature / objet</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" aria-sort="@Model.SortLinks["direction"].State"><a class="sort-button" href="@Model.SortLinks["direction"].Url" title="Trier par sens"><span>Sens</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" aria-sort="@Model.SortLinks["name"].State"><a class="sort-button" href="@Model.SortLinks["name"].Url" title="Trier par contrepartie"><span>Contrepartie</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" aria-sort="@Model.SortLinks["type"].State"><a class="sort-button" href="@Model.SortLinks["type"].Url" title="Trier par typologie"><span>Typologie</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" aria-sort="@Model.SortLinks["kind"].State"><a class="sort-button" href="@Model.SortLinks["kind"].Url" title="Trier par nature"><span>Nature / objet</span><i aria-hidden="true"></i></a></th>
                             <th scope="col">Justification</th>
-                            <th scope="col" class="numeric" aria-sort="@SortState("date")"><a class="sort-button" href="@SortUrl("date")" title="Trier par date"><span>Date</span><i aria-hidden="true"></i></a></th>
-                            <th scope="col" class="numeric" aria-sort="@SortState("amount")"><a class="sort-button" href="@SortUrl("amount")" title="Trier par montant"><span>Montant</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" class="numeric" aria-sort="@Model.SortLinks["date"].State"><a class="sort-button" href="@Model.SortLinks["date"].Url" title="Trier par date"><span>Date</span><i aria-hidden="true"></i></a></th>
+                            <th scope="col" class="numeric" aria-sort="@Model.SortLinks["amount"].State"><a class="sort-button" href="@Model.SortLinks["amount"].Url" title="Trier par montant"><span>Montant</span><i aria-hidden="true"></i></a></th>
                         </tr></thead>
                     <tbody>
                     @foreach (var link in Model.FinancialLinks)
                     {
-                        var motif = link.Justification.FirstOrDefault(item => item.Name == "Motif")?.Value;
-                        var hasJustification = link.Justification.Count > 0;
-                        <tr class="@(hasJustification ? "row-detail" : null)" tabindex="@(hasJustification ? "0" : null)"
-                            aria-label="@(hasJustification ? "Voir la justification : " + link.CounterpartyName : null)"
-                            data-justification-row="@(hasJustification ? "true" : null)">
-                            <td>@(link.Outgoing ? "Vers" : "Depuis")</td>
-                            <th scope="row" data-sort="@link.CounterpartyName"><a href="/@link.CounterpartyId">@link.CounterpartyName</a></th>
+                        <tr class="@link.RowClass" tabindex="@link.RowTabIndex"
+                            aria-label="@link.RowLabel"
+                            data-justification-row="@link.HasJustificationAttribute">
+                            <td>@link.DirectionDisplay</td>
+                            <th scope="row" data-sort="@link.CounterpartyName"><a href="@link.CounterpartyUrl">@link.CounterpartyName</a></th>
                             <td>@link.DeclarationType</td>
-                            <td>@(string.IsNullOrWhiteSpace(link.Kind) ? "—" : link.Kind)</td>
-                            <td data-sort="@motif">
-                                @(string.IsNullOrWhiteSpace(motif) ? "—" : motif)
-                                @if (hasJustification)
+                            <td>@link.KindDisplay</td>
+                            <td data-sort="@link.Motif">
+                                @link.MotifDisplay
+                                @if (link.HasJustification)
                                 {
                                     <template>
                                         <dl>
@@ -119,8 +104,8 @@
                                     </template>
                                 }
                             </td>
-                            <td class="numeric" data-sort="@link.Date.Ticks">@link.Date.ToString("d", frenchCulture)</td>
-                            <td class="numeric" data-sort="@link.Amount.ToString(CultureInfo.InvariantCulture)">@link.Amount.ToString("C0", frenchCulture)</td>
+                            <td class="numeric" data-sort="@link.DateSortValue">@link.DateDisplay</td>
+                            <td class="numeric" data-sort="@link.AmountSortValue">@link.AmountDisplay</td>
                         </tr>
                     }
                     </tbody>
@@ -129,47 +114,38 @@
             <p class="table-note">Cliquez sur une ligne pour voir sa justification.</p>
             @if (Model.FinancialLinkCount > 10)
             {
-                var first = (Model.Page - 1) * Model.PageSize + 1;
-                var last = first + Model.FinancialLinks.Count - 1;
-                var pages = new List<int> { 1, Model.PageCount };
-                for (var n = Model.Page - 2; n <= Model.Page + 2; n++)
-                {
-                    pages.Add(n);
-                }
-                pages = pages.Where(n => n >= 1 && n <= Model.PageCount).Distinct().OrderBy(n => n).ToList();
-                string PageUrl(int n) => $"/{Model.Id}?page={n}&pageSize={Model.PageSize}&sort={Model.Sort}&descending={Model.Descending.ToString().ToLowerInvariant()}#links-title";
                 <div class="pager-bar">
                     <nav class="pager" aria-label="Pagination des liens financiers">
                         @if (Model.Page > 1)
                         {
-                            <a class="pager-link" rel="prev" href="@PageUrl(Model.Page - 1)">Précédent</a>
+                            <a class="pager-link" rel="prev" href="@Model.PreviousPageUrl">Précédent</a>
                         }
-                        @for (var i = 0; i < pages.Count; i++)
+                        @foreach (var pageLink in Model.PageLinks)
                         {
-                            if (i > 0 && pages[i] - pages[i - 1] > 1)
+                            @if (pageLink.GapBefore)
                             {
                                 <span class="pager-gap" aria-hidden="true">…</span>
                             }
-                            if (pages[i] == Model.Page)
+                            @if (pageLink.Current)
                             {
-                                <span class="pager-link is-current" aria-current="page">@pages[i].ToString("N0", frenchCulture)</span>
+                                <span class="pager-link is-current" aria-current="page">@pageLink.Number</span>
                             }
                             else
                             {
-                                <a class="pager-link" href="@PageUrl(pages[i])" aria-label="Page @pages[i]">@pages[i].ToString("N0", frenchCulture)</a>
+                                <a class="pager-link" href="@pageLink.Url" aria-label="Page @pageLink.Number">@pageLink.Number</a>
                             }
                         }
                         @if (Model.Page < Model.PageCount)
                         {
-                            <a class="pager-link" rel="next" href="@PageUrl(Model.Page + 1)">Suivant</a>
+                            <a class="pager-link" rel="next" href="@Model.NextPageUrl">Suivant</a>
                         }
                     </nav>
-                    <form method="get" action="/@Model.Id" class="pager-size">
+                    <form method="get" action="@Model.PageAction" class="pager-size">
                         <label for="page-size">Par page</label>
                         <input type="hidden" name="sort" value="@Model.Sort" />
-                        <input type="hidden" name="descending" value="@Model.Descending.ToString().ToLowerInvariant()" />
+                        <input type="hidden" name="descending" value="@Model.DescendingDisplay" />
                         <select id="page-size" name="pageSize" data-autosubmit>
-                            @foreach (var size in new[] { 10, 20, 50 })
+                            @foreach (var size in Model.PageSizeOptions)
                             {
                                 <option value="@size" selected="@(size == Model.PageSize)">@size</option>
                             }
@@ -178,8 +154,8 @@
                     </form>
                 </div>
                 <p class="table-note">
-                    Déclarations @first.ToString("N0", frenchCulture) à @last.ToString("N0", frenchCulture)
-                    sur @Model.FinancialLinkCount.ToString("N0", frenchCulture).
+                    Déclarations @Model.FirstDisplayedLink à @Model.LastDisplayedLink
+                    sur @Model.FinancialLinkCountDisplay.
                 </p>
             }
         }

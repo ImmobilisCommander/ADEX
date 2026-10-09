@@ -23,7 +23,7 @@
             <a class="brand-mark" href="/" aria-label="ADEX, accueil">ADEX<span>.</span></a>
             <a class="nav-current" href="/">Explorer les données</a>
             <span class="nav-context">Liens d’intérêt · données déclaratives</span>
-            <a class="nav-settings" href="/Home/Settings" aria-current="@(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "page" : null)">Paramètres</a>
+            <a class="nav-settings" href="/Home/Settings" aria-current="@(ViewData["SettingsAriaCurrent"])">Paramètres</a>
         </nav>
     </header>
     <div class="site-shell">

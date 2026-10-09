@@ -1,9 +1,4 @@
 @model Adex.Mvc.Models.DashboardViewModel
-@using System.Globalization
-@{
-    ViewData["Title"] = "Explorer les liens d’intérêt";
-    var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
-}
 
 <!--
 THESIS: A civic data register makes relationships and totals inspectable, refusing an opaque global network.
@@ -39,15 +34,15 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
     <section class="summary-register" aria-label="Indicateurs généraux">
         <div class="summary-item">
             <span class="summary-label">Entités recensées</span>
-            <strong>@Model.EntityCount.ToString("N0", frenchCulture)</strong>
+            <strong>@Model.EntityCountDisplay</strong>
         </div>
         <div class="summary-item">
             <span class="summary-label">Liens financiers</span>
-            <strong>@Model.FinancialLinkCount.ToString("N0", frenchCulture)</strong>
+            <strong>@Model.FinancialLinkCountDisplay</strong>
         </div>
         <div class="summary-item summary-total">
             <span class="summary-label">Montant déclaré cumulé</span>
-            <strong>@Model.TotalAmount.ToString("C0", frenchCulture)</strong>
+            <strong>@Model.TotalAmountDisplay</strong>
         </div>
     </section>
 
@@ -63,49 +58,29 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
             }
             else
             {
-                var months = Model.MonthlyDeclarations;
-                const double chartWidth = 960, chartHeight = 280, left = 56, right = 8, top = 12, bottom = 28;
-                var plotWidth = chartWidth - left - right;
-                var plotHeight = chartHeight - top - bottom;
-                var peak = months.Max(m => m.Count);
-                var magnitude = Math.Pow(10, Math.Floor(Math.Log10(Math.Max(peak, 1))));
-                var step = magnitude / 2;
-                var axisMax = Math.Ceiling(peak / step) * step;
-                var tickCount = Math.Max((int)Math.Round(axisMax / step), 1);
-                var slot = plotWidth / months.Count;
-                var barWidth = Math.Max(slot * 0.78, 0.6);
-                var first = months.First();
-                var last = months.Last();
-                var peakMonth = months.First(m => m.Count == peak);
-                var inv = CultureInfo.InvariantCulture;
-                <svg class="chart-svg" viewBox="0 0 @chartWidth @chartHeight" role="img"
-                     aria-label="Nombre de déclarations par mois, de @(new DateTime(first.Year, first.Month, 1).ToString("MMMM yyyy", frenchCulture)) à @(new DateTime(last.Year, last.Month, 1).ToString("MMMM yyyy", frenchCulture)), maximum @peak.ToString("N0", frenchCulture) en @(new DateTime(peakMonth.Year, peakMonth.Month, 1).ToString("MMMM yyyy", frenchCulture))">
-                    @for (var tick = 0; tick <= tickCount; tick++)
+                <svg class="chart-svg" viewBox="@Model.MonthlyChart.ViewBox" role="img"
+                     aria-label="@Model.MonthlyChart.AccessibleLabel">
+                    @foreach (var tick in Model.MonthlyChart.Ticks)
                     {
-                        var value = axisMax * tick / tickCount;
-                        var y = top + plotHeight - plotHeight * tick / (double)tickCount;
-                        <line class="chart-grid" x1="@left.ToString(inv)" x2="@((chartWidth - right).ToString(inv))" y1="@y.ToString("0.##", inv)" y2="@y.ToString("0.##", inv)" />
-                        @Html.Raw($"<text class=\"chart-label\" x=\"{(left - 6).ToString(inv)}\" y=\"{(y + 4).ToString("0.##", inv)}\" text-anchor=\"end\">{value.ToString("N0", frenchCulture)}</text>")
+                        <line class="chart-grid" x1="56" x2="952" y1="@tick.Y" y2="@tick.Y" />
+                        @:<text class="chart-label" x="50" y="@tick.LabelY" text-anchor="end">@tick.Value</text>
                     }
-                    @for (var i = 0; i < months.Count; i++)
+                    @foreach (var bar in Model.MonthlyChart.Bars)
                     {
-                        var m = months[i];
-                        var x = left + slot * i + (slot - barWidth) / 2;
-                        var h = axisMax == 0 ? 0 : plotHeight * m.Count / axisMax;
-                        <rect class="chart-bar" x="@x.ToString("0.##", inv)" y="@((top + plotHeight - h).ToString("0.##", inv))" width="@barWidth.ToString("0.##", inv)" height="@h.ToString("0.##", inv)">
-                            <title>@(new DateTime(m.Year, m.Month, 1).ToString("MMMM yyyy", frenchCulture)) : @m.Count.ToString("N0", frenchCulture)</title>
+                        <rect class="chart-bar" x="@bar.X" y="@bar.Y" width="@bar.Width" height="@bar.Height">
+                            <title>@bar.Title</title>
                         </rect>
-                        if (m.Month == 1)
+                        @if (bar.Year is not null)
                         {
-                            @Html.Raw($"<text class=\"chart-label\" x=\"{(left + slot * i).ToString("0.##", inv)}\" y=\"{(chartHeight - 8).ToString(inv)}\">{m.Year}</text>")
+                            @:<text class="chart-label" x="@bar.YearX" y="272">@bar.Year</text>
                         }
                     }
                 </svg>
             }
         </section>
 
-        @await Html.PartialAsync("_Concentration", Model.Concentration)
-        @await Html.PartialAsync("_AmountHistogram", Model.AmountHistogram)
+        <partial name="_Concentration" model="Model.ConcentrationChart" />
+        <partial name="_AmountHistogram" model="Model.AmountHistogramChart" />
 
         <section class="register-section entity-types" aria-labelledby="entity-types-title">
             <div class="section-heading">
@@ -123,15 +98,14 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
                         <tr><th scope="col">Typologie</th><th scope="col">Répartition</th><th scope="col" class="numeric">Entités</th></tr>
                     </thead>
                     <tbody>
-                    @foreach (var type in Model.EntityTypes)
+                    @foreach (var row in Model.EntityTypeRows)
                     {
-                        var width = Model.EntityCount == 0 ? 0 : (int)Math.Round(type.Count * 100d / Model.EntityCount);
                         <tr>
-                            <th scope="row">@type.Type</th>
-                            <td class="bar-cell" aria-label="@width %">
-                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @width%"></span></span>
+                            <th scope="row">@row.Entity.Type</th>
+                            <td class="bar-cell" aria-label="@row.Width %">
+                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @row.Width%"></span></span>
                             </td>
-                            <td class="numeric">@type.Count.ToString("N0", frenchCulture)</td>
+                            <td class="numeric">@row.Entity.CountDisplay</td>
                         </tr>
                     }
                     </tbody>
@@ -155,16 +129,15 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
                         <tr><th scope="col">Typologie</th><th scope="col">Répartition</th><th scope="col" class="numeric">Liens</th><th scope="col" class="numeric">Montant</th></tr>
                     </thead>
                     <tbody>
-                    @foreach (var type in Model.FinancialLinkTypes)
+                    @foreach (var row in Model.FinancialLinkTypeRows)
                     {
-                        var width = Model.FinancialLinkCount == 0 ? 0 : (int)Math.Round(type.Count * 100d / Model.FinancialLinkCount);
                         <tr>
-                            <th scope="row">@type.Type</th>
-                            <td class="bar-cell" aria-label="@width %">
-                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @width%"></span></span>
+                            <th scope="row">@row.Type.Type</th>
+                            <td class="bar-cell" aria-label="@row.Width %">
+                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @row.Width%"></span></span>
                             </td>
-                            <td class="numeric">@type.Count.ToString("N0", frenchCulture)</td>
-                            <td class="numeric">@type.Amount.ToString("C0", frenchCulture)</td>
+                            <td class="numeric">@row.Type.CountDisplay</td>
+                            <td class="numeric">@row.Type.AmountDisplay</td>
                         </tr>
                     }
                     </tbody>
@@ -172,8 +145,8 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
             }
         </section>
 
-        @await Html.PartialAsync("_Ranking", new Adex.Mvc.Views.Home.RankingModel("top-beneficiaries", "Top 10 des bénéficiaires par montant reçu", Model.TopBeneficiaries))
-        @await Html.PartialAsync("_Ranking", new Adex.Mvc.Views.Home.RankingModel("top-contributors", "Top 10 des contributeurs par montant versé", Model.TopContributors))
+        <partial name="_Ranking" model="Model.TopBeneficiariesRanking" />
+        <partial name="_Ranking" model="Model.TopContributorsRanking" />
     </div>
     }
 </main>

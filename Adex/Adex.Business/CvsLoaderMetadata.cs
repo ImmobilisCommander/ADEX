@@ -692,16 +692,6 @@ where d.""Entity_Id"" = @entityId",
             throw new NotImplementedException();
         }
 
-        internal class QueryResult
-        {
-            public string Company { get; set; }
-            public string Designation { get; set; }
-            public string Beneficiary { get; set; }
-            public string SocialDenomination { get; set; }
-            public int NumberOfLinks { get; set; }
-            public decimal Amount { get; set; }
-        }
-
         public void Dispose()
         {
             Dispose(disposing: true);

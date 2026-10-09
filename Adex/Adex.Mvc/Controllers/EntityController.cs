@@ -29,6 +29,7 @@ namespace Adex.Mvc.Controllers
             [FromQuery] bool descending = true
         )
         {
+            ViewData["Title"] = "Entité introuvable";
             EntityDetailsViewModel entity;
             try
             {
@@ -41,6 +42,7 @@ namespace Adex.Mvc.Controllers
                     "Unable to load entity details for {EntityId}",
                     id
                 );
+                ViewData["Title"] = "(entité inconnue)";
                 return View(
                     new EntityDetailsViewModel
                     {
@@ -55,9 +57,10 @@ namespace Adex.Mvc.Controllers
             if (entity is null)
             {
                 Response.StatusCode = 404;
-                return View("NotFound", id.ToString());
+                return View("NotFound", new NotFoundViewModel { Identifier = id.ToString() });
             }
 
+            ViewData["Title"] = entity.Name;
             return View(entity);
         }
     }

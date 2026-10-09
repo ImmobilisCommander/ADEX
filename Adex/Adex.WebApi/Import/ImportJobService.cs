@@ -197,11 +197,6 @@ namespace Adex.WebApi.Import
             return new Releaser(_sync);
         }
 
-        private sealed class Releaser(SemaphoreSlim semaphore) : IDisposable
-        {
-            public void Dispose() => semaphore.Release();
-        }
-
         private string ResolveFile()
         {
             if (string.IsNullOrWhiteSpace(_options.DataDirectory))

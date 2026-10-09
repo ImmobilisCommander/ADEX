@@ -198,22 +198,6 @@ namespace Adex.WebApi.Explorer
         }
 
         // Agrégats globaux en SQL direct : l'héritage TPT ferait joindre Entities, Links et FinancialLinks sur des millions de lignes.
-        private sealed class MonthRow
-        {
-            public int Year { get; set; }
-
-            public int Month { get; set; }
-
-            public int Count { get; set; }
-        }
-
-        private sealed class HistogramRow
-        {
-            public int Key { get; set; }
-
-            public int Count { get; set; }
-        }
-
         private static readonly double[] ConcentrationPercents =
             { 0.1, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100 };
 
