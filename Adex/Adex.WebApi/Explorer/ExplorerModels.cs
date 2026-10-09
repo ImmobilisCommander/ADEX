@@ -18,6 +18,72 @@ namespace Adex.WebApi.Explorer
         public List<TopEntity> TopContributors { get; set; } = new();
 
         public List<TopEntity> TopBeneficiaries { get; set; } = new();
+
+        public List<MonthlyDeclarationCount> MonthlyDeclarations { get; set; } = new();
+
+        public List<ConcentrationCurve> Concentration { get; set; } = new();
+
+        public List<AmountHistogramBin> AmountHistogram { get; set; } = new();
+    }
+
+    public sealed class ConcentrationCurve
+    {
+        public string Label { get; set; } = string.Empty;
+
+        public int Count { get; set; }
+
+        public decimal Total { get; set; }
+
+        public double TopOnePercentShare { get; set; }
+
+        public double TopTenShare { get; set; }
+
+        public List<ConcentrationPoint> Points { get; set; } = new();
+    }
+
+    // Part cumulée du montant (en %) détenue par les premiers x % de la population classée par montant décroissant.
+    public sealed class ConcentrationPoint
+    {
+        public double PopulationPercent { get; set; }
+
+        public double AmountPercent { get; set; }
+    }
+
+    // Tranche d'une demi-décade : [LowerBound, UpperBound[. Les montants nuls ou négatifs ont LowerBound = UpperBound = 0.
+    public sealed class AmountHistogramBin
+    {
+        public decimal LowerBound { get; set; }
+
+        public decimal UpperBound { get; set; }
+
+        public int Count { get; set; }
+    }
+
+    public sealed class EntityYearActivity
+    {
+        public int Year { get; set; }
+
+        public int Count { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+
+    public sealed class EntityTypeBreakdown
+    {
+        public string Type { get; set; } = string.Empty;
+
+        public int Count { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+
+    public sealed class MonthlyDeclarationCount
+    {
+        public int Year { get; set; }
+
+        public int Month { get; set; }
+
+        public int Count { get; set; }
     }
 
     public sealed class EntityTypeCount
@@ -79,6 +145,10 @@ namespace Adex.WebApi.Explorer
         public int PageSize { get; set; }
 
         public int PageCount { get; set; } = 1;
+
+        public List<EntityYearActivity> YearlyActivity { get; set; } = new();
+
+        public List<EntityTypeBreakdown> TypeBreakdown { get; set; } = new();
 
         public List<EntityAttributeDetails> Attributes { get; set; } = new();
 

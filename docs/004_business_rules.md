@@ -30,6 +30,20 @@ Le vocabulaire déclaré dans `Adex/Adex.Business/CsvColumnsName.cs` distingue :
 
 Un vocabulaire de colonnes ne confirme pas que toutes les colonnes soient correctement interprétées dans chaque chargeur. Le chargeur de métadonnées contient un commentaire indiquant que le traitement est à adapter selon le type de source (`Adex/Adex.Business/CvsLoaderMetadata.cs`).
 
+## Déclarations par mois (tableau de bord)
+
+- Le graphique compte les liens par mois de leur date (`Links.Date`), et non par date de publication.
+- Seuls les liens datés à partir du 1er janvier 2012 et jusqu’au mois courant sont retenus : les dates aberrantes de la source (année 0001, 1900 utilisée par défaut à l’import, dates futures) sont exclues.
+- Les mois sans déclaration entre le premier et le dernier mois présents sont comblés avec un compte de zéro pour garder un axe continu.
+- Le résultat est mis en cache avec le reste du tableau de bord (6 heures).
+
+## Autres graphiques (tableau de bord et fiches)
+
+- **Concentration** : pour les bénéficiaires (montants reçus) et les entreprises (montants versés) ayant un total strictement positif, courbe de la part cumulée du montant détenue par les x % premiers classés par montant décroissant, avec la part du 1 % supérieur et des 10 premiers.
+- **Distribution des montants** : nombre de liens par tranche d’une demi-décade (1, 3,16, 10, 31,6 €…), échelle logarithmique ; les montants nuls ou négatifs forment une tranche à part (`≤ 0`), expliquée par une note sous le graphique : sur la base locale, 824 033 montants nuls et 121 négatifs (tous des conventions, minimum −210 €), origine non vérifiée. Tous les liens financiers sont comptés, quelle que soit leur date.
+- **Fiche entité** : montants par année (liens des deux sens, dates de 2012 jusqu’à l’année courante, années vides comblées) et répartition des liens par typologie (nombre et montant, toutes dates). Les montants négatifs ne sont pas représentés dans les barres.
+- Les bénéficiaires incluent des personnes morales (hôpitaux, sociétés) : le classement ne se limite pas aux personnes physiques.
+
 ## Déduplication et données manquantes
 
 Une empreinte MD5 calculée à partir de champs d’identité du bénéficiaire existe dans `Adex/Adex.Business/Extensions.cs`. C’est un mécanisme d’identification présent dans le code, mais il ne doit pas être assimilé à une garantie de rapprochement fiable sans tests de collision métier, normalisation et gestion des valeurs absentes.

@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Éléments de solution/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="Adex.Business/Adex.Business.csproj" />
+  <Project Path="Adex.Common/Adex.Common.csproj" />
+  <Project Path="Adex.Data.MetaModel/Adex.Data.MetaModel.csproj" />
+  <Project Path="Adex.Data.Model/Adex.Data.Model.csproj" />
+  <Project Path="Adex.Mvc/Adex.Mvc.csproj" />
+  <Project Path="Adex.WebApi/Adex.WebApi.csproj" />
+</Solution>

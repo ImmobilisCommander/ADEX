@@ -389,6 +389,135 @@ input:focus-visible {
     box-shadow: 0 7px 22px rgba(var(--shadow-rgb), 0.04);
 }
 
+.monthly-chart {
+    grid-column: 1 / -1;
+}
+
+.chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.chart-grid {
+    stroke: var(--line-light);
+    stroke-width: 1;
+}
+
+.chart-label {
+    fill: var(--ink-muted);
+    font-size: 11px;
+}
+
+.chart-bar {
+    fill: var(--accent);
+}
+
+.chart-bar:hover {
+    fill: var(--accent-dark);
+}
+
+.chart-bar-b {
+    fill: var(--teal);
+}
+
+.chart-bar-b:hover {
+    fill: var(--focus);
+}
+
+.chart-line {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+}
+
+.chart-line-a {
+    stroke: var(--accent);
+}
+
+.chart-line-b {
+    stroke: var(--teal);
+}
+
+.chart-diagonal {
+    stroke: var(--ink-muted);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+}
+
+.chart-axis-note {
+    margin: 4px 0 12px;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+}
+
+.chart-legend {
+    display: grid;
+    gap: 6px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.88rem;
+}
+
+.chart-legend li {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+
+.legend-swatch {
+    flex: none;
+    width: 14px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.legend-swatch.chart-line-a {
+    background: var(--accent);
+}
+
+.legend-swatch.chart-line-b {
+    background: var(--teal);
+}
+
+.chart-diagonal-swatch {
+    height: 0;
+    border-top: 2px dashed var(--ink-muted);
+    border-radius: 0;
+}
+
+.stacked-bar {
+    display: flex;
+    height: 22px;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--bar-track);
+}
+
+.stacked-segment {
+    display: block;
+    height: 100%;
+}
+
+.segment-0 { background: var(--accent); }
+.segment-1 { background: var(--teal); }
+.segment-2 { background: var(--focus); }
+.segment-3 { background: var(--ink-muted); }
+
+.entity-charts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 34px;
+}
+
+@media (max-width: 900px) {
+    .entity-charts {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .section-heading {
     display: flex;
     align-items: baseline;

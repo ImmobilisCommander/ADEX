@@ -20,6 +20,70 @@ namespace Adex.Mvc.Models
         public List<TopEntityViewModel> TopContributors { get; set; } = new();
 
         public List<TopEntityViewModel> TopBeneficiaries { get; set; } = new();
+
+        public List<MonthlyDeclarationViewModel> MonthlyDeclarations { get; set; } = new();
+
+        public List<ConcentrationCurveViewModel> Concentration { get; set; } = new();
+
+        public List<AmountHistogramBinViewModel> AmountHistogram { get; set; } = new();
+    }
+
+    public sealed class ConcentrationCurveViewModel
+    {
+        public string Label { get; set; } = string.Empty;
+
+        public int Count { get; set; }
+
+        public decimal Total { get; set; }
+
+        public double TopOnePercentShare { get; set; }
+
+        public double TopTenShare { get; set; }
+
+        public List<ConcentrationPointViewModel> Points { get; set; } = new();
+    }
+
+    public sealed class ConcentrationPointViewModel
+    {
+        public double PopulationPercent { get; set; }
+
+        public double AmountPercent { get; set; }
+    }
+
+    public sealed class AmountHistogramBinViewModel
+    {
+        public decimal LowerBound { get; set; }
+
+        public decimal UpperBound { get; set; }
+
+        public int Count { get; set; }
+    }
+
+    public sealed class EntityYearActivityViewModel
+    {
+        public int Year { get; set; }
+
+        public int Count { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+
+    public sealed class EntityTypeBreakdownViewModel
+    {
+        public string Type { get; set; } = string.Empty;
+
+        public int Count { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+
+    public sealed class MonthlyDeclarationViewModel
+    {
+        public int Year { get; set; }
+
+        public int Month { get; set; }
+
+        public int Count { get; set; }
     }
 
     public sealed class EntityTypeCountViewModel
@@ -92,6 +156,10 @@ namespace Adex.Mvc.Models
         public int PageSize { get; set; }
 
         public int PageCount { get; set; } = 1;
+
+        public List<EntityYearActivityViewModel> YearlyActivity { get; set; } = new();
+
+        public List<EntityTypeBreakdownViewModel> TypeBreakdown { get; set; } = new();
 
         public List<EntityAttributeViewModel> Attributes { get; set; } = new();
 

@@ -115,8 +115,35 @@ namespace Adex.WebApi.Explorer
                 })
                 .ToList();
 
+            var monthlyDeclarations = await GetMonthlyDeclarationsAsync(db, cancellationToken);
+            var concentration = new List<ConcentrationCurve>
+            {
+                BuildConcentration(
+                    "Bénéficiaires (montants reçus)",
+                    await (
+                        from total in db.EntityTotals
+                        join person in db.Persons on total.EntityId equals person.Id
+                        where total.IncomingAmount > 0
+                        select total.IncomingAmount
+                    ).ToListAsync(cancellationToken)
+                ),
+                BuildConcentration(
+                    "Entreprises (montants versés)",
+                    await (
+                        from total in db.EntityTotals
+                        join company in db.Companies on total.EntityId equals company.Id
+                        where total.OutgoingAmount > 0
+                        select total.OutgoingAmount
+                    ).ToListAsync(cancellationToken)
+                ),
+            };
+            var amountHistogram = await GetAmountHistogramAsync(db, cancellationToken);
+
             return new DashboardModel
             {
+                MonthlyDeclarations = monthlyDeclarations,
+                Concentration = concentration,
+                AmountHistogram = amountHistogram,
                 EntityCount = companiesCount + personsCount,
                 FinancialLinkCount = linkTypes.Sum(summary => summary.Count),
                 TotalAmount = linkTypes.Sum(summary => summary.Amount),
@@ -129,6 +156,209 @@ namespace Adex.WebApi.Explorer
                 TopContributors = topContributors,
                 TopBeneficiaries = topBeneficiaries,
             };
+        }
+
+        // La source contient des dates aberrantes (année 0001, 1900 par défaut, etc.) : on les exclut du graphique.
+        private static readonly DateTime MonthlyChartStart = new(2012, 1, 1);
+
+        private static async Task<List<MonthlyDeclarationCount>> GetMonthlyDeclarationsAsync(
+            AdexContext db,
+            CancellationToken cancellationToken
+        )
+        {
+            var now = DateTime.UtcNow;
+            var end = new DateTime(now.Year, now.Month, 1).AddMonths(1);
+
+            var rows = await db.Database
+                .SqlQuery<MonthRow>(
+                    $"""
+                    SELECT date_part('year', "Date")::int AS "Year", date_part('month', "Date")::int AS "Month", count(*)::int AS "Count"
+                    FROM public."Links"
+                    WHERE "Date" >= {MonthlyChartStart.ToString("yyyy-MM-dd")}::timestamp AND "Date" < {end.ToString("yyyy-MM-dd")}::timestamp
+                    GROUP BY 1, 2
+                    """
+                )
+                .ToListAsync(cancellationToken);
+            if (rows.Count == 0)
+            {
+                return new List<MonthlyDeclarationCount>();
+            }
+
+            var counts = rows.ToDictionary(row => (row.Year, row.Month), row => row.Count);
+            var first = rows.Min(row => new DateTime(row.Year, row.Month, 1));
+            var last = rows.Max(row => new DateTime(row.Year, row.Month, 1));
+            var months = new List<MonthlyDeclarationCount>();
+            for (var month = first; month <= last; month = month.AddMonths(1))
+            {
+                counts.TryGetValue((month.Year, month.Month), out var count);
+                months.Add(new MonthlyDeclarationCount { Year = month.Year, Month = month.Month, Count = count });
+            }
+
+            return months;
+        }
+
+        // Agrégats globaux en SQL direct : l'héritage TPT ferait joindre Entities, Links et FinancialLinks sur des millions de lignes.
+        private sealed class MonthRow
+        {
+            public int Year { get; set; }
+
+            public int Month { get; set; }
+
+            public int Count { get; set; }
+        }
+
+        private sealed class HistogramRow
+        {
+            public int Key { get; set; }
+
+            public int Count { get; set; }
+        }
+
+        private static readonly double[] ConcentrationPercents =
+            { 0.1, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100 };
+
+        // Courbe de Pareto : part cumulée du montant détenue par les x % les plus importants.
+        private static ConcentrationCurve BuildConcentration(string label, List<decimal> amounts)
+        {
+            var curve = new ConcentrationCurve { Label = label, Count = amounts.Count };
+            if (amounts.Count == 0)
+            {
+                return curve;
+            }
+
+            amounts.Sort((left, right) => right.CompareTo(left));
+            var cumulative = new decimal[amounts.Count];
+            decimal running = 0;
+            for (var i = 0; i < amounts.Count; i++)
+            {
+                running += amounts[i];
+                cumulative[i] = running;
+            }
+
+            curve.Total = running;
+            double ShareOfTop(int count) =>
+                (double)(cumulative[Math.Clamp(count, 1, amounts.Count) - 1] / running) * 100d;
+
+            foreach (var percent in ConcentrationPercents)
+            {
+                var count = (int)Math.Ceiling(amounts.Count * percent / 100d);
+                curve.Points.Add(new ConcentrationPoint
+                {
+                    PopulationPercent = percent,
+                    AmountPercent = ShareOfTop(count),
+                });
+            }
+
+            curve.TopOnePercentShare = ShareOfTop((int)Math.Ceiling(amounts.Count / 100d));
+            curve.TopTenShare = ShareOfTop(10);
+            return curve;
+        }
+
+        // Tranches d'une demi-décade (1, 3,16, 10, 31,6, 100...) ; la tranche 0 regroupe les montants nuls ou négatifs.
+        private static async Task<List<AmountHistogramBin>> GetAmountHistogramAsync(
+            AdexContext db,
+            CancellationToken cancellationToken
+        )
+        {
+            var rows = await db.Database
+                .SqlQuery<HistogramRow>(
+                    $"""
+                    SELECT CASE WHEN "Amount" <= 0 THEN -1000 ELSE floor(log10("Amount"::double precision) * 2)::int END AS "Key",
+                           count(*)::int AS "Count"
+                    FROM public."FinancialLinks"
+                    GROUP BY 1
+                    """
+                )
+                .ToListAsync(cancellationToken);
+            if (rows.Count == 0)
+            {
+                return new List<AmountHistogramBin>();
+            }
+
+            var positive = rows.Where(row => row.Key > -1000).ToList();
+            var bins = new List<AmountHistogramBin>();
+            var nonPositive = rows.FirstOrDefault(row => row.Key <= -1000);
+            if (nonPositive is not null)
+            {
+                bins.Add(new AmountHistogramBin { Count = nonPositive.Count });
+            }
+
+            if (positive.Count == 0)
+            {
+                return bins;
+            }
+
+            var counts = positive.ToDictionary(row => row.Key, row => row.Count);
+            for (var key = counts.Keys.Min(); key <= counts.Keys.Max(); key++)
+            {
+                counts.TryGetValue(key, out var count);
+                bins.Add(new AmountHistogramBin
+                {
+                    LowerBound = HalfDecade(key),
+                    UpperBound = HalfDecade(key + 1),
+                    Count = count,
+                });
+            }
+
+            return bins;
+        }
+
+        private static decimal HalfDecade(int key)
+        {
+            return Math.Round((decimal)Math.Pow(10d, key / 2d), 2);
+        }
+
+        private static async Task<(List<EntityYearActivity> Activity, List<EntityTypeBreakdown> Breakdown)> GetEntityActivityAsync(
+            AdexContext db,
+            Guid entityId,
+            CancellationToken cancellationToken
+        )
+        {
+            // Une requête par sens pour utiliser les index (entité, date) plutôt qu'un OR sur les deux colonnes.
+            var outgoing = await db.FinancialLinks
+                .Where(link => link.From_Id == entityId)
+                .GroupBy(link => new { link.DeclarationType, link.Date.Year })
+                .Select(group => new { group.Key.DeclarationType, group.Key.Year, Count = group.Count(), Amount = group.Sum(link => link.Amount) })
+                .ToListAsync(cancellationToken);
+            var incoming = await db.FinancialLinks
+                .Where(link => link.To_Id == entityId)
+                .GroupBy(link => new { link.DeclarationType, link.Date.Year })
+                .Select(group => new { group.Key.DeclarationType, group.Key.Year, Count = group.Count(), Amount = group.Sum(link => link.Amount) })
+                .ToListAsync(cancellationToken);
+            var rows = outgoing.Concat(incoming).ToList();
+
+            var breakdown = rows
+                .GroupBy(row => row.DeclarationType ?? "Non renseigné")
+                .Select(group => new EntityTypeBreakdown
+                {
+                    Type = group.Key,
+                    Count = group.Sum(row => row.Count),
+                    Amount = group.Sum(row => row.Amount),
+                })
+                .OrderByDescending(item => item.Count)
+                .ToList();
+
+            var byYear = rows
+                .Where(row => row.Year >= MonthlyChartStart.Year && row.Year <= DateTime.UtcNow.Year)
+                .GroupBy(row => row.Year)
+                .ToDictionary(
+                    group => group.Key,
+                    group => new EntityYearActivity
+                    {
+                        Year = group.Key,
+                        Count = group.Sum(row => row.Count),
+                        Amount = group.Sum(row => row.Amount),
+                    });
+            var activity = new List<EntityYearActivity>();
+            if (byYear.Count > 0)
+            {
+                for (var year = byYear.Keys.Min(); year <= byYear.Keys.Max(); year++)
+                {
+                    activity.Add(byYear.TryGetValue(year, out var item) ? item : new EntityYearActivity { Year = year });
+                }
+            }
+
+            return (activity, breakdown);
         }
 
         public async Task<List<EntitySearchResult>> SearchEntitiesAsync(
@@ -349,8 +579,12 @@ namespace Adex.WebApi.Explorer
                 }
             }
 
+            var (activity, breakdown) = await GetEntityActivityAsync(db, entityId, cancellationToken);
+
             return new EntityDetails
             {
+                YearlyActivity = activity,
+                TypeBreakdown = breakdown,
                 Id = entity.Id,
                 Name = string.IsNullOrWhiteSpace(name) ? "(sans nom)" : name,
                 Type = company is not null

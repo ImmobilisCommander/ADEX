@@ -52,6 +52,61 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
     </section>
 
     <div class="dashboard-grid">
+        <section class="register-section monthly-chart" aria-labelledby="monthly-title">
+            <div class="section-heading">
+                <h2 id="monthly-title">Déclarations par mois</h2>
+                <span class="section-unit">nombre de liens · date du lien</span>
+            </div>
+            @if (Model.MonthlyDeclarations.Count == 0)
+            {
+                <p class="empty-state">Aucune déclaration datée n’est disponible dans la base.</p>
+            }
+            else
+            {
+                var months = Model.MonthlyDeclarations;
+                const double chartWidth = 960, chartHeight = 280, left = 56, right = 8, top = 12, bottom = 28;
+                var plotWidth = chartWidth - left - right;
+                var plotHeight = chartHeight - top - bottom;
+                var peak = months.Max(m => m.Count);
+                var magnitude = Math.Pow(10, Math.Floor(Math.Log10(Math.Max(peak, 1))));
+                var step = magnitude / 2;
+                var axisMax = Math.Ceiling(peak / step) * step;
+                var tickCount = Math.Max((int)Math.Round(axisMax / step), 1);
+                var slot = plotWidth / months.Count;
+                var barWidth = Math.Max(slot * 0.78, 0.6);
+                var first = months.First();
+                var last = months.Last();
+                var peakMonth = months.First(m => m.Count == peak);
+                var inv = CultureInfo.InvariantCulture;
+                <svg class="chart-svg" viewBox="0 0 @chartWidth @chartHeight" role="img"
+                     aria-label="Nombre de déclarations par mois, de @(new DateTime(first.Year, first.Month, 1).ToString("MMMM yyyy", frenchCulture)) à @(new DateTime(last.Year, last.Month, 1).ToString("MMMM yyyy", frenchCulture)), maximum @peak.ToString("N0", frenchCulture) en @(new DateTime(peakMonth.Year, peakMonth.Month, 1).ToString("MMMM yyyy", frenchCulture))">
+                    @for (var tick = 0; tick <= tickCount; tick++)
+                    {
+                        var value = axisMax * tick / tickCount;
+                        var y = top + plotHeight - plotHeight * tick / (double)tickCount;
+                        <line class="chart-grid" x1="@left.ToString(inv)" x2="@((chartWidth - right).ToString(inv))" y1="@y.ToString("0.##", inv)" y2="@y.ToString("0.##", inv)" />
+                        @Html.Raw($"<text class=\"chart-label\" x=\"{(left - 6).ToString(inv)}\" y=\"{(y + 4).ToString("0.##", inv)}\" text-anchor=\"end\">{value.ToString("N0", frenchCulture)}</text>")
+                    }
+                    @for (var i = 0; i < months.Count; i++)
+                    {
+                        var m = months[i];
+                        var x = left + slot * i + (slot - barWidth) / 2;
+                        var h = axisMax == 0 ? 0 : plotHeight * m.Count / axisMax;
+                        <rect class="chart-bar" x="@x.ToString("0.##", inv)" y="@((top + plotHeight - h).ToString("0.##", inv))" width="@barWidth.ToString("0.##", inv)" height="@h.ToString("0.##", inv)">
+                            <title>@(new DateTime(m.Year, m.Month, 1).ToString("MMMM yyyy", frenchCulture)) : @m.Count.ToString("N0", frenchCulture)</title>
+                        </rect>
+                        if (m.Month == 1)
+                        {
+                            @Html.Raw($"<text class=\"chart-label\" x=\"{(left + slot * i).ToString("0.##", inv)}\" y=\"{(chartHeight - 8).ToString(inv)}\">{m.Year}</text>")
+                        }
+                    }
+                </svg>
+            }
+        </section>
+
+        @await Html.PartialAsync("_Concentration", Model.Concentration)
+        @await Html.PartialAsync("_AmountHistogram", Model.AmountHistogram)
+
         <section class="register-section entity-types" aria-labelledby="entity-types-title">
             <div class="section-heading">
                 <h2 id="entity-types-title">Entités par typologie</h2>

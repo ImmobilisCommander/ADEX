@@ -26,7 +26,7 @@ Les constantes de colonnes CSV (`Adex/Adex.Business/CsvColumnsName.cs`) décrive
 | Import de fournisseurs | Lecture d’entreprises depuis un CSV et création d’entités référencées. |
 | Import de déclarations | Lecture de lignes de déclarations, rapprochement d’entreprise et de bénéficiaire, construction de liens. |
 | Recherche | Le contrat métier comprend des opérations pour rechercher des liens et récupérer un bénéficiaire par référence ; l’API comporte des contrôleurs de liens, bénéficiaires et métadonnées. |
-| Tableau de bord | L’accueil présente le nombre d’entités, les liens et montants par type de déclaration, ainsi qu’un classement des dix entités par montant financier cumulé. |
+| Tableau de bord | L’accueil présente le nombre d’entités, les liens et montants par type de déclaration, le nombre de déclarations par mois (graphique en barres), la concentration et la distribution des montants, et un classement des dix entités par montant financier cumulé. Chaque fiche d’entité affiche les montants par année et la répartition de ses liens par typologie. |
 | Recherche et fiche | La recherche d’entités appelle l’API ; une référence ouvre une fiche à l’adresse `/<référence>`, avec ses attributs et ses liens financiers navigables. |
 | Visualisation | Les indicateurs et fiches sont chargés depuis l’API. L’ancien graphe de démonstration et son fichier JSON local ne sont plus utilisés. |
 

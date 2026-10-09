@@ -1,0 +1,60 @@
+@model List<Adex.Mvc.Models.ConcentrationCurveViewModel>
+@using System.Globalization
+@{
+    var frenchCulture = CultureInfo.GetCultureInfo("fr-FR");
+    var inv = CultureInfo.InvariantCulture;
+    var curves = Model.Where(curve => curve.Points.Count > 0).ToList();
+    const double chartWidth = 480, chartHeight = 300, left = 40, right = 12, top = 12, bottom = 32;
+    var plotWidth = chartWidth - left - right;
+    var plotHeight = chartHeight - top - bottom;
+    double X(double percent) => left + plotWidth * percent / 100d;
+    double Y(double percent) => top + plotHeight - plotHeight * percent / 100d;
+    string[] classes = { "chart-line-a", "chart-line-b" };
+}
+
+<section class="register-section concentration-chart" aria-labelledby="concentration-title">
+    <div class="section-heading">
+        <h2 id="concentration-title">Concentration des montants</h2>
+        <span class="section-unit">part cumulée du montant</span>
+    </div>
+    @if (curves.Count == 0)
+    {
+        <p class="empty-state">Aucun montant n’est disponible pour calculer la concentration.</p>
+    }
+    else
+    {
+        <svg class="chart-svg" viewBox="0 0 @chartWidth @chartHeight" role="img"
+             aria-label="Courbe de concentration : part cumulée du montant détenue par les premiers pourcents de chaque population">
+            @foreach (var tick in new[] { 0, 25, 50, 75, 100 })
+            {
+                <line class="chart-grid" x1="@left.ToString(inv)" x2="@((chartWidth - right).ToString(inv))" y1="@Y(tick).ToString("0.##", inv)" y2="@Y(tick).ToString("0.##", inv)" />
+                @Html.Raw($"<text class=\"chart-label\" x=\"{(left - 6).ToString(inv)}\" y=\"{(Y(tick) + 4).ToString("0.##", inv)}\" text-anchor=\"end\">{tick} %</text>")
+                @Html.Raw($"<text class=\"chart-label\" x=\"{X(tick).ToString("0.##", inv)}\" y=\"{(chartHeight - 12).ToString(inv)}\" text-anchor=\"middle\">{tick} %</text>")
+            }
+            <line class="chart-diagonal" x1="@X(0).ToString("0.##", inv)" y1="@Y(0).ToString("0.##", inv)" x2="@X(100).ToString("0.##", inv)" y2="@Y(100).ToString("0.##", inv)" />
+            @for (var c = 0; c < curves.Count; c++)
+            {
+                var points = string.Join(" ", new[] { $"{X(0).ToString("0.##", inv)},{Y(0).ToString("0.##", inv)}" }
+                    .Concat(curves[c].Points.Select(p => $"{X(p.PopulationPercent).ToString("0.##", inv)},{Y(p.AmountPercent).ToString("0.##", inv)}")));
+                <polyline class="chart-line @classes[c % classes.Length]" points="@points" />
+            }
+        </svg>
+        <p class="chart-axis-note">Abscisse : part de la population, classée du montant le plus élevé au plus faible.</p>
+        <ul class="chart-legend">
+            @for (var c = 0; c < curves.Count; c++)
+            {
+                var curve = curves[c];
+                <li>
+                    <span class="legend-swatch @classes[c % classes.Length]" aria-hidden="true"></span>
+                    <span>
+                        <strong>@curve.Label</strong> :
+                        les 1 % premiers détiennent @curve.TopOnePercentShare.ToString("0.#", frenchCulture) % du montant,
+                        les 10 premiers @curve.TopTenShare.ToString("0.#", frenchCulture) %
+                        (@curve.Count.ToString("N0", frenchCulture) entités).
+                    </span>
+                </li>
+            }
+            <li><span class="legend-swatch chart-diagonal-swatch" aria-hidden="true"></span><span>Répartition parfaitement égale</span></li>
+        </ul>
+    }
+</section>
