@@ -24,6 +24,28 @@ namespace Adex.Mvc
             return GetModelAsync<DashboardViewModel>("api/dashboard", cancellationToken);
         }
 
+        public async Task<DashboardViewModel> TryGetDashboardAsync(
+            CancellationToken cancellationToken
+        )
+        {
+            using var response = await _httpClient.GetAsync(
+                "api/dashboard/progressive",
+                cancellationToken
+            );
+            if (response.StatusCode == HttpStatusCode.Accepted)
+            {
+                return null;
+            }
+
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<DashboardViewModel>(
+                    cancellationToken
+                )
+                ?? throw new InvalidOperationException(
+                    "The API returned an empty dashboard response."
+                );
+        }
+
         public Task<List<EntitySearchResultViewModel>> SearchEntitiesAsync(
             string query,
             CancellationToken cancellationToken

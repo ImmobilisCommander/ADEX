@@ -8,10 +8,6 @@ FIRST VIEWPORT: Search and three headline totals lead; declaration types and the
 FORM: Dense register mosaic, assigned direction 4; staging keeps every summary attached to legible source rows.
 -->
 <main class="explorer-page">
-    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-    {
-        <p class="error-state" role="alert">@Model.ErrorMessage</p>
-    }
     <section class="explorer-intro" aria-labelledby="page-title">
         <div class="intro-copy">
             <h1 id="page-title">Explorer les liens d’intérêt</h1>
@@ -28,127 +24,84 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
             <ul id="search-results" class="search-results" role="listbox" hidden data-search-results></ul>
         </form>
     </section>
-
-    @if (string.IsNullOrEmpty(Model.ErrorMessage))
-    {
-    <section class="summary-register" aria-label="Indicateurs généraux">
-        <div class="summary-item">
-            <span class="summary-label">Entités recensées</span>
-            <strong>@Model.EntityCountDisplay</strong>
+    <section id="dashboard-content" class="dashboard-content" data-dashboard-content
+             data-dashboard-url="@Model.ContentUrl" aria-busy="true">
+        <div class="dashboard-loading-progress" role="progressbar"
+             aria-label="Chargement des indicateurs et graphiques"
+             aria-valuetext="Calcul en cours">
+            <span></span>
         </div>
-        <div class="summary-item">
-            <span class="summary-label">Liens financiers</span>
-            <strong>@Model.FinancialLinkCountDisplay</strong>
-        </div>
-        <div class="summary-item summary-total">
-            <span class="summary-label">Montant déclaré cumulé</span>
-            <strong>@Model.TotalAmountDisplay</strong>
+        <section class="summary-register dashboard-loading-summary" aria-hidden="true">
+            <div class="summary-item">
+                <span class="summary-label">Entités recensées</span>
+                <strong class="kpi-countup" data-countup-target="790000"></strong>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Liens financiers</span>
+                <strong class="kpi-countup" data-countup-target="5600000"></strong>
+            </div>
+            <div class="summary-item summary-total">
+                <span class="summary-label">Montant déclaré cumulé</span>
+                <strong class="kpi-countup" data-countup-target="10000000000" data-countup-suffix=" €"></strong>
+            </div>
+        </section>
+        <div class="dashboard-grid dashboard-loading-grid" aria-hidden="true">
+            <section class="register-section monthly-chart dashboard-loading-panel dashboard-loading-bars">
+                <div class="section-heading">
+                    <h2>Déclarations par mois</h2>
+                    <span class="section-unit">nombre de liens · date du lien</span>
+                </div>
+                <div class="dashboard-loading-visual dashboard-loading-months">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+            </section>
+            <section class="register-section dashboard-loading-panel dashboard-loading-concentration">
+                <div class="section-heading">
+                    <h2>Concentration des montants</h2>
+                    <span class="section-unit">part cumulée du montant</span>
+                </div>
+                <div class="dashboard-loading-visual dashboard-loading-curve">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <path d="M 4 94 C 18 88, 26 75, 40 63 S 66 39, 96 7" />
+                    </svg>
+                </div>
+                <div class="dashboard-loading-legend"><i></i><i></i><i></i></div>
+            </section>
+            <section class="register-section dashboard-loading-panel dashboard-loading-histogram">
+                <div class="section-heading">
+                    <h2>Distribution des montants</h2>
+                    <span class="section-unit">nombre de liens · échelle logarithmique</span>
+                </div>
+                <div class="dashboard-loading-visual dashboard-loading-columns">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+            </section>
+            <section class="register-section dashboard-loading-panel">
+                <div class="section-heading"><h2>Entités par typologie</h2><span class="section-unit">nombre</span></div>
+                <div class="dashboard-loading-table">
+                    <i></i><i></i><i></i>
+                </div>
+            </section>
+            <section class="register-section dashboard-loading-panel">
+                <div class="section-heading"><h2>Liens financiers par typologie</h2><span class="section-unit">liens · montants</span></div>
+                <div class="dashboard-loading-table dashboard-loading-table-wide">
+                    <i></i><i></i><i></i><i></i>
+                </div>
+            </section>
+            <section class="register-section dashboard-loading-panel top-entities">
+                <div class="section-heading"><h2>Top 10 des bénéficiaires par montant reçu</h2><span class="section-unit">montants déclarés</span></div>
+                <div class="dashboard-loading-ranking">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+            </section>
+            <section class="register-section dashboard-loading-panel top-entities">
+                <div class="section-heading"><h2>Top 10 des contributeurs par montant versé</h2><span class="section-unit">montants déclarés</span></div>
+                <div class="dashboard-loading-ranking">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+            </section>
         </div>
     </section>
-
-    <div class="dashboard-grid">
-        <section class="register-section monthly-chart" aria-labelledby="monthly-title">
-            <div class="section-heading">
-                <h2 id="monthly-title">Déclarations par mois</h2>
-                <span class="section-unit">nombre de liens · date du lien</span>
-            </div>
-            @if (Model.MonthlyDeclarations.Count == 0)
-            {
-                <p class="empty-state">Aucune déclaration datée n’est disponible dans la base.</p>
-            }
-            else
-            {
-                <svg class="chart-svg" viewBox="@Model.MonthlyChart.ViewBox" role="img"
-                     aria-label="@Model.MonthlyChart.AccessibleLabel">
-                    @foreach (var tick in Model.MonthlyChart.Ticks)
-                    {
-                        <line class="chart-grid" x1="56" x2="952" y1="@tick.Y" y2="@tick.Y" />
-                        @:<text class="chart-label" x="50" y="@tick.LabelY" text-anchor="end">@tick.Value</text>
-                    }
-                    @foreach (var bar in Model.MonthlyChart.Bars)
-                    {
-                        <rect class="chart-bar" x="@bar.X" y="@bar.Y" width="@bar.Width" height="@bar.Height">
-                            <title>@bar.Title</title>
-                        </rect>
-                        @if (bar.Year is not null)
-                        {
-                            @:<text class="chart-label" x="@bar.YearX" y="272">@bar.Year</text>
-                        }
-                    }
-                </svg>
-            }
-        </section>
-
-        <partial name="_Concentration" model="Model.ConcentrationChart" />
-        <partial name="_AmountHistogram" model="Model.AmountHistogramChart" />
-
-        <section class="register-section entity-types" aria-labelledby="entity-types-title">
-            <div class="section-heading">
-                <h2 id="entity-types-title">Entités par typologie</h2>
-                <span class="section-unit">nombre</span>
-            </div>
-            @if (Model.EntityTypes.Count == 0 || Model.EntityCount == 0)
-            {
-                <p class="empty-state">Aucune entité n’est disponible dans la base.</p>
-            }
-            else
-            {
-                <table class="data-table">
-                    <thead>
-                        <tr><th scope="col">Typologie</th><th scope="col">Répartition</th><th scope="col" class="numeric">Entités</th></tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var row in Model.EntityTypeRows)
-                    {
-                        <tr>
-                            <th scope="row">@row.Entity.Type</th>
-                            <td class="bar-cell" aria-label="@row.Width %">
-                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @row.Width%"></span></span>
-                            </td>
-                            <td class="numeric">@row.Entity.CountDisplay</td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            }
-        </section>
-
-        <section class="register-section link-types" aria-labelledby="link-types-title">
-            <div class="section-heading">
-                <h2 id="link-types-title">Liens financiers par typologie</h2>
-                <span class="section-unit">liens · montants</span>
-            </div>
-            @if (Model.FinancialLinkTypes.Count == 0)
-            {
-                <p class="empty-state">Aucune déclaration financière n’est disponible dans la base.</p>
-            }
-            else
-            {
-                <table class="data-table">
-                    <thead>
-                        <tr><th scope="col">Typologie</th><th scope="col">Répartition</th><th scope="col" class="numeric">Liens</th><th scope="col" class="numeric">Montant</th></tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var row in Model.FinancialLinkTypeRows)
-                    {
-                        <tr>
-                            <th scope="row">@row.Type.Type</th>
-                            <td class="bar-cell" aria-label="@row.Width %">
-                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @row.Width%"></span></span>
-                            </td>
-                            <td class="numeric">@row.Type.CountDisplay</td>
-                            <td class="numeric">@row.Type.AmountDisplay</td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            }
-        </section>
-
-        <partial name="_Ranking" model="Model.TopBeneficiariesRanking" />
-        <partial name="_Ranking" model="Model.TopContributorsRanking" />
-    </div>
-    }
 </main>
 
 @section Scripts {

@@ -1,4 +1,100 @@
 (() => {
+    const dashboard = document.querySelector("[data-dashboard-content]");
+    if (dashboard) {
+        const url = dashboard.dataset.dashboardUrl;
+        let timer;
+        let loading = false;
+        let countUpFrame;
+        const counters = [...dashboard.querySelectorAll("[data-countup-target]")];
+        const fullNumber = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
+        const countUpTau = 2000;
+        const countUpStart = performance.now();
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const renderCounters = factor => {
+            for (const counter of counters) {
+                const value = Math.round(Number(counter.dataset.countupTarget) * factor);
+                counter.textContent = `${fullNumber.format(value)}${counter.dataset.countupSuffix ?? ""}`;
+            }
+        };
+
+        // Saturation exponentielle : v(t) = V * (1 - e^(-t/tau)), rapide puis de plus en plus lente.
+        const animateCounters = now => {
+            const elapsed = now - countUpStart;
+            renderCounters(1 - Math.exp(-elapsed / countUpTau));
+            countUpFrame = window.requestAnimationFrame(animateCounters);
+        };
+
+        if (reducedMotion) {
+            renderCounters(1);
+        } else {
+            countUpFrame = window.requestAnimationFrame(animateCounters);
+        }
+        const chartObserver = "IntersectionObserver" in window
+            ? new IntersectionObserver(entries => {
+                for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
+                    entry.target.classList.add("is-visible");
+                    chartObserver.unobserve(entry.target);
+                }
+            }, { rootMargin: "48px" })
+            : null;
+
+        const observeCharts = root => {
+            root.querySelectorAll(".dashboard-loading-panel, [data-chart-motion]").forEach(chart => {
+                if (chartObserver) {
+                    chartObserver.observe(chart);
+                } else {
+                    chart.classList.add("is-visible");
+                }
+            });
+        };
+
+        const loadDashboard = async () => {
+            if (document.hidden || loading || dashboard.dataset.loaded === "true") return;
+
+            loading = true;
+            try {
+                const response = await fetch(url, {
+                    headers: { Accept: "text/html" },
+                    cache: "no-store"
+                });
+                if (response.status === 202) {
+                    loading = false;
+                    timer = window.setTimeout(loadDashboard, 1200);
+                    return;
+                }
+                if (!response.ok) throw new Error("Le tableau de bord est indisponible.");
+
+                window.cancelAnimationFrame(countUpFrame);
+                dashboard.querySelectorAll(".dashboard-loading-panel").forEach(panel => chartObserver?.unobserve(panel));
+                dashboard.innerHTML = await response.text();
+                dashboard.classList.add("is-loaded");
+                dashboard.dataset.loaded = "true";
+                dashboard.setAttribute("aria-busy", "false");
+                observeCharts(dashboard);
+                loading = false;
+            } catch {
+                window.cancelAnimationFrame(countUpFrame);
+                dashboard.innerHTML = '<p class="error-state" role="alert">Le tableau de bord est indisponible. Rechargez la page pour réessayer.</p>';
+                dashboard.setAttribute("aria-busy", "false");
+                loading = false;
+            }
+        };
+
+        document.addEventListener("visibilitychange", () => {
+            window.clearTimeout(timer);
+            dashboard.classList.toggle("document-hidden", document.hidden);
+            if (!document.hidden && dashboard.dataset.loaded !== "true") {
+                loadDashboard();
+            }
+        });
+
+        dashboard.classList.toggle("document-hidden", document.hidden);
+        observeCharts(dashboard);
+        loadDashboard();
+    }
+
     const form = document.querySelector("[data-entity-search]");
     if (!form) return;
 

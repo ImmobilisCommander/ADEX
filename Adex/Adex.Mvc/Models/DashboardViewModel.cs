@@ -11,6 +11,8 @@ namespace Adex.Mvc.Models
     {
         public string ErrorMessage { get; set; }
 
+        public string ContentUrl { get; } = "/Home/DashboardContent";
+
         public int EntityCount { get; set; }
 
         public int FinancialLinkCount { get; set; }

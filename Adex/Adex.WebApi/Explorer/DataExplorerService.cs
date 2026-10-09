@@ -20,6 +20,8 @@ namespace Adex.WebApi.Explorer
         public static readonly int[] PageSizes = { 10, 20, 50 };
 
         private static readonly SemaphoreSlim DashboardLock = new(1, 1);
+        private static readonly object DashboardBuildLock = new();
+        private static Task<DashboardModel> _dashboardBuildTask;
 
         private readonly IDbContextFactory<AdexContext> _contextFactory;
         private readonly IMemoryCache _cache;
@@ -28,6 +30,64 @@ namespace Adex.WebApi.Explorer
         {
             _contextFactory = contextFactory;
             _cache = cache;
+        }
+
+        public Task<DashboardModel> TryGetDashboardAsync()
+        {
+            if (_cache.TryGetValue(DashboardCacheKey, out DashboardModel cached))
+            {
+                return Task.FromResult(cached);
+            }
+
+            lock (DashboardBuildLock)
+            {
+                if (_cache.TryGetValue(DashboardCacheKey, out cached))
+                {
+                    return Task.FromResult(cached);
+                }
+
+                if (_dashboardBuildTask?.IsCompletedSuccessfully == true)
+                {
+                    _dashboardBuildTask = null;
+                }
+
+                _dashboardBuildTask ??= Task.Run(BuildDashboardInBackgroundAsync);
+                return _dashboardBuildTask.IsCompleted
+                    ? _dashboardBuildTask
+                    : Task.FromResult<DashboardModel>(null);
+            }
+        }
+
+        private async Task<DashboardModel> BuildDashboardInBackgroundAsync()
+        {
+            try
+            {
+                await DashboardLock.WaitAsync(CancellationToken.None);
+                try
+                {
+                    if (_cache.TryGetValue(DashboardCacheKey, out DashboardModel cached))
+                    {
+                        return cached;
+                    }
+
+                    var dashboard = await BuildDashboardAsync(CancellationToken.None);
+                    _cache.Set(DashboardCacheKey, dashboard, TimeSpan.FromHours(6));
+                    return dashboard;
+                }
+                finally
+                {
+                    DashboardLock.Release();
+                }
+            }
+            catch
+            {
+                lock (DashboardBuildLock)
+                {
+                    _dashboardBuildTask = null;
+                }
+
+                throw;
+            }
         }
 
         public async Task<DashboardModel> GetDashboardAsync(CancellationToken cancellationToken)

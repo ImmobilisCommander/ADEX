@@ -21,17 +21,33 @@ namespace Adex.Mvc.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        public IActionResult Index()
         {
             ViewData["Title"] = "Explorer les liens d’intérêt";
+            return View(new DashboardViewModel());
+        }
+
+        [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> DashboardContent(CancellationToken cancellationToken)
+        {
             try
             {
-                return View(await _apiClient.GetDashboardAsync(cancellationToken));
+                var model = await _apiClient.TryGetDashboardAsync(cancellationToken);
+                return model is null
+                    ? StatusCode(StatusCodes.Status202Accepted)
+                    : PartialView("_DashboardContent", model);
             }
             catch (HttpRequestException exception)
             {
+                if (exception.StatusCode == System.Net.HttpStatusCode.ServiceUnavailable)
+                {
+                    return StatusCode(StatusCodes.Status202Accepted);
+                }
+
                 _logger.LogError(exception, "Unable to load dashboard data from the API");
-                return View(
+                return PartialView(
+                    "_DashboardContent",
                     new DashboardViewModel
                     {
                         ErrorMessage =

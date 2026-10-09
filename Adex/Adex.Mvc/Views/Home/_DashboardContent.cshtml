@@ -1,0 +1,126 @@
+@model Adex.Mvc.Models.DashboardViewModel
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p class="error-state" role="alert">@Model.ErrorMessage</p>
+}
+    @if (string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+    <section class="summary-register" aria-label="Indicateurs généraux">
+        <div class="summary-item">
+            <span class="summary-label">Entités recensées</span>
+            <strong>@Model.EntityCountDisplay</strong>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Liens financiers</span>
+            <strong>@Model.FinancialLinkCountDisplay</strong>
+        </div>
+        <div class="summary-item summary-total">
+            <span class="summary-label">Montant déclaré cumulé</span>
+            <strong>@Model.TotalAmountDisplay</strong>
+        </div>
+    </section>
+
+    <div class="dashboard-grid">
+        <section class="register-section monthly-chart" data-chart-motion="bars" aria-labelledby="monthly-title">
+            <div class="section-heading">
+                <h2 id="monthly-title">Déclarations par mois</h2>
+                <span class="section-unit">nombre de liens · date du lien</span>
+            </div>
+            @if (Model.MonthlyDeclarations.Count == 0)
+            {
+                <p class="empty-state">Aucune déclaration datée n’est disponible dans la base.</p>
+            }
+            else
+            {
+                <svg class="chart-svg" viewBox="@Model.MonthlyChart.ViewBox" role="img"
+                     aria-label="@Model.MonthlyChart.AccessibleLabel">
+                    @foreach (var tick in Model.MonthlyChart.Ticks)
+                    {
+                        <line class="chart-grid" x1="56" x2="952" y1="@tick.Y" y2="@tick.Y" />
+                        @:<text class="chart-label" x="50" y="@tick.LabelY" text-anchor="end">@tick.Value</text>
+                    }
+                    @foreach (var bar in Model.MonthlyChart.Bars)
+                    {
+                        <rect class="chart-bar" x="@bar.X" y="@bar.Y" width="@bar.Width" height="@bar.Height">
+                            <title>@bar.Title</title>
+                        </rect>
+                        @if (bar.Year is not null)
+                        {
+                            @:<text class="chart-label" x="@bar.YearX" y="272">@bar.Year</text>
+                        }
+                    }
+                </svg>
+            }
+        </section>
+
+        <partial name="_Concentration" model="Model.ConcentrationChart" />
+        <partial name="_AmountHistogram" model="Model.AmountHistogramChart" />
+
+        <section class="register-section entity-types" data-chart-motion="segments" aria-labelledby="entity-types-title">
+            <div class="section-heading">
+                <h2 id="entity-types-title">Entités par typologie</h2>
+                <span class="section-unit">nombre</span>
+            </div>
+            @if (Model.EntityTypes.Count == 0 || Model.EntityCount == 0)
+            {
+                <p class="empty-state">Aucune entité n’est disponible dans la base.</p>
+            }
+            else
+            {
+                <table class="data-table">
+                    <thead>
+                        <tr><th scope="col">Typologie</th><th scope="col">Répartition</th><th scope="col" class="numeric">Entités</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in Model.EntityTypeRows)
+                    {
+                        <tr>
+                            <th scope="row">@row.Entity.Type</th>
+                            <td class="bar-cell" aria-label="@row.Width %">
+                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @row.Width%"></span></span>
+                            </td>
+                            <td class="numeric">@row.Entity.CountDisplay</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+        </section>
+
+        <section class="register-section link-types" data-chart-motion="segments" aria-labelledby="link-types-title">
+            <div class="section-heading">
+                <h2 id="link-types-title">Liens financiers par typologie</h2>
+                <span class="section-unit">liens · montants</span>
+            </div>
+            @if (Model.FinancialLinkTypes.Count == 0)
+            {
+                <p class="empty-state">Aucune déclaration financière n’est disponible dans la base.</p>
+            }
+            else
+            {
+                <table class="data-table">
+                    <thead>
+                        <tr><th scope="col">Typologie</th><th scope="col">Répartition</th><th scope="col" class="numeric">Liens</th><th scope="col" class="numeric">Montant</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var row in Model.FinancialLinkTypeRows)
+                    {
+                        <tr>
+                            <th scope="row">@row.Type.Type</th>
+                            <td class="bar-cell" aria-label="@row.Width %">
+                                <span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width: @row.Width%"></span></span>
+                            </td>
+                            <td class="numeric">@row.Type.CountDisplay</td>
+                            <td class="numeric">@row.Type.AmountDisplay</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+        </section>
+
+        <partial name="_Ranking" model="Model.TopBeneficiariesRanking" />
+        <partial name="_Ranking" model="Model.TopContributorsRanking" />
+    </div>
+    }
