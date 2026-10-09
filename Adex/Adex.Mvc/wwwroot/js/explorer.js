@@ -119,7 +119,7 @@
         name.className = "search-result-name";
         name.textContent = entity.name;
         meta.className = "search-result-meta";
-        meta.textContent = entity.type;
+        meta.textContent = entity.detail ? `${entity.type} · ${entity.detail}` : entity.type;
         link.append(name, meta);
         item.append(link);
         return item;

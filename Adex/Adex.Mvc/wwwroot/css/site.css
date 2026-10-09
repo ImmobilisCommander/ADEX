@@ -1757,6 +1757,7 @@ input:focus-visible {
 }
 
 .entity-totals {
+    margin-top: 34px;
     margin-bottom: 34px;
 }
 

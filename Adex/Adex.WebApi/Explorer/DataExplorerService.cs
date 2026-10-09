@@ -13,7 +13,7 @@ namespace Adex.WebApi.Explorer
     {
         public const string DashboardCacheKey = "adex-dashboard";
 
-        private const int SearchResultLimit = 20;
+        private const int SearchResultLimit = 100;
         private const int SearchMinimumLength = 3;
         public static readonly string[] SortKeys = { "date", "amount", "type", "kind", "direction", "name" };
         public const int DefaultPageSize = 20;
@@ -471,17 +471,24 @@ namespace Adex.WebApi.Explorer
                     .ToListAsync(cancellationToken);
                 results.AddRange(companies);
 
-                var persons = await db.Persons
-                    .Where(person =>
+                // Every word must match the first or the last name, so "karine lacombe" finds all homonyms.
+                var personQuery = db.Persons.AsQueryable();
+                foreach (var token in query.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var tokenPattern = $"%{EscapeLikePattern(token)}%";
+                    personQuery = personQuery.Where(person =>
                         (
                             person.FirstName != null
-                            && EF.Functions.ILike(person.FirstName, pattern, escapeCharacter)
+                            && EF.Functions.ILike(person.FirstName, tokenPattern, escapeCharacter)
                         )
                         || (
                             person.LastName != null
-                            && EF.Functions.ILike(person.LastName, pattern, escapeCharacter)
+                            && EF.Functions.ILike(person.LastName, tokenPattern, escapeCharacter)
                         )
-                    )
+                    );
+                }
+
+                var persons = await personQuery
                     .OrderBy(person => person.LastName)
                     .ThenBy(person => person.FirstName)
                     .Take(SearchResultLimit)
@@ -502,13 +509,47 @@ namespace Adex.WebApi.Explorer
                 );
             }
 
-            return results
+            var found = results
                 .GroupBy(result => result.Id)
                 .Select(group => group.First())
                 .OrderBy(result => result.Name)
                 .ThenBy(result => result.Id)
                 .Take(SearchResultLimit)
                 .ToList();
+
+            // Homonyms are distinct entities: show profession and city to tell them apart.
+            var ids = found.Select(result => result.Id).ToList();
+            var attributeRows = await db.EntityAttributes
+                .Where(attribute => ids.Contains(attribute.EntityId))
+                .Select(attribute => new { attribute.EntityId, attribute.Data })
+                .ToListAsync(cancellationToken);
+            foreach (var row in attributeRows)
+            {
+                if (row.Data is null)
+                {
+                    continue;
+                }
+
+                var result = found.First(item => item.Id == row.EntityId);
+                result.Attributes = row.Data;
+                var parts = new[] { "Profession", "Ville" }
+                    .Select(key => row.Data.TryGetValue(key, out var value) ? value : null)
+                    .Where(value => !string.IsNullOrWhiteSpace(value));
+                result.Detail = string.Join(" · ", parts);
+            }
+
+            var totalRows = await db.EntityTotals
+                .Where(total => ids.Contains(total.EntityId))
+                .Select(total => new { total.EntityId, total.LinkCount, total.IncomingAmount, total.OutgoingAmount })
+                .ToListAsync(cancellationToken);
+            foreach (var total in totalRows)
+            {
+                var result = found.First(item => item.Id == total.EntityId);
+                result.LinkCount = total.LinkCount;
+                result.Amount = total.IncomingAmount + total.OutgoingAmount;
+            }
+
+            return found;
         }
 
         public async Task<EntityDetails> GetEntityAsync(

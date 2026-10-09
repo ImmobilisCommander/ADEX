@@ -42,3 +42,7 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 - API CSV : un SemaphoreSlim limite à une seule lecture du fichier à la fois ; les requêtes en attente restent annulables.
 - API CSV : durée du cache (Csv:CacheDurationSeconds, 60 s par défaut, 0 = pas de cache) lue via IOptionsMonitor pour être prise en compte à chaud ; contrôleurs CSV passés au constructeur principal ; règle correspondante ajoutée à AGENTS.md.
 - Documentation : règle de mise à jour continue des documents ajoutée à AGENTS.md ;  01_description.md et  03_architecture.md complétés (menu burger, pleine largeur, page et API d'interrogation du CSV).
+
+- Fiche détaillée : ajout d'une marge haute de 34 px au bloc des KPI pour l'aligner sur l'espacement des autres blocs.
+
+- Recherche d'entités : les bénéficiaires sont désormais trouvés par nom complet (chaque mot de la requête doit correspondre au prénom ou au nom, ex. « karine lacombe »), ce qui fait apparaître tous les homonymes ; la profession et la ville sont affichées en complément pour les distinguer, y compris dans la liste déroulante de l'accueil ; la page de résultats affiche en plus le nombre de liens, le montant total et tous les attributs disponibles (référence, identifiant, profession, adresse, ville, pays, SIREN…) en colonnes ; la limite de résultats passe de 20 à 100 (la recherche « lacombe » était tronquée et masquait des homonymes).
