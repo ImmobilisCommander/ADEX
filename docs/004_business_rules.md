@@ -35,7 +35,7 @@ Un vocabulaire de colonnes ne confirme pas que toutes les colonnes soient correc
 - Le graphique compte les liens par mois de leur date (`Links.Date`), et non par date de publication.
 - Seuls les liens datés à partir du 1er janvier 2012 et jusqu’au mois courant sont retenus : les dates aberrantes de la source (année 0001, 1900 utilisée par défaut à l’import, dates futures) sont exclues.
 - Les mois sans déclaration entre le premier et le dernier mois présents sont comblés avec un compte de zéro pour garder un axe continu.
-- Le résultat est persisté avec le reste du tableau de bord en base (`DashboardSnapshots`) pendant `Dashboard:TimeToLiveHours` heures (24 par défaut), généré au démarrage de l'API s'il est absent ou expiré ; aucun cache mémoire ni invalidation.
+- Le résultat est persisté avec le reste du tableau de bord en base (`DashboardSnapshots`) pendant `Dashboard:TimeToLive` (durée `hh:mm:ss`, obligatoire, sans valeur par défaut, validée au démarrage ; `24:00:00` dans `appsettings.json`), généré au démarrage de l'API s'il est absent ou expiré ; aucun cache mémoire ni invalidation.
 
 ## Autres graphiques (tableau de bord et fiches)
 

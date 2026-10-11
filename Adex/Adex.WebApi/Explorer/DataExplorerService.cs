@@ -36,8 +36,7 @@ namespace Adex.WebApi.Explorer
             _dashboardOptions = dashboardOptions;
         }
 
-        private TimeSpan DashboardTimeToLive =>
-            TimeSpan.FromHours(_dashboardOptions.CurrentValue.TimeToLiveHours);
+        private TimeSpan DashboardTimeToLive => _dashboardOptions.CurrentValue.TimeToLive;
 
         /// <summary>
         /// Returns the stored dashboard, or null while a missing or expired snapshot is being regenerated in background.

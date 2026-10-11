@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Adex.WebApi.Explorer
@@ -6,7 +7,7 @@ namespace Adex.WebApi.Explorer
     {
         public const string SectionName = "Dashboard";
 
-        [Range(1, 8760, ErrorMessage = "Le paramètre « Dashboard:TimeToLiveHours » doit être compris entre 1 et 8760.")]
-        public int TimeToLiveHours { get; set; } = 24;
+        [Range(typeof(TimeSpan), "00:01:00", "365.00:00:00", ErrorMessage = "Le paramètre « Dashboard:TimeToLive » est obligatoire et doit être une durée (hh:mm:ss ou d.hh:mm:ss) comprise entre 00:01:00 et 365.00:00:00.")]
+        public required TimeSpan TimeToLive { get; set; }
     }
 }
