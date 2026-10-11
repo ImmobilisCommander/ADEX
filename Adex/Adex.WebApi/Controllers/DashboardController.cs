@@ -32,11 +32,11 @@ namespace Adex.WebApi.Controllers
 
         [HttpGet("progressive")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public async Task<ActionResult<DashboardModel>> GetProgressive()
+        public async Task<ActionResult<DashboardModel>>         GetProgressive(CancellationToken cancellationToken)
         {
             try
             {
-                var dashboard = await _explorer.TryGetDashboardAsync();
+                        var dashboard = await _explorer.TryGetDashboardAsync(cancellationToken);
                 return dashboard is null ? Accepted() : dashboard;
             }
             catch (Exception exception)

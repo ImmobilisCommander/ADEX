@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Adex.Data.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Adex.WebApi.Explorer
 {
     public sealed class DataExplorerService
     {
-        public const string DashboardCacheKey = "adex-dashboard";
+        private const string DashboardSnapshotKey = "adex-dashboard";
 
         private const int SearchResultLimit = 100;
         private const int SearchMinimumLength = 3;
@@ -20,98 +21,133 @@ namespace Adex.WebApi.Explorer
         public static readonly int[] PageSizes = { 10, 20, 50 };
 
         private static readonly SemaphoreSlim DashboardLock = new(1, 1);
-        private static readonly object DashboardBuildLock = new();
+        private static readonly SemaphoreSlim DashboardBuildGate = new(1, 1);
         private static Task<DashboardModel> _dashboardBuildTask;
 
         private readonly IDbContextFactory<AdexContext> _contextFactory;
-        private readonly IMemoryCache _cache;
+        private readonly IOptionsMonitor<DashboardOptions> _dashboardOptions;
 
-        public DataExplorerService(IDbContextFactory<AdexContext> contextFactory, IMemoryCache cache)
+        public DataExplorerService(
+            IDbContextFactory<AdexContext> contextFactory,
+            IOptionsMonitor<DashboardOptions> dashboardOptions
+        )
         {
             _contextFactory = contextFactory;
-            _cache = cache;
+            _dashboardOptions = dashboardOptions;
         }
 
-        public Task<DashboardModel> TryGetDashboardAsync()
+        private TimeSpan DashboardTimeToLive =>
+            TimeSpan.FromHours(_dashboardOptions.CurrentValue.TimeToLiveHours);
+
+        /// <summary>
+        /// Returns the stored dashboard, or null while a missing or expired snapshot is being regenerated in background.
+        /// </summary>
+        public async Task<DashboardModel> TryGetDashboardAsync(CancellationToken cancellationToken)
         {
-            if (_cache.TryGetValue(DashboardCacheKey, out DashboardModel cached))
+            var stored = await ReadSnapshotAsync(cancellationToken);
+            if (stored is not null)
             {
-                return Task.FromResult(cached);
+                return stored;
             }
 
-            lock (DashboardBuildLock)
+            Task<DashboardModel> build;
+            await DashboardBuildGate.WaitAsync(cancellationToken);
+            try
             {
-                if (_cache.TryGetValue(DashboardCacheKey, out cached))
-                {
-                    return Task.FromResult(cached);
-                }
-
                 if (_dashboardBuildTask?.IsCompletedSuccessfully == true)
                 {
                     _dashboardBuildTask = null;
                 }
 
-                _dashboardBuildTask ??= Task.Run(BuildDashboardInBackgroundAsync);
-                return _dashboardBuildTask.IsCompleted
-                    ? _dashboardBuildTask
-                    : Task.FromResult<DashboardModel>(null);
+                build = _dashboardBuildTask ??= Task.Run(() => EnsureDashboardAsync(CancellationToken.None));
             }
+            finally
+            {
+                DashboardBuildGate.Release();
+            }
+
+            return build.IsCompleted ? await build : null;
         }
 
-        private async Task<DashboardModel> BuildDashboardInBackgroundAsync()
+        public Task<DashboardModel> GetDashboardAsync(CancellationToken cancellationToken)
         {
+            return EnsureDashboardAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Computes and stores the dashboard unless a non-expired snapshot already exists.
+        /// </summary>
+        public async Task<DashboardModel> EnsureDashboardAsync(CancellationToken cancellationToken)
+        {
+            await DashboardLock.WaitAsync(cancellationToken);
             try
             {
-                await DashboardLock.WaitAsync(CancellationToken.None);
-                try
+                var stored = await ReadSnapshotAsync(cancellationToken);
+                if (stored is not null)
                 {
-                    if (_cache.TryGetValue(DashboardCacheKey, out DashboardModel cached))
-                    {
-                        return cached;
-                    }
+                    return stored;
+                }
 
-                    var dashboard = await BuildDashboardAsync(CancellationToken.None);
-                    _cache.Set(DashboardCacheKey, dashboard, TimeSpan.FromHours(6));
-                    return dashboard;
-                }
-                finally
-                {
-                    DashboardLock.Release();
-                }
+                var dashboard = await BuildDashboardAsync(cancellationToken);
+                await SaveSnapshotAsync(dashboard, cancellationToken);
+                return dashboard;
             }
             catch
             {
-                lock (DashboardBuildLock)
+                await DashboardBuildGate.WaitAsync(CancellationToken.None);
+                try
                 {
                     _dashboardBuildTask = null;
+                }
+                finally
+                {
+                    DashboardBuildGate.Release();
                 }
 
                 throw;
             }
-        }
-
-        public async Task<DashboardModel> GetDashboardAsync(CancellationToken cancellationToken)
-        {
-            if (_cache.TryGetValue(DashboardCacheKey, out DashboardModel cached))
-            {
-                return cached;
-            }
-
-            await DashboardLock.WaitAsync(cancellationToken);
-            try
-            {
-                if (_cache.TryGetValue(DashboardCacheKey, out cached))
-                {
-                    return cached;
-                }
-
-                var dashboard = await BuildDashboardAsync(cancellationToken);
-                _cache.Set(DashboardCacheKey, dashboard, TimeSpan.FromHours(6));
-                return dashboard;
-            }
             finally
             {
                 DashboardLock.Release();
+            }
+        }
+
+        private async Task<DashboardModel> ReadSnapshotAsync(CancellationToken cancellationToken)
+        {
+            await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
+            var snapshot = await db.DashboardSnapshots
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item => item.Key == DashboardSnapshotKey, cancellationToken);
+            if (snapshot is null || snapshot.ComputedAtUtc + DashboardTimeToLive <= DateTime.UtcNow)
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<DashboardModel>(snapshot.Json);
+        }
+
+        private async Task SaveSnapshotAsync(DashboardModel dashboard, CancellationToken cancellationToken)
+        {
+            await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
+            var json = JsonSerializer.Serialize(dashboard);
+            var computedAtUtc = DateTime.UtcNow;
+            var updated = await db.DashboardSnapshots
+                .Where(item => item.Key == DashboardSnapshotKey)
+                .ExecuteUpdateAsync(
+                    setters => setters
+                        .SetProperty(item => item.Json, json)
+                        .SetProperty(item => item.ComputedAtUtc, computedAtUtc),
+                    cancellationToken
+                );
+            if (updated == 0)
+            {
+                db.DashboardSnapshots.Add(new DashboardSnapshot
+                {
+                    Key = DashboardSnapshotKey,
+                    Json = json,
+                    ComputedAtUtc = computedAtUtc,
+                });
+                await db.SaveChangesAsync(cancellationToken);
             }
         }
 

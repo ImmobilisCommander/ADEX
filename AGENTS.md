@@ -5,6 +5,7 @@
 - Un fichier `.cs` ne contient qu'une seule déclaration de classe, record class, interface ou enum, y compris les types imbriqués. Placer chaque type dans son propre fichier.
 - Utiliser en priorité le constructeur principal (primary constructor) pour passer les paramètres et dépendances des classes, plutôt qu'un constructeur explicite avec des champs `readonly` assignés à la main.
 - Toute opération pouvant être asynchrone (E/S fichier, réseau, base de données) doit exposer et utiliser une méthode asynchrone. Dans un contrôleur, toujours transmettre le `CancellationToken` de la requête HTTP (paramètre `CancellationToken cancellationToken`, lié à `HttpContext.RequestAborted`) à chaque appel asynchrone, jusqu'aux couches basses, afin que le travail s'arrête quand le client quitte la page.
+- Ne jamais utiliser `lock` (ni `Monitor`) : protéger les sections critiques avec un `SemaphoreSlim` uniquement, acquis par `WaitAsync` et libéré dans un `finally`.
 
 ## Journal des modifications
 

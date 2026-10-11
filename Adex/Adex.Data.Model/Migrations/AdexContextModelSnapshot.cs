@@ -24,6 +24,22 @@ namespace Adex.Data.Model.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Adex.Data.Model.DashboardSnapshot", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ComputedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Json")
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("DashboardSnapshots");
+                });
+
             modelBuilder.Entity("Adex.Data.Model.Entity", b =>
                 {
                     b.Property<Guid>("Id")

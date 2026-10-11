@@ -25,6 +25,8 @@ namespace Adex.Data.Model
 
         public DbSet<FinancialLinkTypeTotal> FinancialLinkTypeTotals { get; set; }
 
+        public DbSet<DashboardSnapshot> DashboardSnapshots { get; set; }
+
         public AdexContext(DbContextOptions<AdexContext> options)
             : base(options) { }
 
@@ -33,6 +35,7 @@ namespace Adex.Data.Model
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.HasPostgresExtension("pg_trgm");
+            modelBuilder.Entity<DashboardSnapshot>().Property(snapshot => snapshot.Json).HasColumnType("jsonb");
             modelBuilder.Entity<EntityTotal>().HasKey(total => total.EntityId);
             modelBuilder.Entity<EntityTotal>().HasIndex(total => total.Total);
             modelBuilder

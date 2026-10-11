@@ -127,7 +127,6 @@ namespace Adex.WebApi.Import
                 _logger.LogInformation("Full import of {Path} started", path);
 
                 await using var scope = _scopeFactory.CreateAsyncScope();
-                var cache = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
                 var result = await scope.ServiceProvider
                     .GetRequiredService<DeclarationsImporter>()
                     .ImportAsync(
@@ -144,7 +143,6 @@ namespace Adex.WebApi.Import
                         cancellationToken
                     );
 
-                cache.Remove(Explorer.DataExplorerService.DashboardCacheKey);
 
                 using (Acquire())
                 {

@@ -57,7 +57,7 @@ L’état en mémoire de `ImportJobService` ne suffit plus ; la base PostgreSQL 
 2. **Table `ImportRuns`** : id, début, fin, statut (`Running`/`Succeeded`/`Failed`), étape, progression, instance, `LastHeartbeat`. Un import `Running` sans heartbeat depuis plus de 30 s est considéré comme mort et passé en `Failed`.
 3. **Statut lu en base** par toutes les instances API (cache de quelques secondes).
 4. **Diffusion entre instances** : PostgreSQL `LISTEN/NOTIFY` (`import_status`, `import_completed`), sans nouvelle infrastructure. Redis backplane ou Azure SignalR Service ne sont pertinents que s’ils existent déjà.
-5. **Invalidation des caches** : `import_completed` déclenche la suppression du cache du tableau de bord sur toutes les instances (sinon cache distribué, ou identifiant du dernier import dans la clé).
+5. **Invalidation des caches** : le snapshot du tableau de bord n'est plus invalidé par l'import ; envisager de le régénérer à la fin d'un import complet.
 6. **Load balancer** : sessions persistantes ou WebSockets seuls (`SkipNegotiation`) pour SignalR.
 
 Ordre proposé : table `ImportRuns` et verrou, puis statut public, middleware et page de maintenance, puis SignalR et `LISTEN/NOTIFY`.

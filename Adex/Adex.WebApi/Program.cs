@@ -70,6 +70,10 @@ namespace Adex.WebApi
             builder.Services.AddScoped<DataExplorerService>();
             builder.Services.AddScoped<DeclarationsImporter>();
 
+            builder.Services.AddOptions<Adex.WebApi.Explorer.DashboardOptions>()
+                .BindConfiguration(Adex.WebApi.Explorer.DashboardOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
             builder.Services.AddOptions<Adex.WebApi.Csv.CsvOptions>()
                 .BindConfiguration(Adex.WebApi.Csv.CsvOptions.SectionName)
                 .ValidateDataAnnotations()
@@ -137,6 +141,7 @@ namespace Adex.WebApi
                     await migrationContext.Database.MigrateAsync(app.Lifetime.ApplicationStopping);
                 }
 
+                await app.EnsureDashboardAsync(shutdown.Token);
                 await app.RunAsync(shutdown.Token);
             }
             finally
