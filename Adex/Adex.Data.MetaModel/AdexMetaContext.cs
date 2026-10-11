@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Adex.Data.MetaModel
 {
-    public class AdexMetaContext : DbContext
+    public class AdexMetaContext(DbContextOptions<AdexMetaContext> options) : DbContext(options)
     {
         public DbSet<Entity> Entities { get; set; }
 
@@ -16,9 +16,6 @@ namespace Adex.Data.MetaModel
         public DbSet<Metadata> Metadatas { get; set; }
 
         public DbSet<Link> Links { get; set; }
-
-        public AdexMetaContext(DbContextOptions<AdexMetaContext> options)
-            : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -31,7 +31,10 @@ namespace Adex.Business
     /// company, beneficiary and link, the most recently published row; pass 2 writes the
     /// picked rows. A failed import is simply restarted from the beginning.
     /// </summary>
-    public sealed class DeclarationsImporter
+    public sealed class DeclarationsImporter(
+        IDbContextFactory<AdexContext> contextFactory,
+        ILogger<DeclarationsImporter> logger
+        )
     {
         private static readonly string[] ExpectedColumns =
         {
@@ -112,18 +115,7 @@ namespace Adex.Business
 
         private readonly record struct TotalRow(Guid Id, int Count, decimal Outgoing, decimal Incoming);
 
-        private readonly IDbContextFactory<AdexContext> _contextFactory;
-        private readonly ILogger<DeclarationsImporter> _logger;
         private readonly Stopwatch _total = new();
-
-        public DeclarationsImporter(
-            IDbContextFactory<AdexContext> contextFactory,
-            ILogger<DeclarationsImporter> logger
-        )
-        {
-            _contextFactory = contextFactory;
-            _logger = logger;
-        }
 
         public async Task<DeclarationsImportResult> ImportAsync(
             string path,
@@ -133,7 +125,7 @@ namespace Adex.Business
         {
             var connectionString = await GetConnectionStringAsync();
             _total.Restart();
-            _logger.LogInformation("Import: démarrage ({Path})", path);
+            logger.LogInformation("Import: démarrage ({Path})", path);
 
             progress?.Report("Analyse du fichier (passe 1/2)");
             var scan = await Task.Factory.StartNew(
@@ -142,7 +134,7 @@ namespace Adex.Business
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default
             );
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Import: {Rows} lignes lues, {Skipped} ignorées, {Companies} entreprises, {Persons} bénéficiaires, {Links} liens (total {Total})",
                 scan.Rows,
                 scan.Skipped,
@@ -169,7 +161,7 @@ namespace Adex.Business
                 Beneficiaries = scan.Persons.Count,
                 Links = scan.Links.Count,
             };
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Import terminé en {Elapsed}: {Companies} entreprises, {Persons} bénéficiaires, {Links} liens",
                 _total.Elapsed,
                 result.Companies,
@@ -358,7 +350,7 @@ namespace Adex.Business
             };
                             tasks.AddRange(entityShards.Concat(linkShards).Select(x => x.Completion));
             await WhenAllRethrowRootCauseAsync(tasks);
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Import: données écrites (entités {Entities}, attributs {Attributes}, liens {Links}) en {Elapsed}",
                 entities.Rows,
                 entityShards.Concat(linkShards).Sum(x => x.Rows),
@@ -390,7 +382,7 @@ namespace Adex.Business
                 totalRows.Complete();
             });
             await WhenAllRethrowRootCauseAsync(new List<Task> { totalsProducer, totalRows.Completion });
-            _logger.LogInformation("Import: {Rows} totaux écrits (total {Total})", totalRows.Rows, _total.Elapsed);
+            logger.LogInformation("Import: {Rows} totaux écrits (total {Total})", totalRows.Rows, _total.Elapsed);
         }
 
         private void Produce(
@@ -611,7 +603,7 @@ namespace Adex.Business
 
         private async Task<string> GetConnectionStringAsync()
         {
-            await using var db = await _contextFactory.CreateDbContextAsync();
+            await using var db = await contextFactory.CreateDbContextAsync();
             return db.Database.GetConnectionString()
                 ?? throw new InvalidOperationException("The 'Adex' connection string is not configured.");
         }
@@ -635,7 +627,7 @@ namespace Adex.Business
                 await command.ExecuteNonQueryAsync(cancellationToken);
             }
 
-            _logger.LogInformation("Import: {Label} terminé en {Elapsed} (total {Total})", label, watch.Elapsed, _total.Elapsed);
+            logger.LogInformation("Import: {Label} terminé en {Elapsed} (total {Total})", label, watch.Elapsed, _total.Elapsed);
         }
 
         private void Report(IProgress<string> progress, string label, FileStream file, TimeSpan elapsed, long rows)

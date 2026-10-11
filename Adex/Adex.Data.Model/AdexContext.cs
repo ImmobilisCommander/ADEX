@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Adex.Data.Model
 {
-    public class AdexContext : DbContext
+    public class AdexContext(DbContextOptions<AdexContext> options) : DbContext(options)
     {
         public DbSet<Entity> Entities { get; set; }
 
@@ -26,9 +26,6 @@ namespace Adex.Data.Model
         public DbSet<FinancialLinkTypeTotal> FinancialLinkTypeTotals { get; set; }
 
         public DbSet<DashboardSnapshot> DashboardSnapshots { get; set; }
-
-        public AdexContext(DbContextOptions<AdexContext> options)
-            : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

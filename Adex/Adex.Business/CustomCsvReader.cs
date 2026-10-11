@@ -16,15 +16,13 @@ namespace Adex.Business
     /// <summary>
     /// Custom implementation of <see cref="CsvReader"/>
     /// </summary>
-    internal class CustomCsvReader : CsvReader
+    /// <remarks>
+    /// Constructor
+    /// </remarks>
+    /// <param name="sr">Stream of the file</param>
+    /// <param name="inf">Culture of the file</param>
+    internal class CustomCsvReader(StreamReader sr, CsvConfiguration configuration) : CsvReader(sr, configuration)
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="sr">Stream of the file</param>
-        /// <param name="inf">Culture of the file</param>
-        public CustomCsvReader(StreamReader sr, CsvConfiguration configuration)
-            : base(sr, configuration) { }
 
         /// <summary>
         /// Get the filed by index if index greater than or equal to 0

@@ -5,18 +5,12 @@ using System.Text.Json;
 
 namespace Adex.Business
 {
-    internal sealed class AttributeSink
+    internal sealed class AttributeSink(ImportTableWriter<AttributeRow> writer)
     {
-        private readonly ImportTableWriter<AttributeRow> _writer;
         private readonly ArrayBufferWriter<byte> _buffer = new();
         private Utf8JsonWriter _json;
         private Guid _current;
         private bool _open;
-
-        public AttributeSink(ImportTableWriter<AttributeRow> writer)
-        {
-            _writer = writer;
-        }
 
         public void Add(Guid entityId, string name, string value)
         {
@@ -46,7 +40,7 @@ namespace Adex.Business
 
             _json.WriteEndObject();
             _json.Flush();
-            _writer.Add(new AttributeRow(_current, Encoding.UTF8.GetString(_buffer.WrittenSpan)));
+            writer.Add(new AttributeRow(_current, Encoding.UTF8.GetString(_buffer.WrittenSpan)));
             _json.Dispose();
             _open = false;
         }

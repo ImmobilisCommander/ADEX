@@ -8,18 +8,12 @@ namespace Adex.Business
     /// Minimal streaming reader for semicolon-separated, double-quote-escaped CSV with embedded
     /// line breaks. Only the requested columns are materialised as strings.
     /// </summary>
-    internal sealed class CsvRecordReader : IDisposable
+    internal sealed class CsvRecordReader(TextReader reader) : IDisposable
     {
-        private readonly TextReader _reader;
         private readonly char[] _buffer = new char[1 << 16];
         private readonly StringBuilder _field = new(512);
         private int _position;
         private int _length;
-
-        public CsvRecordReader(TextReader reader)
-        {
-            _reader = reader;
-        }
 
         public long RecordNumber { get; private set; }
 
@@ -37,7 +31,7 @@ namespace Adex.Business
             {
                 if (_position == _length)
                 {
-                    _length = _reader.Read(_buffer, 0, _buffer.Length);
+                    _length = reader.Read(_buffer, 0, _buffer.Length);
                     _position = 0;
                     if (_length == 0)
                     {
@@ -143,7 +137,7 @@ namespace Adex.Business
 
         public void Dispose()
         {
-            _reader.Dispose();
+            reader.Dispose();
         }
     }
 }

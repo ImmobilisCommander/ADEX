@@ -14,34 +14,20 @@ using System.Threading.Tasks;
 
 namespace Adex.WebApi.Import
 {
-    public class ImportJobService
+    public class ImportJobService(
+        IServiceScopeFactory scopeFactory,
+        IHostApplicationLifetime lifetime,
+        IWebHostEnvironment environment,
+        IOptions<ImportOptions> options,
+        ILogger<ImportJobService> logger
+        )
     {
         private const string StepName = "Declarations";
-
-        private readonly IServiceScopeFactory _scopeFactory;
-        private readonly IHostApplicationLifetime _lifetime;
-        private readonly IWebHostEnvironment _environment;
-        private readonly ImportOptions _options;
-        private readonly ILogger<ImportJobService> _logger;
+        private readonly ImportOptions _options = options.Value;
         private readonly SemaphoreSlim _sync = new(1, 1);
 
         private ImportStatus _status = new();
         private CancellationTokenSource _cancellation;
-
-        public ImportJobService(
-            IServiceScopeFactory scopeFactory,
-            IHostApplicationLifetime lifetime,
-            IWebHostEnvironment environment,
-            IOptions<ImportOptions> options,
-            ILogger<ImportJobService> logger
-        )
-        {
-            _scopeFactory = scopeFactory;
-            _lifetime = lifetime;
-            _environment = environment;
-            _options = options.Value;
-            _logger = logger;
-        }
 
         public bool IsEnabled => !string.IsNullOrEmpty(_options.ApiKey);
 
@@ -82,7 +68,7 @@ namespace Adex.WebApi.Import
 
                 _cancellation?.Dispose();
                 _cancellation = CancellationTokenSource.CreateLinkedTokenSource(
-                    _lifetime.ApplicationStopping
+                    lifetime.ApplicationStopping
                 );
                 _status = new ImportStatus
                 {
@@ -124,9 +110,9 @@ namespace Adex.WebApi.Import
                 }
 
                 var path = ResolveFile();
-                _logger.LogInformation("Full import of {Path} started", path);
+                logger.LogInformation("Full import of {Path} started", path);
 
-                await using var scope = _scopeFactory.CreateAsyncScope();
+                await using var scope = scopeFactory.CreateAsyncScope();
                 var result = await scope.ServiceProvider
                     .GetRequiredService<DeclarationsImporter>()
                     .ImportAsync(
@@ -138,7 +124,7 @@ namespace Adex.WebApi.Import
                                 step.Message = message;
                             }
 
-                            _logger.LogInformation("Import: {Message}", message);
+                            logger.LogInformation("Import: {Message}", message);
                         }),
                         cancellationToken
                     );
@@ -157,7 +143,7 @@ namespace Adex.WebApi.Import
                     run.State = step.State;
                 }
 
-                _logger.LogInformation("Import finished: {Summary}", step.Message);
+                logger.LogInformation("Import finished: {Summary}", step.Message);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -167,7 +153,7 @@ namespace Adex.WebApi.Import
                     run.State = ImportState.Cancelled;
                 }
 
-                _logger.LogWarning("Import cancelled, database may be partial, rerun the import");
+                logger.LogWarning("Import cancelled, database may be partial, rerun the import");
             }
             catch (Exception e)
             {
@@ -178,7 +164,7 @@ namespace Adex.WebApi.Import
                     run.State = ImportState.Failed;
                 }
 
-                _logger.LogError(e, "Import failed, database may be partial, rerun the import");
+                logger.LogError(e, "Import failed, database may be partial, rerun the import");
             }
             finally
             {
@@ -197,7 +183,7 @@ namespace Adex.WebApi.Import
 
         private string ResolveFile()
         {
-            var directory = Path.GetFullPath(_options.DataDirectory, _environment.ContentRootPath);
+            var directory = Path.GetFullPath(_options.DataDirectory, environment.ContentRootPath);
             var path = Path.Combine(directory, Path.GetFileName(_options.FileName));
             return File.Exists(path)
                 ? path

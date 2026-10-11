@@ -10,7 +10,10 @@ using Microsoft.Extensions.Options;
 
 namespace Adex.WebApi.Explorer
 {
-    public sealed class DataExplorerService
+    public sealed class DataExplorerService(
+        IDbContextFactory<AdexContext> contextFactory,
+        IOptionsMonitor<DashboardOptions> dashboardOptions
+        )
     {
         private const string DashboardSnapshotKey = "adex-dashboard";
 
@@ -24,19 +27,7 @@ namespace Adex.WebApi.Explorer
         private static readonly SemaphoreSlim DashboardBuildGate = new(1, 1);
         private static Task<DashboardModel> _dashboardBuildTask;
 
-        private readonly IDbContextFactory<AdexContext> _contextFactory;
-        private readonly IOptionsMonitor<DashboardOptions> _dashboardOptions;
-
-        public DataExplorerService(
-            IDbContextFactory<AdexContext> contextFactory,
-            IOptionsMonitor<DashboardOptions> dashboardOptions
-        )
-        {
-            _contextFactory = contextFactory;
-            _dashboardOptions = dashboardOptions;
-        }
-
-        private TimeSpan DashboardTimeToLive => _dashboardOptions.CurrentValue.TimeToLive;
+        private TimeSpan DashboardTimeToLive => dashboardOptions.CurrentValue.TimeToLive;
 
         /// <summary>
         /// Returns the stored dashboard, or null while a missing or expired snapshot is being regenerated in background.
@@ -113,7 +104,7 @@ namespace Adex.WebApi.Explorer
 
         private async Task<DashboardModel> ReadSnapshotAsync(CancellationToken cancellationToken)
         {
-            await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
             var snapshot = await db.DashboardSnapshots
                 .AsNoTracking()
                 .FirstOrDefaultAsync(item => item.Key == DashboardSnapshotKey, cancellationToken);
@@ -127,7 +118,7 @@ namespace Adex.WebApi.Explorer
 
         private async Task SaveSnapshotAsync(DashboardModel dashboard, CancellationToken cancellationToken)
         {
-            await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
             var json = JsonSerializer.Serialize(dashboard);
             var computedAtUtc = DateTime.UtcNow;
             var updated = await db.DashboardSnapshots
@@ -152,7 +143,7 @@ namespace Adex.WebApi.Explorer
 
         private async Task<DashboardModel> BuildDashboardAsync(CancellationToken cancellationToken)
         {
-            await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
             // Agrégat sur toute la table des liens, mis en cache ensuite : le délai par défaut (30 s) est trop court.
             db.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 
@@ -451,7 +442,7 @@ namespace Adex.WebApi.Explorer
                 return new List<EntitySearchResult>();
             }
 
-            await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
             var results = new List<EntitySearchResult>();
 
             var queryId = Guid.TryParse(query, out var parsedId) ? parsedId : Guid.Empty;
@@ -596,7 +587,7 @@ namespace Adex.WebApi.Explorer
             CancellationToken cancellationToken
         )
         {
-            await using var db = await _contextFactory.CreateDbContextAsync(cancellationToken);
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
 
             var company = await db.Companies
                 .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);

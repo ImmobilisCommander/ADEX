@@ -10,17 +10,11 @@ namespace Adex.WebApi.Csv
     /// <summary>
     /// Forward-only asynchronous reader of semicolon-separated, double-quote-escaped CSV records.
     /// </summary>
-    public sealed class CsvRecordCursor
+    public sealed class CsvRecordCursor(TextReader reader)
     {
-        private readonly TextReader _reader;
         private readonly char[] _buffer = new char[1 << 14];
         private int _position;
         private int _length;
-
-        public CsvRecordCursor(TextReader reader)
-        {
-            _reader = reader;
-        }
 
         public async ValueTask<List<string>> ReadRecordAsync(CancellationToken cancellationToken)
         {
@@ -101,7 +95,7 @@ namespace Adex.WebApi.Csv
 
         private async ValueTask<bool> FillAsync(CancellationToken cancellationToken)
         {
-            _length = await _reader.ReadAsync(_buffer.AsMemory(), cancellationToken);
+            _length = await reader.ReadAsync(_buffer.AsMemory(), cancellationToken);
             _position = 0;
             return _length > 0;
         }

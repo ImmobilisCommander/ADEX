@@ -12,15 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.Mvc
 {
-    public sealed class AdexApiClient
+    public sealed class AdexApiClient(HttpClient httpClient)
     {
-        private readonly HttpClient _httpClient;
-
-        public AdexApiClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-
         public Task<DashboardViewModel> GetDashboardAsync(CancellationToken cancellationToken)
         {
             return GetModelAsync<DashboardViewModel>("api/dashboard", cancellationToken);
@@ -30,7 +23,7 @@ namespace Adex.Mvc
             CancellationToken cancellationToken
         )
         {
-            using var response = await _httpClient.GetAsync(
+            using var response = await httpClient.GetAsync(
                 "api/dashboard/progressive",
                 cancellationToken
             );
@@ -71,7 +64,7 @@ namespace Adex.Mvc
             CancellationToken cancellationToken
         )
         {
-            using var response = await _httpClient.GetAsync(
+            using var response = await httpClient.GetAsync(
                 $"api/entity/{id}?page={page}&pageSize={pageSize}&sort={Uri.EscapeDataString(sort)}&descending={descending}",
                 cancellationToken
             );
@@ -94,7 +87,7 @@ namespace Adex.Mvc
             CancellationToken cancellationToken
         )
         {
-            using var response = await _httpClient.GetAsync(
+            using var response = await httpClient.GetAsync(
                 $"api/entity/{id}",
                 cancellationToken
             );
@@ -119,7 +112,7 @@ namespace Adex.Mvc
             query.AddRange(
                 filters.Select(x => $"filters[{Uri.EscapeDataString(x.Key)}]={Uri.EscapeDataString(x.Value)}")
             );
-            using var response = await _httpClient.GetAsync(
+            using var response = await httpClient.GetAsync(
                 $"api/csv?{string.Join('&', query)}",
                 cancellationToken
             );
@@ -142,7 +135,7 @@ namespace Adex.Mvc
             CancellationToken cancellationToken
         )
         {
-            using var response = await _httpClient.GetAsync(relativeUri, cancellationToken);
+            using var response = await httpClient.GetAsync(relativeUri, cancellationToken);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<T>(cancellationToken)
                 ?? throw new InvalidOperationException("The API returned an empty response.");

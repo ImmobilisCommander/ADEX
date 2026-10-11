@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Adex.Business
 {
-    public class CvsLoaderMetadata : IDisposable, ICsvLoader, ILinkSearchService, IMetadataLookupService
+    public class CvsLoaderMetadata(string dbConnectionString) : IDisposable, ICsvLoader, ILinkSearchService, IMetadataLookupService
     {
         public event EventHandler<MessageEventArgs> OnMessage;
 
@@ -34,17 +34,12 @@ namespace Adex.Business
         private int _mainCounter = 0;
         private bool _disposedValue;
 
-        private readonly string _dbConnectionString;
-
-        public CvsLoaderMetadata(string dbConnectionString)
-        {
-            _dbConnectionString = string.IsNullOrWhiteSpace(dbConnectionString)
+        private readonly string _dbConnectionString = string.IsNullOrWhiteSpace(dbConnectionString)
                 ? throw new ArgumentException(
                     "A metadata database connection string is required.",
                     nameof(dbConnectionString)
                 )
                 : dbConnectionString;
-        }
 
         private CsvConfiguration CreateConfiguration()
         {
