@@ -1,24 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net.Http;
 using Adex.Mvc.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Adex.Mvc.Controllers
 {
-    public sealed class EntityController : Controller
+    public sealed class EntityController(AdexApiClient apiClient) : Controller
     {
-        private readonly AdexApiClient _apiClient;
-        private readonly ILogger<EntityController> _logger;
-
-        public EntityController(AdexApiClient apiClient, ILogger<EntityController> logger)
-        {
-            _apiClient = apiClient;
-            _logger = logger;
-        }
-
         [HttpGet("/{id:guid}")]
         public async Task<IActionResult> Details(
             Guid id,
@@ -29,33 +18,10 @@ namespace Adex.Mvc.Controllers
             [FromQuery] bool descending = true
         )
         {
-            ViewData["Title"] = "Entité introuvable";
-            EntityDetailsViewModel entity;
-            try
-            {
-                entity = await _apiClient.GetEntityAsync(id, page, pageSize, sort ?? "date", descending, cancellationToken);
-            }
-            catch (HttpRequestException exception)
-            {
-                _logger.LogError(
-                    exception,
-                    "Unable to load entity details for {EntityId}",
-                    id
-                );
-                ViewData["Title"] = "(entité inconnue)";
-                return View(
-                    new EntityDetailsViewModel
-                    {
-                        Id = id,
-                        Name = "(entité inconnue)",
-                        ErrorMessage =
-                            "Les données de cette entité ne sont pas accessibles. Réessayez dans un instant."
-                    }
-                );
-            }
-
+            var entity = await apiClient.GetEntityAsync(id, page, pageSize, sort ?? "date", descending, cancellationToken);
             if (entity is null)
             {
+                ViewData["Title"] = "Entité introuvable";
                 Response.StatusCode = 404;
                 return View("NotFound", new NotFoundViewModel { Identifier = id.ToString() });
             }

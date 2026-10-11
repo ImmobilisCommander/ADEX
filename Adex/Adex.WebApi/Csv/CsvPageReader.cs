@@ -19,6 +19,25 @@ namespace Adex.WebApi.Csv
     /// </summary>
     public sealed class CsvPageReader(ILogger<CsvPageReader> logger)
     {
+        private static FileStream OpenFile(string path)
+        {
+            try
+            {
+                return new FileStream(
+                    path,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.ReadWrite,
+                    1 << 16,
+                    FileOptions.SequentialScan | FileOptions.Asynchronous
+                );
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                throw new CsvFileUnavailableException(path, exception);
+            }
+        }
+
         public async Task<CsvPage> ReadAsync(
             string path,
             int page,
@@ -27,14 +46,7 @@ namespace Adex.WebApi.Csv
             CancellationToken cancellationToken
         )
         {
-            using var stream = new FileStream(
-                path,
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.ReadWrite,
-                1 << 16,
-                FileOptions.SequentialScan | FileOptions.Asynchronous
-            );
+            using var stream = OpenFile(path);
             using var reader = new StreamReader(stream, new UTF8Encoding(false), true, 1 << 16);
 
             var cursor = new CsvRecordCursor(reader);

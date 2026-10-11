@@ -20,8 +20,7 @@ namespace Adex.WebApi.Controllers
         CsvPageReader reader,
         IMemoryCache cache,
         IOptionsMonitor<CsvOptions> options,
-        IWebHostEnvironment environment,
-        ILogger<CsvController> logger
+        IWebHostEnvironment environment
     ) : ControllerBase
     {
         private const int PageSize = 10;
@@ -49,41 +48,30 @@ namespace Adex.WebApi.Controllers
             var settings = options.CurrentValue;
             var path = Path.GetFullPath(settings.FilePath, environment.ContentRootPath);
             var key = CacheKey(path, Math.Max(page, 1), criteria);
+            if (cache.TryGetValue(key, out CsvPage cached))
+            {
+                return cached;
+            }
+
+            // One scan of the file at a time; waiting requests stop as soon as their client leaves.
+            await ScanLock.WaitAsync(cancellationToken);
             try
             {
-                if (cache.TryGetValue(key, out CsvPage cached))
-                {
-                    return cached;
-                }
-
-                // One scan of the file at a time; waiting requests stop as soon as their client leaves.
-                await ScanLock.WaitAsync(cancellationToken);
-                try
-                {
-                    return await cache.GetOrCreateAsync(
-                        key,
-                        entry =>
-                        {
-                            // Read on every scan so that a configuration change applies to the next search.
-                            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(
-                                options.CurrentValue.CacheDurationSeconds
-                            );
-                            return reader.ReadAsync(path, Math.Max(page, 1), PageSize, criteria, cancellationToken);
-                        }
-                    );
-                }
-                finally
-                {
-                    ScanLock.Release();
-                }
-            }
-            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
-            {
-                logger.LogError(exception, "Unable to read the CSV file {Path}", path);
-                return Problem(
-                    detail: $"Le fichier « {Path.GetFileName(path)} » est introuvable ou illisible.",
-                    statusCode: StatusCodes.Status404NotFound
+                return await cache.GetOrCreateAsync(
+                    key,
+                    entry =>
+                    {
+                        // Read on every scan so that a configuration change applies to the next search.
+                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(
+                            options.CurrentValue.CacheDurationSeconds
+                        );
+                        return reader.ReadAsync(path, Math.Max(page, 1), PageSize, criteria, cancellationToken);
+                    }
                 );
+            }
+            finally
+            {
+                ScanLock.Release();
             }
         }
 

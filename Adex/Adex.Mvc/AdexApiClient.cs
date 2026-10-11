@@ -34,8 +34,11 @@ namespace Adex.Mvc
                 "api/dashboard/progressive",
                 cancellationToken
             );
-            if (response.StatusCode == HttpStatusCode.Accepted)
+            if (
+                response.StatusCode is HttpStatusCode.Accepted or HttpStatusCode.ServiceUnavailable
+            )
             {
+                // 503 means an import blocks the API: keep waiting like for a running calculation.
                 return null;
             }
 
