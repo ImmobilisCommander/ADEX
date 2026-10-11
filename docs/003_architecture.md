@@ -1,71 +1,64 @@
 # Architecture
 
-## Organisation de la solution
+## Projets de la solution
 
-La solution Visual Studio `Adex/Adex.sln` contient les projets suivants :
+La solution `Adex/Adex.slnx` regroupe les projets suivants :
 
-| Projet | Responsabilité observée |
+| Projet | Responsabilité |
 |---|---|
-| `Adex.Common` | Contrats et types partagés, dont les objets de visualisation en graphe. |
-| `Adex.Data.Model` | Modèle métier relationnel canonique, avec attributs complémentaires sur les entités et déclarations. |
-| `Adex.Data.MetaModel` | Ancien modèle générique, conservé comme source temporaire pour le transfert des attributs. |
-| `Adex.Business` | Chargement CSV normalisé, transformations et opérations de recherche historiques. |
-| `Adex.WebApi` | API HTTP ASP.NET Core avec contrôleurs. |
-| `Adex.Mvc` | Application ASP.NET Core MVC, vues Razor et ressources statiques. |
+| `Adex.Application` | Contrats de cas d’usage et résultats applicatifs, dont l’import des déclarations. |
+| `Adex.Contracts` | DTO de transport JSON partagés entre l’API et le client MVC (`Explorer`, `Csv`). |
+| `Adex.Data.Model` | Modèle relationnel normalisé canonique, contexte EF Core, entités et migrations PostgreSQL. |
+| `Adex.Data.ReadModel` | Requêtes et projections de lecture du tableau de bord, de la recherche et des fiches ; dépend du modèle normalisé et des contrats de réponse. |
+| `Adex.Data.Import` | Pipeline spécialisé d’import `declarations.csv`, lecture en flux, COPY binaire Npgsql et reconstruction des index/contraintes. |
+| `Adex.Data.MetaModel` | Ancien modèle générique et son contexte EF Core, conservés pour le transfert temporaire des métadonnées. |
+| `Adex.Legacy.MetaModel` | Ancien chargeur, ses contrats et ses objets de graphe ; seul consommateur du modèle `Adex.Data.MetaModel`. |
+| `Adex.WebApi` | Hôte HTTP ASP.NET Core : contrôleurs groupés par domaine, configuration, middleware et orchestration du travail d’import. |
+| `Adex.Mvc` | Hôte MVC/Razor : vues, contrôleurs et ViewModels organisés par domaine ; client HTTP et conversion des contrats API vers les modèles de présentation. |
 
-Les six projets .NET de la solution ciblent `net10.0` via `Adex/Directory.Build.props`. Les versions des dépendances NuGet sont centralisées dans `Adex/Directory.Packages.props`. Les projets `Adex.Web` (Vue/Node.js) et `Adex.App` ont été supprimés et ne font plus partie de la solution.
+Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuGet sont centralisées dans `Adex/Directory.Packages.props`. Les anciens projets `Adex.Common` et `Adex.Business` ont été retirés : leurs types ont été replacés dans les projets responsables. Les projets `Adex.Web` et `Adex.App` ne font pas partie de la solution.
 
-## Technologies et flux
+## Dépendances et frontières
 
-- **Import CSV :** `CsvHelper` et un lecteur personnalisé ; encodage UTF-8 déclaré par le chargeur normalisé et culture `fr-FR` pour interpréter les dates (`Adex/Adex.Business/CsvLoaderNormalized.cs`).
-- **Persistance :** `AdexContext` et PostgreSQL constituent la source canonique de lecture et d’écriture. `EntityAttributes` conserve les champs complémentaires du métamodèle et `FinancialLink.DeclarationType` identifie les catégories Avantage, Convention et Rémunération. `AdexMetaContext` reste une source de transfert temporaire, pas une source de lecture de l’interface.
-- **API :** contrôleurs ASP.NET Core et routage par attributs dans `Adex.WebApi`, initialisés via l’hébergement minimal (`WebApplication.CreateBuilder` et `builder.Services`) sans fichier `Startup`. Swagger UI est disponible à `/swagger` en environnement de développement.
-- **Interface serveur :** vues MVC ASP.NET Core et contenu statique servi depuis `wwwroot`.
-- **Interface MVC :** tableau de bord alimenté par l’API, recherche d’entités et fiches accessibles par `/<référence>`. Le top 10 est classé par somme des montants des liens entrants et sortants de chaque entité ; le total général additionne chaque déclaration une seule fois. Le graphique « Déclarations par mois » est un SVG rendu côté serveur à partir du champ `MonthlyDeclarations` de `GET /api/dashboard` (année, mois, nombre de liens), sans dépendance JavaScript. Le même point d’accès fournit `Concentration` (courbes de Pareto des bénéficiaires et des entreprises) et `AmountHistogram` (tranches d’une demi-décade) ; `GET /api/entity/{id}` fournit `YearlyActivity` (montants par année) et `TypeBreakdown` (liens et montants par typologie). Les agrégats globaux du tableau de bord (mois, histogramme) sont écrits en SQL direct (`Database.SqlQuery`), car l’héritage TPT d’EF Core joindrait `Entities`, `Links` et `FinancialLinks` sur des millions de lignes (calcul à froid passé de ~106 s à ~35 s).
-- **Injection de dépendances :** les fabriques de contextes EF Core et les services de recherche sont configurés dans le démarrage API. Les contrôleurs dépendent d’interfaces métier et les services sont limités à la durée d’une requête. MVC utilise un client HTTP typé enregistré par `AddHttpClient`, avec une stratégie de résilience (`AddResilienceHandler`) qui retente indéfiniment, avec backoff exponentiel plafonné à 30 s, tant que l’API est indisponible (erreurs réseau, 5xx, 408, 429).
-- **Journalisation :** les deux hôtes web utilisent Serilog configuré dans leurs fichiers `appsettings.json`, avec sorties console et fichier sous `D:\Logs`. Chaque application a son propre fichier avec rotation journalière, limite de 20 Mio par fichier et conservation de 10 fichiers. Les requêtes HTTP sont journalisées par `UseSerilogRequestLogging`; Npgsql journalise les commandes SQL sans valeurs de paramètres. Le niveau général est `Information`, les catégories Microsoft bruyantes sont relevées à `Warning`, et les événements de durée de vie de l’hôte restent en `Information`.
-- **Gestion globale des exceptions :** aucun `try/catch` dans les contrôleurs. L’API enregistre `ApiExceptionHandler` (`IExceptionHandler` + `ProblemDetails`) : `CsvFileUnavailableException` (fichier CSV illisible, levée par `CsvPageReader`) devient un 404, toute autre exception un 500 générique, une requête annulée par le client un 499 sans erreur. Le MVC utilise `UseExceptionHandler("/Home/Error")` et `MvcExceptionHandler` : `ExceptionMapping` traduit les `HttpRequestException` de l’API en 503 (import en cours) ou 502, les requêtes `Accept: application/json` reçoivent un `ProblemDetails`, les pages affichent la vue `Error` avec le message et l’identifiant de requête. Les exceptions sont journalisées par le middleware.
-- **JSON et annulation :** les contrats utilisent `System.Text.Json`. Les recherches EF Core et Dapper et les appels HTTP sont asynchrones ; les contrôleurs propagent le token d’annulation de la requête aux opérations de données.
+- `Adex.Mvc` référence seulement `Adex.Contracts` parmi les projets applicatifs ; l’accès aux données passe par HTTP vers `Adex.WebApi`.
+- `Adex.WebApi` orchestre les cas d’usage via `Application` et compose les adaptateurs `Data.Import`, `Data.ReadModel` et `Data.Model`, ainsi que les contrats HTTP.
+- `Adex.Data.Import` implémente le port `IDeclarationsImporter` défini par `Adex.Application.Import`; l’API ne lie son orchestrateur qu’à ce contrat.
+- `Adex.Data.ReadModel` dépend du modèle normalisé et des DTO de réponse, pas de l’hôte API.
+- `Adex.Data.Import` reçoit le `NpgsqlDataSource` configuré par l’API et n’accède pas au contexte EF Core.
+- `Adex.Legacy.MetaModel` référence le modèle métadonnées historique ; il n’est pas référencé par les hôtes actifs.
+- Les types API et MVC suivent leurs namespaces racines par domaine, par exemple `Adex.WebApi.Entities`, `Adex.WebApi.Csv`, `Adex.Mvc.Home`, `Adex.Mvc.Entities` et `Adex.Mvc.Csv`. Les répertoires source correspondants suivent ces namespaces. Les contrats utilisent `Adex.Contracts.Explorer` et `Adex.Contracts.Csv`.
 
-Les anciennes structures de graphe partagées restent présentes pour l’API historique. Une migration EF Core ajoute `EntityAttributes` et `FinancialLink.DeclarationType` au schéma normalisé. L’API applique les migrations d’`AdexContext` au démarrage ; le schéma source `AdexMeta` n’est pas migré par ce démarrage.
+`Adex.Data.ReadModel.Explorer.DataExplorerService` porte encore à la fois les requêtes EF/SQL et la composition des résultats de lecture. Il a été retiré de l’hôte API, mais son découpage interne en cas d’usage et adaptateurs de requête pourra être poursuivi si d’autres consommateurs apparaissent.
 
-## Configuration et intégration
+## Flux de données
 
-Les routes de navigation sont `GET /api/dashboard`, `GET /api/entity/search?query=...` et `GET /api/entity/{id}` (Guid). L’ancienne route `GET /api/beneficiary/info/{id}` retourne désormais les détails normalisés d’une entité. MVC utilise `AdexApiClient`; son adresse de base est fournie par `AdexApi:BaseAddress`.
+- **Lecture :** les contrôleurs API délèguent les recherches, fiches et agrégats à `DataExplorerService`. Les réponses utilisent `Adex.Contracts`; `AdexApiClient` les convertit en ViewModels MVC. Les agrégats mensuels et l’histogramme sont calculés en SQL direct pour éviter les jointures TPT coûteuses.
+- **Import :** `Adex.WebApi.Import.ImportJobService` vérifie l’état et le contrôle d’accès, puis appelle le port applicatif `Adex.Application.Import.IDeclarationsImporter`. Son adaptateur `Adex.Data.Import.DeclarationsImporter` lit deux fois le CSV, conserve les lignes les plus récemment publiées, puis écrit les tables normalisées par COPY binaire Npgsql. En cas d’échec ou d’annulation, la base peut être partielle ; l’import doit être relancé depuis le début.
+- **CSV à la demande :** l’API `GET api/csv` utilise `CsvService`, son cache et `CsvPageReader`; les réponses sont des contrats `CsvPage`. Le MVC traduit les erreurs HTTP et les pages reçues vers ses propres ViewModels.
+- **Métamodèle historique :** le chargeur et les modèles de graphe sont regroupés dans `Adex.Legacy.MetaModel`. Ce projet n’est pas enregistré dans le démarrage API et ne participe pas aux lectures de l’interface.
 
-La chaîne `Adex` est nécessaire pour le fonctionnement normal de l’API. La chaîne `AdexMeta` sert uniquement à l’étape temporaire de transfert des attributs ; elle peut être retirée après vérification complète du transfert et de la sauvegarde de la base source. Les secrets sont fournis par une source sécurisée (variables d’environnement, User Secrets ou gestionnaire de secrets). Les fabriques EF utilisent `ConnectionStrings__Adex` et `ConnectionStrings__AdexMeta`.
+## Hôtes et configuration
 
-La migration `AddEntityAttributesAndDeclarationType` est générée pour `AdexContext`. Elle est appliquée par l’API à son démarrage ; vérifier les sauvegardes et le schéma cible avant tout déploiement sur une base existante.
+L’API et le MVC utilisent l’hébergement minimal ASP.NET Core. L’API applique au démarrage les migrations de `AdexContext`; elle ne migre pas `AdexMetaContext`. Les fabriques de contextes, `NpgsqlDataSource`, services d’import et services de lecture sont enregistrés dans `Adex.WebApi.Hosting`. Le client HTTP typé du MVC utilise `AddHttpClient` et une stratégie de résilience avec backoff exponentiel plafonné à 30 secondes.
 
-Les projets MVC et API coexistent et le client HTTP est configuré pour les relier. L’intégration de bout en bout dépend toutefois de la disponibilité de l’API et de ses bases.
+Les routes principales sont `GET /api/dashboard`, `GET /api/entity/search?query=...`, `GET /api/entity/{id}` et `GET /api/csv`. MVC utilise `AdexApi:BaseAddress`. L’import accepte `POST`, `GET` et `DELETE /api/import`, protégés par `X-Api-Key`; le nom et le dossier du CSV viennent de la configuration `Import`.
 
-Le package Dapper est référencé directement par `Adex.Business`, qui contient ses appels SQL. Les projets de données ne portent plus cette dépendance.
+La chaîne `Adex` sert à l’application normale. `AdexMeta` est conservée uniquement pour le transfert historique des métadonnées et pourra être retirée après vérification du transfert et de la sauvegarde de la base source. Les secrets doivent provenir d’une source sécurisée.
 
-Les fichiers suivent les préfixes `Adex.Mvc-` et `Adex.WebApi-`, suivis de la date ; les fichiers roulés pour dépassement de taille reçoivent un suffixe numérique. Les processus doivent disposer des droits d’écriture sur `D:\Logs`. Les seuils et chemins sont déclaratifs dans `Adex/Adex.Mvc/appsettings.json` et `Adex/Adex.WebApi/appsettings.json`.
+Les deux hôtes utilisent Serilog, sorties console et fichiers sous `D:\Logs`, journalisation des requêtes HTTP et des commandes SQL sans valeurs de paramètres. Les erreurs de l’API sont converties en `ProblemDetails`; le MVC traite globalement les erreurs HTTP et affiche sa page d’erreur ou un `ProblemDetails` selon le type de requête.
 
-## Limites techniques constatées
+## Limites connues
 
-- La cible de la solution est désormais `net10.0`, centralisée dans `Directory.Build.props`.
-- Plusieurs versions de dépendances dans `Directory.Packages.props` utilisent des plages flottantes ; la version restaurée peut donc évoluer sans modification du fichier.
-- Les migrations initiales sont des migrations EF Core propres, sans reprise de l’historique EF6. Le transfert des attributs est relançable et idempotent, mais il faut conserver et comparer la base source avant son retrait.
-- Le modèle normalisé ne contient que les typologies et champs effectivement reconnus par l’import ; les attributs bruts sont conservés pour éviter de perdre les colonnes complémentaires.
-- Les points incomplets et scénarios de validation sont détaillés dans [Tests](005_testing.md) et [Recommandations](006_recommendations.md).
-
-## Import des données CSV
-
-L’API expose un import complet en arrière-plan (`Adex.WebApi/Import/ImportJobService.cs`, `Adex.Business/DeclarationsImporter.cs`) à partir du fichier consolidé `declarations.csv`.
-
-- `POST api/import` lance le traitement (202), ou répond 409 s’il est déjà en cours ; `GET api/import` donne l’état et `DELETE api/import` l’annule. Les routes exigent l’en-tête `X-Api-Key` égal à `Import:ApiKey` ; si cette clé est vide, elles répondent 404.
-- Le fichier est `Import:FileName` (défaut `declarations.csv`) dans `Import:DataDirectory` (relatif à la racine du projet API). Aucun chemin n’est accepté du client.
-- COPY binaire Npgsql en deux passes sur le CSV, sans table temporaire ni transaction : la passe 1 retient, pour chaque entreprise, bénéficiaire et lien, la ligne la plus récemment publiée ; la passe 2 écrit directement les tables finales via plusieurs connexions parallèles (entités identifiées par un Guid généré à l’import, sans préfixe ; l’identifiant source est conservé comme attribut `Référence`). Les clés étrangères et index sont supprimés avant le chargement, puis recréés (clés étrangères `NOT VALID`) suivis d’un `ANALYZE`. Les attributs d’une entité tiennent dans une seule ligne `jsonb` (`EntityAttributes(EntityId, Data)`). En cas d’erreur ou d’annulation, la base peut être partielle : relancer l’import depuis le début.
-- Les lignes sans identifiant d’entreprise, de bénéficiaire ou de déclaration sont ignorées et comptées (`errorCount`). Le statut est conservé en mémoire seulement.
-- La base `AdexMeta` et l’ancien import par quatre CSV ne sont plus utilisés.
+- Le pipeline optimisé de `Adex.Data.Import` reste spécifique à PostgreSQL et regroupe encore sélection, transformation et persistance dans un même composant d’import ; son contrat applicatif est toutefois indépendant de cet adaptateur.
+- `Adex.Legacy.MetaModel` conserve du code non raccordé aux hôtes actifs, notamment des opérations incomplètes ; il est isolé mais pas encore supprimé.
+- Les migrations sont des migrations EF Core propres, sans reprise de l’historique EF6. Tester leur application sur des bases dédiées avant tout déploiement.
+- Le modèle normalisé ne contient que les champs reconnus ; les attributs JSON bruts gardent les données complémentaires.
+- Des scénarios de validation restent documentés dans [Tests](005_testing.md) et les travaux ouverts dans [Recommandations](006_recommendations.md).
 
 ## Interrogation directe du CSV
 
-- `GET api/csv?page=N&filters[colonne]=valeur` (`Adex.WebApi/Controllers/CsvController.cs`) renvoie 10 lignes (`CsvPage`). Le MVC l’appelle par `/Csv` (page immédiate) puis `/Csv/Content` (tableau chargé par `csv-loader.js`, requête annulée quand l’utilisateur quitte la page).
-- Lecture asynchrone, strictement vers l’avant (`CsvPageReader.ReadAsync`, `CsvRecordCursor`), sans repositionnement ni retour arrière ; l’arrêt a lieu dès la page lue plus une ligne correspondante. Le jeton d’annulation de la requête HTTP est transmis jusqu’à la lecture.
-- Filtres : « contient », insensible à la casse et aux accents, cumulés par « et ». Seules les colonnes de `CsvFilterableColumns` (texte et identifiants) sont acceptées ; les autres donnent 400. Le tri est fait côté client sur la page affichée uniquement.
-- Un `SemaphoreSlim` limite à une seule lecture du fichier à la fois ; les requêtes en attente sont annulables.
-- Le résultat de chaque page et combinaison de filtres est mis en cache (`IMemoryCache`) pendant `Csv:CacheDurationSeconds` secondes (60 par défaut, 0 sans cache). La valeur est lue via `IOptionsMonitor` et se modifie à chaud.
-- Configuration (`CsvOptions`, validée au démarrage) : `Csv:FilePath` (obligatoire, relatif à la racine de l’API) et `Csv:CacheDurationSeconds`. Côté MVC, `AdexApi:BaseAddress` (`AdexApiOptions`) est validée au démarrage et le délai d’attente de l’appel est infini.
+- `GET api/csv?page=N&filters[colonne]=valeur` (`Adex/WebApi/Csv/CsvController.cs`) renvoie des pages de 10 lignes. MVC sert `/Csv`, puis `/Csv/Content` charge le tableau via `csv-loader.js`; la requête est annulée à la navigation.
+- La lecture asynchrone est strictement vers l’avant et s’arrête après la page plus une ligne correspondante. Le jeton d’annulation HTTP est transmis jusqu’à la lecture du fichier.
+- Les filtres « contient » sont insensibles à la casse et aux accents, cumulés par « et ». Seules les colonnes de `CsvFilterableColumns` sont autorisées ; les autres donnent 400.
+- Un `SemaphoreSlim` limite à une lecture simultanée. Les pages filtrées sont mises en cache pendant `Csv:CacheDurationSeconds` (60 secondes par défaut, 0 sans cache).
+- `CsvOptions` valide `Csv:FilePath` et `Csv:CacheDurationSeconds` au démarrage. `AdexApi:BaseAddress` est également validée au démarrage côté MVC ; le délai HTTP est infini et l’annulation dépend du jeton de la requête.

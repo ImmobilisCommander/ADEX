@@ -1,5 +1,6 @@
 using Adex.Data.Model;
-using Adex.WebApi.Explorer;
+using Adex.Data.ReadModel.Explorer;
+using Adex.WebApi.Dashboard;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;

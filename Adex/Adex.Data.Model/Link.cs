@@ -5,7 +5,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using Adex.Common;
 
 namespace Adex.Data.Model
 {

@@ -8,7 +8,4 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Adex.Common\Adex.Common.csproj" />
-  </ItemGroup>
 </Project>

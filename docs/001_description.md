@@ -17,18 +17,18 @@ Les concepts visibles dans le modèle sont :
 
 Ces concepts sont implémentés dans `Adex/Adex.Data.Model/` et `Adex/Adex.Data.MetaModel/`.
 
-Les constantes de colonnes CSV (`Adex/Adex.Business/CsvColumnsName.cs`) décrivent des champs relatifs aux entreprises, aux bénéficiaires et à trois familles de déclarations : avantages, conventions et rémunérations. Les échantillons de données se trouvent dans `Data/`.
+Les constantes du chargeur CSV historique (`Adex/Adex.Legacy.MetaModel/Import/CsvColumnsName.cs`) décrivent des champs relatifs aux entreprises, aux bénéficiaires et à trois familles de déclarations : avantages, conventions et rémunérations. L’import normalisé actif est dans `Adex/Adex.Data.Import/`; les échantillons de données se trouvent dans `Data/`.
 
 ## Capacités visibles
 
 | Capacité | Description |
 |---|---|
-| Import de fournisseurs | Lecture d’entreprises depuis un CSV et création d’entités référencées. |
-| Import de déclarations | Lecture de lignes de déclarations, rapprochement d’entreprise et de bénéficiaire, construction de liens. |
-| Recherche | Le contrat métier comprend des opérations pour rechercher des liens et récupérer un bénéficiaire par référence ; l’API comporte des contrôleurs de liens, bénéficiaires et métadonnées. |
+| Import normalisé | Lecture du CSV consolidé, sélection des lignes à retenir et chargement des entités et liens dans PostgreSQL par COPY binaire. |
+| Import historique | Un chargeur et ses contrats subsistent dans `Adex.Legacy.MetaModel`; ce projet n’est pas utilisé par les hôtes actifs et conserve des opérations incomplètes. |
+| Recherche | L’API interroge le modèle normalisé ; les contrats JSON partagés sont séparés des ViewModels MVC. |
 | Tableau de bord | L’accueil présente le nombre d’entités, les liens et montants par type de déclaration, le nombre de déclarations par mois (graphique en barres), la concentration et la distribution des montants, et un classement des dix entités par montant financier cumulé. Chaque fiche d’entité affiche les montants par année et la répartition de ses liens par typologie. |
 | Recherche et fiche | La recherche d’entités appelle l’API ; une référence ouvre une fiche à l’adresse `/<référence>`, avec ses attributs et ses liens financiers navigables. |
-| Visualisation | Les indicateurs et fiches sont chargés depuis l’API. L’ancien graphe de démonstration et son fichier JSON local ne sont plus utilisés. |
+| Visualisation | Les indicateurs et fiches sont chargés depuis l’API. Les anciens DTO de graphe restent confinés au projet historique `Adex.Legacy.MetaModel`. |
 | Interrogation du CSV | La page `/Csv` affiche le fichier `declarations.csv` par pages de 10 lignes. Elle s’affiche tout de suite avec un tableau fictif, puis charge les lignes. L’utilisateur peut masquer des colonnes (choix mémorisé dans le navigateur), trier la page affichée, filtrer sur tout le fichier avec un opérateur « contient » (colonnes texte et identifiants seulement, indiquées par un entonnoir) et ouvrir une ligne dans une modale libellé/valeur. |
 | Navigation | Un menu burger en haut à droite donne accès aux paramètres, à l’interrogation du CSV et à la page « Source et avertissement ». Le site occupe toute la largeur de la fenêtre. |
 

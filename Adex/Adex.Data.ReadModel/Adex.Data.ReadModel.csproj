@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Adex.Data.ReadModel</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Adex.Contracts\Adex.Contracts.csproj" />
+    <ProjectReference Include="..\Adex.Data.Model\Adex.Data.Model.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,6 +1,8 @@
-using Adex.Business;
+using Adex.Application.Import;
+using Adex.Data.Import;
+using Adex.Data.ReadModel.Explorer;
 using Adex.WebApi.Csv;
-using Adex.WebApi.Explorer;
+using Adex.WebApi.Dashboard;
 using Adex.WebApi.Import;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +31,7 @@ namespace Adex.WebApi.Hosting
         public static IServiceCollection AddAdexServices(this IServiceCollection services)
         {
             services.AddScoped<DataExplorerService>();
-            services.AddScoped<DeclarationsImporter>();
+            services.AddScoped<IDeclarationsImporter, DeclarationsImporter>();
 
             services.AddOptions<DashboardOptions>()
                 .BindConfiguration(DashboardOptions.SectionName)

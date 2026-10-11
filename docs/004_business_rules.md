@@ -1,51 +1,34 @@
 # Règles métier
 
-Cette page consigne uniquement les règles que le code inspecté permet d’observer. Elle ne remplace pas une validation par les responsables métier, en particulier pour les choix temporels et les critères de rapprochement.
+Cette page consigne les comportements observables dans l’import et les lectures actifs. Le traitement de `Adex.Legacy.MetaModel` est historique et ne définit pas les règles de l’API actuelle.
 
-## Identification des acteurs
+## Import normalisé
 
-- Les fournisseurs sont identifiés par la colonne `identifiant` et créés avec leur `denomination_sociale` dans le chargeur normalisé (`Adex/Adex.Business/CsvLoaderNormalized.cs`).
-- Les déclarations relient une entreprise à un bénéficiaire via les identifiants externes présents dans les colonnes `entreprise_identifiant` et `benef_identifiant_valeur`.
-- La représentation d’une personne utilise notamment `benef_nom` et `benef_prenom`.
-- Le chargeur normalisé conserve les références connues dans un ensemble et évite d’ajouter à nouveau certaines références pendant le chargement. Le comportement dépend de cet état de chargement et ne suffit pas, à lui seul, à prouver une unicité garantie en base.
+L’import actif (`Adex/Adex.Data.Import/DeclarationsImporter.cs`) lit le fichier consolidé en deux passes :
 
-## Sélection des déclarations
+- Les lignes sans identifiant d’entreprise (`entreprise_id`), de bénéficiaire (`id_beneficiaire`) ou de déclaration (`id`) sont ignorées.
+- Pour chaque identifiant d’entreprise, de bénéficiaire et de déclaration, l’import retient la ligne portant la date de publication la plus récente (`date_publication`). À égalité, la première ligne rencontrée reste retenue.
+- La date du lien est prise dans `date`, puis `date_debut`, puis `date_publication`; si ces dates ne sont pas valides, `1900-01-01` est utilisée.
+- Les montants acceptent la virgule décimale ; une valeur vide ou mal formée devient zéro.
+- Les types « avantage », « convention » et « rémunération » sont normalisés en libellés français. Les valeurs non reconnues deviennent « Non renseigné ».
+- Les colonnes complémentaires reconnues sont conservées dans `EntityAttributes` en JSONB. L’identifiant source est notamment gardé comme attribut « Référence ».
+- Chaque lien contribue aux totaux du contributeur et du bénéficiaire. Le tableau de bord est un snapshot à durée de vie configurée ; un import ne l’invalide pas immédiatement.
 
-Le traitement des déclarations du chargeur normalisé :
+Le pipeline remplace les données normalisées et n’utilise pas de transaction couvrant les deux passes. Une erreur ou une annulation peut donc laisser une base partielle ; l’opération doit être relancée depuis le début. Le statut d’import est en mémoire dans l’instance API.
 
-- lit la date parmi `avant_date_signature`, `conv_date_signature` et `remu_date` ;
-- convertit cette date avec la culture française ;
-- ne traite que les lignes dont l’année de date est **2019** ;
-- exige une valeur non vide de `benef_identifiant_valeur` avant de créer le lien.
+## Recherche et présentation
 
-Ces conditions sont observables dans `Adex/Adex.Business/CsvLoaderNormalized.cs`. Le dépôt ne justifie pas pourquoi 2019 est retenu ni si cette période est encore souhaitée.
+- La recherche exacte par GUID est disponible même pour une requête courte. La recherche par nom exige au moins trois caractères ; tous les mots doivent apparaître dans le prénom ou le nom. Les résultats sont limités à 100 et incluent les attributs disponibles.
+- Une fiche entité combine les liens entrants et sortants. La page et le tri sont appliqués en base ; les tailles de page acceptées sont 10, 20 et 50.
+- Les lignes de déclaration du CSV sont filtrées avec « contient », sans distinction de casse ou d’accents. Les filtres sont cumulés par « et » et limités aux colonnes explicitement autorisées.
 
-## Champs des déclarations
+## Indicateurs
 
-Le vocabulaire déclaré dans `Adex/Adex.Business/CsvColumnsName.cs` distingue :
+- Le graphique mensuel compte les liens par `Links.Date`, à partir du 1er janvier 2012 jusqu’au mois courant ; les mois intermédiaires sans donnée sont complétés par zéro.
+- La concentration est calculée pour les bénéficiaires (montants reçus) et les entreprises (montants versés) avec total strictement positif ; les entités sont classées par montant décroissant.
+- L’histogramme répartit les liens financiers par tranches logarithmiques d’une demi-décade. Les montants nuls et négatifs sont présentés séparément.
+- La fiche affiche les montants annuels des liens des deux sens depuis 2012, ainsi que le nombre et le montant par typologie.
 
-- les avantages : date de signature, montant TTC, nature, lien à une convention et semestre ;
-- les conventions : dates, objet, montant TTC et informations de manifestation ;
-- les rémunérations : date, montant TTC et lien à une convention.
+## Code historique
 
-Un vocabulaire de colonnes ne confirme pas que toutes les colonnes soient correctement interprétées dans chaque chargeur. Le chargeur de métadonnées contient un commentaire indiquant que le traitement est à adapter selon le type de source (`Adex/Adex.Business/CvsLoaderMetadata.cs`).
-
-## Déclarations par mois (tableau de bord)
-
-- Le graphique compte les liens par mois de leur date (`Links.Date`), et non par date de publication.
-- Seuls les liens datés à partir du 1er janvier 2012 et jusqu’au mois courant sont retenus : les dates aberrantes de la source (année 0001, 1900 utilisée par défaut à l’import, dates futures) sont exclues.
-- Les mois sans déclaration entre le premier et le dernier mois présents sont comblés avec un compte de zéro pour garder un axe continu.
-- Le résultat est persisté avec le reste du tableau de bord en base (`DashboardSnapshots`) pendant `Dashboard:TimeToLive` (durée `hh:mm:ss`, obligatoire, sans valeur par défaut, validée au démarrage ; `24:00:00` dans `appsettings.json`), généré au démarrage de l'API s'il est absent ou expiré ; aucun cache mémoire ni invalidation.
-
-## Autres graphiques (tableau de bord et fiches)
-
-- **Concentration** : pour les bénéficiaires (montants reçus) et les entreprises (montants versés) ayant un total strictement positif, courbe de la part cumulée du montant détenue par les x % premiers classés par montant décroissant, avec la part du 1 % supérieur et des 10 premiers.
-- **Distribution des montants** : nombre de liens par tranche d’une demi-décade (1, 3,16, 10, 31,6 €…), échelle logarithmique ; les montants nuls ou négatifs forment une tranche à part (`≤ 0`), expliquée par une note sous le graphique : sur la base locale, 824 033 montants nuls et 121 négatifs (tous des conventions, minimum −210 €), origine non vérifiée. Tous les liens financiers sont comptés, quelle que soit leur date.
-- **Fiche entité** : montants par année (liens des deux sens, dates de 2012 jusqu’à l’année courante, années vides comblées) et répartition des liens par typologie (nombre et montant, toutes dates). Les montants négatifs ne sont pas représentés dans les barres.
-- Les bénéficiaires incluent des personnes morales (hôpitaux, sociétés) : le classement ne se limite pas aux personnes physiques.
-
-## Déduplication et données manquantes
-
-Une empreinte MD5 calculée à partir de champs d’identité du bénéficiaire existe dans `Adex/Adex.Business/Extensions.cs`. C’est un mécanisme d’identification présent dans le code, mais il ne doit pas être assimilé à une garantie de rapprochement fiable sans tests de collision métier, normalisation et gestion des valeurs absentes.
-
-Les règles de traitement des lignes incomplètes, des identifiants réutilisés, des doublons et des corrections de déclarations ne sont pas suffisamment établies par la seule présence des colonnes. Ces cas doivent être spécifiés et vérifiés.
+`Adex.Legacy.MetaModel/Import` conserve l’ancien chargeur CSV, ses méthodes d’identification et ses contrats ; les opérations incomplètes qui s’y trouvent ne sont pas exposées par les hôtes actifs. Les règles propres à ce chargeur ne doivent pas être interprétées comme des règles actuelles sans réactivation et validation.

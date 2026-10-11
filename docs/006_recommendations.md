@@ -1,6 +1,6 @@
 # Recommandations
 
-Les éléments ci-dessous sont des propositions de travail dérivées des limites visibles dans le code ; ils ne sont pas présentés comme déjà réalisés. Les priorités sont indicatives et devraient être confirmées avec les responsables produit et techniques.
+Les propositions qui suivent distinguent les changements d’architecture déjà appliqués des travaux encore ouverts. Les priorités restantes sont indicatives et devraient être confirmées avec les responsables produit et techniques.
 
 ## Réalisé lors de la première étape de modernisation
 
@@ -9,17 +9,25 @@ Les éléments ci-dessous sont des propositions de travail dérivées des limite
 - Appels MVC → API déplacés vers un client HTTP typé et `HttpClientFactory`.
 - Migration de certaines API obsolètes EF6/CsvHelper du chemin de recherche pour permettre à la solution .NET 10 de compiler.
 
+## Réalisé — Séparation des responsabilités
+
+- Retrait de `Adex.Common` et `Adex.Business` : interfaces d’entités replacées dans `Adex.Data.Model`, pipeline actif dans `Adex.Data.Import`, contrats JSON dans `Adex.Contracts`.
+- Déplacement de `DataExplorerService` et de ses requêtes hors de l’hôte API vers `Adex.Data.ReadModel`.
+- DTO de transport séparés des ViewModels Razor ; `AdexApiClient` convertit explicitement les contrats vers les modèles de présentation.
+- Chargeur CSV historique, contrat de chargement, métamodèle et types de graphe isolés dans `Adex.Legacy.MetaModel`, hors du graphe de dépendances des hôtes actifs.
+- Contrôleurs et modèles MVC/API regroupés par domaine, avec namespaces racines et chemins de fichiers alignés.
+- Port et résultat applicatifs d’import déplacés vers `Adex.Application`; l’API dépend du contrat applicatif, tandis que `Adex.Data.Import` en fournit l’adaptateur PostgreSQL.
+
 ## Priorité 1 — Fiabiliser les parcours actuels
 
-- **Confirmer la période métier.** Valider la sélection de l’année 2019 et rendre la période explicite/configurable si elle doit évoluer (`Adex/Adex.Business/CsvLoaderNormalized.cs`).
-- **Achever les fonctionnalités incomplètes.** `GetBeneficiary` lève encore `NotImplementedException` dans le chargeur de métadonnées ; préciser le comportement attendu et implémenter ou retirer cette opération.
+- **Clarifier le cycle de vie de l’import historique.** `CvsLoaderMetadata.SaveAsync` lève `NotImplementedException` dans le projet isolé `Adex.Legacy.MetaModel`; décider s’il faut l’achever ou retirer ce chemin après vérification du transfert des données.
 - **Ajouter des tests automatisés.** Tester les imports, les règles de date, le rapprochement, la persistance, les recherches et les routes (voir [Tests](005_testing.md)).
 
 ## Priorité 2 — Préparer une exécution maintenable
 
 - **Définir la configuration de déploiement.** Fournir les chaînes de connexion et l’adresse API par variables d’environnement ou gestionnaire de secrets, et documenter ces paramètres hors développement.
-- **Sécuriser l’application des migrations.** Les migrations EF Core initiales sont générées pour deux bases PostgreSQL mais ne sont pas appliquées. Valider la sauvegarde, l’état des schémas existants et le plan de reprise avant toute commande de mise à jour.
-- **Documenter l’import.** Définir les fichiers d’entrée, les colonnes obligatoires, la gestion des erreurs, des doublons et des reprises après échec.
+- **Sécuriser l’application des migrations.** L’API applique les migrations de la base `Adex` au démarrage ; `AdexMeta` n’est pas migrée par l’hôte actif. Valider sauvegarde, état des schémas et plan de reprise avant déploiement.
+- **Documenter l’import.** Les colonnes principales et les règles visibles sont décrites dans [Règles métier](004_business_rules.md) ; préciser les reprises, les erreurs, les doublons et les conditions d’exploitation.
 - **Valider le parcours intégré.** Tester MVC → API → base de données sur une instance de développement correctement configurée.
 
 ## Priorité 3 — Renforcer les garanties métier et opérationnelles
@@ -31,7 +39,7 @@ Les éléments ci-dessous sont des propositions de travail dérivées des limite
 
 ## Ordre recommandé
 
-Tester l’application des deux migrations sur des bases PostgreSQL dédiées, puis ajouter des tests automatisés sur la configuration DI, les services, les routes et le parcours complet. Confirmer en parallèle les règles métier et la configuration de déploiement avant d’étendre les fonctionnalités.
+Valider les migrations sur des bases PostgreSQL dédiées, puis ajouter des tests automatisés sur DI, services, routes et parcours complet. Confirmer en parallèle les règles métier et la configuration de déploiement avant d’étendre les fonctionnalités.
 
 ## À traiter ultérieurement — Page de maintenance pendant l’import
 
@@ -66,4 +74,4 @@ Ordre proposé : table `ImportRuns` et verrou, puis statut public, middleware et
 
 ## Règle de conception — synchronisation
 
-Dans toute la solution, utiliser `SemaphoreSlim` plutôt que `lock` pour la synchronisation (sections critiques asynchrones, `WaitAsync` / `Release` dans un `try/finally`). Le code existant à migrer : `Adex.WebApi/Import/ImportJobService.cs`, qui utilise `lock (_sync)`.
+Dans toute la solution, utiliser `SemaphoreSlim` plutôt que `lock` pour la synchronisation (sections critiques asynchrones, `WaitAsync` / `Release` dans un `try/finally`). `Adex.WebApi/Import/ImportJobService.cs` applique déjà cette règle.

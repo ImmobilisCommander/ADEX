@@ -42,7 +42,7 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 - API CSV : résultat de chaque page/combinaison de filtres conservé 1 minute dans IMemoryCache.
 - API CSV : un SemaphoreSlim limite à une seule lecture du fichier à la fois ; les requêtes en attente restent annulables.
 - API CSV : durée du cache (Csv:CacheDurationSeconds, 60 s par défaut, 0 = pas de cache) lue via IOptionsMonitor pour être prise en compte à chaud ; contrôleurs CSV passés au constructeur principal ; règle correspondante ajoutée à AGENTS.md.
-- Documentation : règle de mise à jour continue des documents ajoutée à AGENTS.md ;  01_description.md et  03_architecture.md complétés (menu burger, pleine largeur, page et API d'interrogation du CSV).
+- Documentation : règle de mise à jour continue des documents ajoutée à AGENTS.md ; 001_description.md et 003_architecture.md complétés (menu burger, pleine largeur, page et API d'interrogation du CSV).
 
 - Fiche détaillée : ajout d'une marge haute de 34 px au bloc des KPI pour l'aligner sur l'espacement des autres blocs.
 
@@ -60,5 +60,7 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 
 - Résilience MVC → API : le client HTTP typé utilise `Microsoft.Extensions.Http.Resilience` avec une stratégie de nouvelle tentative illimitée (backoff exponentiel avec gigue, 1 s à 30 s) sur erreurs réseau, 5xx, 408 et 429 ; l'annulation de la requête utilisateur interrompt les tentatives.
 - Refactorisation des points d'entrée : Program de l'API et du MVC ne font plus que composer des méthodes d'extension du dossier Hosting de chaque projet (ConfigureAdexHost, enregistrement des services, base de données, client API, pipeline HTTP, migration, exécution avec arrêt propre). Le filtre « import en cours » de l'API devient le middleware ImportInProgressMiddleware. Comportement inchangé ; builds API et MVC réussis.
-- Les WebApplication des deux Program sont désormais libérés via wait using.
+- Les WebApplication des deux Program sont désormais libérés via await using.
 - Gestion globale des exceptions : ajout de `ApiExceptionHandler` (API, `ProblemDetails`) et de `MvcExceptionHandler`/`ExceptionMapping` (MVC, page `Error` ou `ProblemDetails` JSON) ; suppression des `try/catch` des contrôleurs des deux applications, nouvelle `CsvFileUnavailableException` levée par `CsvPageReader`, et `TryGetDashboardAsync` traite le 503 d'import comme « en cours ». Les erreurs d'API affichées dans les pages passent désormais par la page d'erreur globale. Builds MVC et API réussis ; aucun test automatisé ajouté.
+- Réorganisation des responsabilités .NET : suppression de `Adex.Common` et `Adex.Business`, extraction des projets `Adex.Contracts`, `Adex.Data.Import`, `Adex.Data.ReadModel` et `Adex.Legacy.MetaModel`; DTO API séparés des ViewModels MVC avec conversion explicite. Contrôleurs et modèles MVC/API regroupés par domaine avec namespaces et chemins alignés ; documentation d’architecture, de conception et de règles mise à jour.
+- Réorganisation des responsabilités .NET : ajout de `Adex.Application` pour le port et le résultat applicatifs d’import. `Adex.WebApi.Import.ImportJobService` dépend désormais de ce contrat, implémenté par l’adaptateur PostgreSQL `Adex.Data.Import`; documentation d’architecture et de recommandations actualisée.

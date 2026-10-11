@@ -6,7 +6,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Adex.Common;
 
 namespace Adex.Data.MetaModel
 {

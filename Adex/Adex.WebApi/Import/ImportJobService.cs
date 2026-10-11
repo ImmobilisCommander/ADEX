@@ -1,4 +1,4 @@
-using Adex.Business;
+using Adex.Application.Import;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -114,7 +114,7 @@ namespace Adex.WebApi.Import
 
                 await using var scope = scopeFactory.CreateAsyncScope();
                 var result = await scope.ServiceProvider
-                    .GetRequiredService<DeclarationsImporter>()
+                    .GetRequiredService<IDeclarationsImporter>()
                     .ImportAsync(
                         path,
                         new Progress<string>(message =>

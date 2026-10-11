@@ -1,34 +1,23 @@
 # Conception
 
-## Concepts et responsabilités
+## Modèle et responsabilités
 
-Le modèle métier normalisé se trouve dans `Adex/Adex.Data.Model/` :
+Le modèle relationnel canonique est dans `Adex/Adex.Data.Model/` : `Entity`, `Company`, `Person`, `Link`, `FinancialLink` et `AdexContext`. Les contrats `IEntity` et `ILink` résident dans le même projet que les entités qu’ils décrivent.
 
-- `Entity` fournit le concept d’entité référencée.
-- `Company` et `Person` représentent les entreprises et les personnes.
-- `Link` et `FinancialLink` représentent les relations et leur spécialisation financière.
-- `AdexContext` est un contexte Entity Framework Core et expose les ensembles du modèle.
+Le modèle de métadonnées historique est séparé dans `Adex/Adex.Data.MetaModel/`. Son chargeur, ses contrats CSV et ses types de visualisation sont isolés dans `Adex/Adex.Legacy.MetaModel/`; ils ne sont pas partagés par les hôtes actifs.
 
-Le modèle de métadonnées est séparé dans `Adex/Adex.Data.MetaModel/`, avec ses propres entités et contexte Entity Framework Core. Les objets destinés à la visualisation sont partagés dans `Adex/Adex.Common/`, notamment `GraphDataSet`, `ForceDirectedData`, `ForceDirectedNodeItem` et `ForceDirectedLinkItem`.
+Les réponses HTTP communes au serveur API et au client MVC sont des DTO dans `Adex/Adex.Contracts/`. Le service de lecture `DataExplorerService` et ses requêtes EF Core sont dans `Adex/Adex.Data.ReadModel/`. Les contrôleurs API regroupés par domaine ne contiennent que la logique HTTP et délèguent à ce service. Les ViewModels MVC restent distincts des DTO et sont produits par le client API.
 
-Le code distingue donc le modèle relationnel, le modèle de métadonnées, les traitements métiers et la représentation du graphe. Cette distinction est visible dans les références de projets et les contrats ; elle ne prouve pas que toutes les implémentations soient raccordées dans chaque application.
+## Parcours d’import
 
-Les migrations encore présentes dans les deux projets de données utilisent les API `System.Data.Entity.Migrations` d’Entity Framework 6, alors que les contextes actuels héritent de `Microsoft.EntityFrameworkCore.DbContext`. La cohérence et l’utilisation effective de ces migrations restent à vérifier.
+`ImportJobService` gère le cycle de vie de l’import en arrière-plan dans l’hôte API. Il utilise le port applicatif `Adex.Application.Import.IDeclarationsImporter`; l’adaptateur `Adex.Data.Import.DeclarationsImporter` lit le fichier consolidé, applique les règles de sélection et écrit les lignes avec le COPY binaire Npgsql via un `NpgsqlDataSource`.
 
-## Flux de traitement envisagé par les implémentations
+Ce pipeline est volontairement spécialisé pour les volumes élevés et la base PostgreSQL. Il ne dépend plus du contexte EF Core, mais l’analyse des règles, la transformation des lignes et les opérations de persistance restent regroupées dans l’implémentation d’import. Une séparation plus fine n’est justifiée que si des consommateurs ou des variantes d’import apparaissent.
 
-1. Le chargeur CSV lit les données d’entreprise et les déclarations à partir de fichiers.
-2. Les identifiants externes servent à retrouver ou créer les acteurs représentés par les lignes.
-3. Les lignes retenues sont transformées en liens financiers.
-4. Les opérations `Save` persistent les données lorsque cette implémentation est utilisée.
-5. Les opérations de recherche peuvent projeter les liens en `GraphDataSet` pour une consommation par une interface.
+## Contrats et limites
 
-Ce flux résume les composants disponibles, non une garantie d’exécution intégrale par un seul point d’entrée. Les chargeurs normalisé et de métadonnées sont distincts ; certaines méthodes de contrat sont incomplètes dans les implémentations (`Adex/Adex.Business/CsvLoaderNormalized.cs`, `CvsLoaderMetadata.cs`).
+Les namespaces suivent les domaines applicatifs, par exemple `Adex.WebApi.Dashboard`, `Adex.WebApi.Entities`, `Adex.Mvc.Home`, `Adex.Mvc.Entities`, `Adex.Contracts.Explorer` et `Adex.Contracts.Csv`. Les chemins des sources reflètent ces namespaces ; les vues Razor référencent explicitement les ViewModels de leur domaine.
 
-## Contrats et limites de conception
+Le code historique du métamodèle reste disponible dans un projet distinct pour ne pas confondre le transfert ancien avec l’import normalisé actif. `Adex.Common` et `Adex.Business` ont été supprimés, leurs types étant replacés dans les projets d’import, de données, de contrats ou d’héritage selon leur rôle.
 
-`ICsvLoader` (`Adex/Adex.Common/ICsvLoader.cs`) décrit les opérations de chargement des références, des fournisseurs et des liens, de sauvegarde, de recherche de graphe et de récupération d’un bénéficiaire. Les contrôleurs API consomment désormais les contrats plus ciblés `ILinkSearchService` et `IMetadataLookupService` (`Adex/Adex.Business/ISearchServices.cs`), enregistrés avec une durée de vie par requête. Les scripts de visualisation sont dans le projet MVC.
-
-Les règles d’association et de déduplication dépendent des identifiants externes et des ensembles de références maintenus par les chargeurs. Les clés, contraintes et règles d’unicité de base de données doivent être vérifiées dans la stratégie de persistance avant de considérer cette déduplication comme garantie au niveau persistance. Les projets `Adex.Web` (Vue) et `Adex.App` ont été supprimés de la solution actuelle.
-
-Pour le comportement effectif, voir [Règles métier](004_business_rules.md) ; pour les écarts entre interfaces et services, voir [Architecture](003_architecture.md).
+Les règles d’association et de déduplication et les garanties de persistance doivent être vérifiées sur les schémas et données cibles. Pour les règles observables, voir [Règles métier](004_business_rules.md) ; pour les dépendances des projets, voir [Architecture](003_architecture.md).

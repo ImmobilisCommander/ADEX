@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Adex.Contracts.Csv;
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace Adex.WebApi.Csv
     /// seeked or rewound, and reading stops as soon as the page (plus one matching record, to
     /// detect a next page) has been read. Filters use a case and accent insensitive "contains".
     /// </summary>
-    public sealed class CsvPageReader(ILogger<CsvPageReader> logger)
+    public sealed class CsvPageReader
     {
         private static FileStream OpenFile(string path)
         {
