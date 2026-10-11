@@ -55,3 +55,5 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 - Tableau de bord : le TTL devient un `TimeSpan` (`Dashboard:TimeToLive`, format `hh:mm:ss` ou `d.hh:mm:ss`, `24:00:00` par défaut, entre 1 minute et 365 jours) en remplacement de `Dashboard:TimeToLiveHours`.
 - Tableau de bord : `Dashboard:TimeToLive` devient obligatoire, sans valeur par défaut dans le code (`TimeSpan?` + `[Required]`) ; l'absence ou une valeur hors de 1 min – 365 jours empêche le démarrage (`ValidateOnStart`). La valeur `24:00:00` reste fournie par `appsettings.json`.
 - Tableau de bord : `DashboardOptions.TimeToLive` est un `TimeSpan` non nullable déclaré `required` ; une clé absente donne une durée nulle, rejetée au démarrage par la plage de validation (minimum 1 minute).
+
+- Résilience MVC → API : le client HTTP typé utilise `Microsoft.Extensions.Http.Resilience` avec une stratégie de nouvelle tentative illimitée (backoff exponentiel avec gigue, 1 s à 30 s) sur erreurs réseau, 5xx, 408 et 429 ; l'annulation de la requête utilisateur interrompt les tentatives.

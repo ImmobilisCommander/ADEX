@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Options;
+using Polly;
 using Serilog;
 
 namespace Adex.Mvc
@@ -41,7 +43,22 @@ namespace Adex.Mvc
                 );
                 // Scanning the whole CSV can be long; the call is cancelled when the user leaves the page.
                 client.Timeout = Timeout.InfiniteTimeSpan;
-            });
+            })
+            .AddResilienceHandler(
+                "adex-api-retry",
+                pipeline =>
+                    pipeline.AddRetry(
+                        new HttpRetryStrategyOptions
+                        {
+                            // Retry until the API answers; the request cancellation token stops it.
+                            MaxRetryAttempts = int.MaxValue,
+                            BackoffType = DelayBackoffType.Exponential,
+                            UseJitter = true,
+                            Delay = TimeSpan.FromSeconds(1),
+                            MaxDelay = TimeSpan.FromSeconds(30),
+                        }
+                    )
+            );
 
             var app = builder.Build();
             app.UseSerilogRequestLogging();
