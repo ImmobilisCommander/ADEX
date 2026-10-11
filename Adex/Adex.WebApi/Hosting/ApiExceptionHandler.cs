@@ -38,6 +38,11 @@ namespace Adex.WebApi.Hosting
                     "Fichier CSV indisponible",
                     exception.Message
                 ),
+                CsvFilterNotAllowedException => (
+                    StatusCodes.Status400BadRequest,
+                    "Filtre invalide",
+                    exception.Message
+                ),
                 _ => (
                     StatusCodes.Status500InternalServerError,
                     "Erreur interne",

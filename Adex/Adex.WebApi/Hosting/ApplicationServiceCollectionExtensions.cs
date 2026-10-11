@@ -40,6 +40,7 @@ namespace Adex.WebApi.Hosting
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
             services.AddSingleton<CsvPageReader>();
+            services.AddSingleton<ICsvService, CsvService>();
 
             services.AddOptions<ImportOptions>()
                 .BindConfiguration(ImportOptions.SectionName)
