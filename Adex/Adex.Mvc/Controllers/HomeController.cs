@@ -59,7 +59,7 @@ namespace Adex.Mvc.Controllers
 
             if (Request.Headers.Accept.ToString().Contains("application/json", System.StringComparison.OrdinalIgnoreCase))
             {
-                return new JsonResult(results);
+                return Ok(results);
             }
 
             return View(

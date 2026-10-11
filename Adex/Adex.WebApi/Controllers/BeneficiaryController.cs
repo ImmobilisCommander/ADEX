@@ -26,7 +26,7 @@ namespace Adex.WebApi.Controllers
         )
         {
             var entity = await explorer.GetEntityAsync(id, 1, DataExplorerService.DefaultPageSize, "date", true, cancellationToken);
-            return entity is null ? NotFound() : new JsonResult(entity);
+            return entity is null ? NotFound() : Ok(entity);
         }
     }
 }
