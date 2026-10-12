@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Adex.Contracts.Csv;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace Adex.Application.Csv
@@ -30,7 +30,9 @@ namespace Adex.Application.Csv
             var criteria = (filters ?? new Dictionary<string, string>())
                 .Where(x => !string.IsNullOrWhiteSpace(x.Value))
                 .ToDictionary(x => x.Key, x => x.Value.Trim(), StringComparer.OrdinalIgnoreCase);
-            var forbidden = criteria.Keys.FirstOrDefault(x => !CsvFilterableColumns.Names.Contains(x));
+            var forbidden = criteria.Keys.FirstOrDefault(x =>
+                !CsvFilterableColumns.Names.Contains(x)
+            );
             if (forbidden is not null)
             {
                 throw new CsvFilterNotAllowedException(forbidden);
@@ -56,7 +58,13 @@ namespace Adex.Application.Csv
                         entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(
                             options.CurrentValue.CacheDurationSeconds
                         );
-                        return reader.ReadAsync(path, pageNumber, PageSize, criteria, cancellationToken);
+                        return reader.ReadAsync(
+                            path,
+                            pageNumber,
+                            PageSize,
+                            criteria,
+                            cancellationToken
+                        );
                     }
                 );
             }

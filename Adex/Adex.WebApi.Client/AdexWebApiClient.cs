@@ -19,9 +19,14 @@ namespace Adex.WebApi.Client
             return GetModelAsync<DashboardModel>("api/dashboard", cancellationToken);
         }
 
-        public async Task<DashboardModel> TryGetDashboardAsync(CancellationToken cancellationToken = default)
+        public async Task<DashboardModel> TryGetDashboardAsync(
+            CancellationToken cancellationToken = default
+        )
         {
-            using var response = await httpClient.GetAsync("api/dashboard/progressive", cancellationToken);
+            using var response = await httpClient.GetAsync(
+                "api/dashboard/progressive",
+                cancellationToken
+            );
             if (response.StatusCode is HttpStatusCode.Accepted or HttpStatusCode.ServiceUnavailable)
             {
                 return null;
@@ -29,7 +34,9 @@ namespace Adex.WebApi.Client
 
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<DashboardModel>(cancellationToken)
-                ?? throw new InvalidOperationException("The API returned an empty dashboard response.");
+                ?? throw new InvalidOperationException(
+                    "The API returned an empty dashboard response."
+                );
         }
 
         public async Task<IReadOnlyList<EntitySearchResult>> SearchEntitiesAsync(
@@ -64,16 +71,24 @@ namespace Adex.WebApi.Client
 
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<EntityDetails>(cancellationToken)
-                ?? throw new InvalidOperationException("The API returned an empty entity response.");
+                ?? throw new InvalidOperationException(
+                    "The API returned an empty entity response."
+                );
         }
 
-        public async Task<JsonElement> GetEntityJsonAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<JsonElement> GetEntityJsonAsync(
+            Guid id,
+            CancellationToken cancellationToken = default
+        )
         {
             using var response = await httpClient.GetAsync($"api/entity/{id}", cancellationToken);
             response.EnsureSuccessStatusCode();
 
             await using var content = await response.Content.ReadAsStreamAsync(cancellationToken);
-            using var document = await JsonDocument.ParseAsync(content, cancellationToken: cancellationToken);
+            using var document = await JsonDocument.ParseAsync(
+                content,
+                cancellationToken: cancellationToken
+            );
             return document.RootElement.Clone();
         }
 
@@ -86,29 +101,45 @@ namespace Adex.WebApi.Client
             var query = new List<string> { $"page={page}" };
             if (filters != null)
             {
-                query.AddRange(filters.Select(x => $"filters[{Uri.EscapeDataString(x.Key)}]={Uri.EscapeDataString(x.Value)}"));
+                query.AddRange(
+                    filters.Select(x =>
+                        $"filters[{Uri.EscapeDataString(x.Key)}]={Uri.EscapeDataString(x.Value)}"
+                    )
+                );
             }
 
-            using var response = await httpClient.GetAsync($"api/csv?{string.Join('&', query)}", cancellationToken);
+            using var response = await httpClient.GetAsync(
+                $"api/csv?{string.Join('&', query)}",
+                cancellationToken
+            );
             if (response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.BadRequest)
             {
                 var message = "Le fichier CSV est inaccessible.";
                 try
                 {
-                    await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                    using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
-                    if (doc.RootElement.TryGetProperty("detail", out var detail) && detail.GetString() is { } detailStr)
+                    await using var stream = await response.Content.ReadAsStreamAsync(
+                        cancellationToken
+                    );
+                    using var doc = await JsonDocument.ParseAsync(
+                        stream,
+                        cancellationToken: cancellationToken
+                    );
+                    if (
+                        doc.RootElement.TryGetProperty("detail", out var detail)
+                        && detail.GetString() is { } detailStr
+                    )
                     {
                         message = detailStr;
                     }
-                    else if (doc.RootElement.TryGetProperty("title", out var title) && title.GetString() is { } titleStr)
+                    else if (
+                        doc.RootElement.TryGetProperty("title", out var title)
+                        && title.GetString() is { } titleStr
+                    )
                     {
                         message = titleStr;
                     }
                 }
-                catch (JsonException)
-                {
-                }
+                catch (JsonException) { }
 
                 throw new AdexApiException(message, response.StatusCode);
             }
@@ -118,7 +149,10 @@ namespace Adex.WebApi.Client
                 ?? throw new InvalidOperationException("The API returned an empty CSV response.");
         }
 
-        private async Task<T> GetModelAsync<T>(string relativeUri, CancellationToken cancellationToken)
+        private async Task<T> GetModelAsync<T>(
+            string relativeUri,
+            CancellationToken cancellationToken
+        )
         {
             using var response = await httpClient.GetAsync(relativeUri, cancellationToken);
             response.EnsureSuccessStatusCode();

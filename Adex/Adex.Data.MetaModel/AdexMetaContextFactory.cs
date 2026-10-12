@@ -8,7 +8,8 @@ namespace Adex.Data.MetaModel
     {
         public AdexMetaContext CreateDbContext(string[] args)
         {
-            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__AdexMeta")
+            var connectionString =
+                Environment.GetEnvironmentVariable("ConnectionStrings__AdexMeta")
                 ?? throw new InvalidOperationException(
                     "Set ConnectionStrings__AdexMeta before creating or applying AdexMeta migrations."
                 );

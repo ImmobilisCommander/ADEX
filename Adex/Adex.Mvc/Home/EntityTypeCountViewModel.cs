@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-
 using System.Globalization;
 
 namespace Adex.Mvc.Home
 {
-
     public sealed class EntityTypeCountViewModel
     {
         public string Type { get; set; } = string.Empty;

@@ -11,7 +11,12 @@ namespace Adex.Mvc.Home
         IReadOnlyList<Adex.Mvc.Home.TopEntityViewModel> Entities
     )
     {
-        public IReadOnlyList<(Adex.Mvc.Home.TopEntityViewModel Entity, string Rank, int Width, string Amount)> Items
+        public IReadOnlyList<(
+            Adex.Mvc.Home.TopEntityViewModel Entity,
+            string Rank,
+            int Width,
+            string Amount
+        )> Items
         {
             get
             {
@@ -21,11 +26,17 @@ namespace Adex.Mvc.Home
                         (entity, index) =>
                             (
                                 Entity: entity,
-                                Rank: (index + 1).ToString("D2", CultureInfo.GetCultureInfo("fr-FR")),
+                                Rank: (index + 1).ToString(
+                                    "D2",
+                                    CultureInfo.GetCultureInfo("fr-FR")
+                                ),
                                 Width: topAmount == 0
                                     ? 0
                                     : (int)Math.Round((double)(entity.Amount * 100m / topAmount)),
-                                Amount: entity.Amount.ToString("C0", CultureInfo.GetCultureInfo("fr-FR"))
+                                Amount: entity.Amount.ToString(
+                                    "C0",
+                                    CultureInfo.GetCultureInfo("fr-FR")
+                                )
                             )
                     )
                     .ToList();

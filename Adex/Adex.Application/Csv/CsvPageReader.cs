@@ -1,5 +1,3 @@
-using Adex.Contracts.Csv;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -8,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Contracts.Csv;
 
 namespace Adex.Application.Csv
 {
@@ -32,7 +31,8 @@ namespace Adex.Application.Csv
                     FileOptions.SequentialScan | FileOptions.Asynchronous
                 );
             }
-            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            catch (Exception exception)
+                when (exception is IOException or UnauthorizedAccessException)
             {
                 throw new CsvFileUnavailableException(path, exception);
             }
@@ -60,7 +60,9 @@ namespace Adex.Application.Csv
             var criteria = new List<(int Index, string Value)>();
             foreach (var (column, value) in filters)
             {
-                var index = header.FindIndex(x => string.Equals(x, column, StringComparison.OrdinalIgnoreCase));
+                var index = header.FindIndex(x =>
+                    string.Equals(x, column, StringComparison.OrdinalIgnoreCase)
+                );
                 if (index < 0)
                 {
                     return new CsvPage { Columns = header, FilterableColumns = filterable };

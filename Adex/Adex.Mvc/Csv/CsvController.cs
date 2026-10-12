@@ -37,7 +37,11 @@ namespace Adex.Mvc.Csv
             CancellationToken cancellationToken = default
         )
         {
-            var model = await BuildAsync(Math.Max(page, 1), ActiveFilters(filters), cancellationToken);
+            var model = await BuildAsync(
+                Math.Max(page, 1),
+                ActiveFilters(filters),
+                cancellationToken
+            );
             return PartialView("_CsvContent", model);
         }
 
@@ -62,8 +66,8 @@ namespace Adex.Mvc.Csv
                 {
                     Page = page,
                     PageSize = PageSize,
-                    Columns = csv.Columns
-                        .Select(name => new CsvColumnViewModel
+                    Columns = csv
+                        .Columns.Select(name => new CsvColumnViewModel
                         {
                             Name = name,
                             IsFilterable = filterable.Contains(name),
@@ -72,7 +76,9 @@ namespace Adex.Mvc.Csv
                         .ToList(),
                     Rows = csv.Rows,
                     PreviousPageUrl = page > 1 ? ActionUrl(nameof(Index), page - 1, filters) : null,
-                    NextPageUrl = csv.HasNextPage ? ActionUrl(nameof(Index), page + 1, filters) : null,
+                    NextPageUrl = csv.HasNextPage
+                        ? ActionUrl(nameof(Index), page + 1, filters)
+                        : null,
                     ClearFiltersUrl = filters.Count > 0 ? Url.Action(nameof(Index)) : null,
                 };
             }

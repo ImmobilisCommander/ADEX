@@ -13,9 +13,11 @@ namespace Adex.Mvc.Csv
 
         public int PageSize { get; init; } = 10;
 
-        public IReadOnlyList<CsvColumnViewModel> Columns { get; init; } = new List<CsvColumnViewModel>();
+        public IReadOnlyList<CsvColumnViewModel> Columns { get; init; } =
+            new List<CsvColumnViewModel>();
 
-        public IReadOnlyList<IReadOnlyList<string>> Rows { get; init; } = new List<IReadOnlyList<string>>();
+        public IReadOnlyList<IReadOnlyList<string>> Rows { get; init; } =
+            new List<IReadOnlyList<string>>();
 
         public string PreviousPageUrl { get; init; }
 

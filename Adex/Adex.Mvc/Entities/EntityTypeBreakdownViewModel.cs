@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-
 using System.Globalization;
 
 namespace Adex.Mvc.Entities
 {
-
     public sealed class EntityTypeBreakdownViewModel
     {
         public string Type { get; set; } = string.Empty;

@@ -10,5 +10,4 @@ namespace Adex.Contracts.Explorer
 
         public double AmountPercent { get; set; }
     }
-
 }

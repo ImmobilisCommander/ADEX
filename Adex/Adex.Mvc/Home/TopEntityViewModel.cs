@@ -1,10 +1,9 @@
-using System.Globalization;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Adex.Mvc.Home
 {
-
     public sealed class TopEntityViewModel
     {
         public Guid Id { get; set; }

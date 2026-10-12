@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Adex.Contracts.Explorer
 {
-
     public sealed class FinancialLinkTypeSummary
     {
         public string Type { get; set; } = string.Empty;

@@ -14,10 +14,13 @@ namespace Adex.WebApi.Client
             Action<AdexWebApiOptions> configureOptions = null
         )
         {
-            var optionsBuilder = services.AddOptions<AdexWebApiOptions>()
+            var optionsBuilder = services
+                .AddOptions<AdexWebApiOptions>()
                 .BindConfiguration(AdexWebApiOptions.SectionName)
                 .Validate(
-                    options => !string.IsNullOrWhiteSpace(options.BaseAddress) && Uri.TryCreate(options.BaseAddress, UriKind.Absolute, out _),
+                    options =>
+                        !string.IsNullOrWhiteSpace(options.BaseAddress)
+                        && Uri.TryCreate(options.BaseAddress, UriKind.Absolute, out _),
                     "Le paramètre « AdexApi:BaseAddress » doit être une URL absolue valide."
                 )
                 .ValidateOnStart();
@@ -27,26 +30,31 @@ namespace Adex.WebApi.Client
                 optionsBuilder.Configure(configureOptions);
             }
 
-            services.AddHttpClient<IAdexWebApiClient, AdexWebApiClient>((serviceProvider, client) =>
-            {
-                var options = serviceProvider.GetRequiredService<IOptions<AdexWebApiOptions>>().Value;
-                client.BaseAddress = new Uri(options.BaseAddress);
-                client.Timeout = Timeout.InfiniteTimeSpan;
-            })
-            .AddResilienceHandler(
-                "adex-api-retry",
-                pipeline =>
-                    pipeline.AddRetry(
-                        new HttpRetryStrategyOptions
-                        {
-                            MaxRetryAttempts = int.MaxValue,
-                            BackoffType = DelayBackoffType.Exponential,
-                            UseJitter = true,
-                            Delay = TimeSpan.FromSeconds(1),
-                            MaxDelay = TimeSpan.FromSeconds(30),
-                        }
-                    )
-            );
+            services
+                .AddHttpClient<IAdexWebApiClient, AdexWebApiClient>(
+                    (serviceProvider, client) =>
+                    {
+                        var options = serviceProvider
+                            .GetRequiredService<IOptions<AdexWebApiOptions>>()
+                            .Value;
+                        client.BaseAddress = new Uri(options.BaseAddress);
+                        client.Timeout = Timeout.InfiniteTimeSpan;
+                    }
+                )
+                .AddResilienceHandler(
+                    "adex-api-retry",
+                    pipeline =>
+                        pipeline.AddRetry(
+                            new HttpRetryStrategyOptions
+                            {
+                                MaxRetryAttempts = int.MaxValue,
+                                BackoffType = DelayBackoffType.Exponential,
+                                UseJitter = true,
+                                Delay = TimeSpan.FromSeconds(1),
+                                MaxDelay = TimeSpan.FromSeconds(30),
+                            }
+                        )
+                );
 
             return services;
         }

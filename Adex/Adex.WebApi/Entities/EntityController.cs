@@ -1,13 +1,11 @@
-using Adex.Contracts.Explorer;
-using Adex.Data.ReadModel.Explorer;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Contracts.Explorer;
+using Adex.Data.ReadModel.Explorer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.WebApi.Entities
 {
@@ -59,7 +57,14 @@ namespace Adex.WebApi.Entities
             [FromQuery] bool descending = true
         )
         {
-            var entity = await explorer.GetEntityAsync(id, page, pageSize, sort, descending, cancellationToken);
+            var entity = await explorer.GetEntityAsync(
+                id,
+                page,
+                pageSize,
+                sort,
+                descending,
+                cancellationToken
+            );
             return entity is null ? NotFound() : Ok(entity);
         }
     }

@@ -1,8 +1,6 @@
-using Adex.Mvc.Hosting;
-
-using Microsoft.AspNetCore.Builder;
-
 using System.Threading.Tasks;
+using Adex.Mvc.Hosting;
+using Microsoft.AspNetCore.Builder;
 
 namespace Adex.Mvc
 {
@@ -12,9 +10,7 @@ namespace Adex.Mvc
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.ConfigureAdexHost();
-            builder.Services
-                .AddAdexMvc()
-                .AddAdexApiClient();
+            builder.Services.AddAdexMvc().AddAdexApiClient();
 
             await using var app = builder.Build();
             app.UseAdexPipeline();

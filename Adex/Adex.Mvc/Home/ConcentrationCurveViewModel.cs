@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-
 using System.Globalization;
 
 namespace Adex.Mvc.Home
 {
-
     public sealed class ConcentrationCurveViewModel
     {
         public string Label { get; set; } = string.Empty;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Adex.Mvc.Home
 {
-
     public sealed class MonthlyDeclarationViewModel
     {
         public int Year { get; set; }

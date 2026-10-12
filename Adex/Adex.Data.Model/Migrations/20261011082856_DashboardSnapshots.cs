@@ -17,19 +17,22 @@ namespace Adex.Data.Model.Migrations
                 {
                     Key = table.Column<string>(type: "text", nullable: false),
                     Json = table.Column<string>(type: "jsonb", nullable: true),
-                    ComputedAtUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    ComputedAtUtc = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DashboardSnapshots", x => x.Key);
-                });
+                }
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "DashboardSnapshots");
+            migrationBuilder.DropTable(name: "DashboardSnapshots");
         }
     }
 }

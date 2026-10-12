@@ -50,7 +50,9 @@ namespace Adex.WebApi.Dashboard
         [ProducesResponseType(typeof(DashboardModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
-        public async Task<ActionResult<DashboardModel>> GetProgressive(CancellationToken cancellationToken)
+        public async Task<ActionResult<DashboardModel>> GetProgressive(
+            CancellationToken cancellationToken
+        )
         {
             var dashboard = await explorer.TryGetDashboardAsync(cancellationToken);
             return dashboard is null ? Accepted() : dashboard;

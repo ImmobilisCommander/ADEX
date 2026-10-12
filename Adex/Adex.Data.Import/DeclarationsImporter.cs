@@ -1,11 +1,3 @@
-using Adex.Application.Import;
-
-using Microsoft.Extensions.Logging;
-
-using Npgsql;
-
-using NpgsqlTypes;
-
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -20,6 +12,10 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Application.Import;
+using Microsoft.Extensions.Logging;
+using Npgsql;
+using NpgsqlTypes;
 
 namespace Adex.Data.Import
 {
@@ -33,23 +29,61 @@ namespace Adex.Data.Import
     public sealed class DeclarationsImporter(
         NpgsqlDataSource dataSource,
         ILogger<DeclarationsImporter> logger
-        ) : IDeclarationsImporter
+    ) : IDeclarationsImporter
     {
         private static readonly string[] ExpectedColumns =
         {
-            "id", "token", "entreprise_id", "lien_interet", "identifiant_unique",
-            "convention_liee", "motif_lien_interet_code", "motif_lien_interet", "autre_motif",
-            "information_evenement", "montant", "date", "date_debut", "date_fin",
-            "id_beneficiaire", "identite", "prenom", "beneficiaire_categorie_code",
-            "beneficiaire_categorie", "beneficiaire_type_code", "beneficiaire_type",
-            "beneficiaire_identifiant", "beneficiaire_profession_code", "profession_libelle",
-            "structure_exercice", "pays_code", "adresse", "code_postal", "ville",
-            "demande_de_rectification", "statut", "date_publication", "date_transmission",
-            "raison_sociale", "numero_siren", "secteur_activite", "mere_id",
-            "Ville de l'entreprise", "Département de l'entreprise", "Région de l'entreprise",
-            "entreprise_nom_pays", "code_postal_entreprise", "ville_sanscedex", "dep_code",
-            "reg_code", "reg_name", "dep_name", "beneficiaire_nom_prenom_com_name",
-            "semestre_annee", "pays_libelle", "Nom Pays (Bénéficiaire)",
+            "id",
+            "token",
+            "entreprise_id",
+            "lien_interet",
+            "identifiant_unique",
+            "convention_liee",
+            "motif_lien_interet_code",
+            "motif_lien_interet",
+            "autre_motif",
+            "information_evenement",
+            "montant",
+            "date",
+            "date_debut",
+            "date_fin",
+            "id_beneficiaire",
+            "identite",
+            "prenom",
+            "beneficiaire_categorie_code",
+            "beneficiaire_categorie",
+            "beneficiaire_type_code",
+            "beneficiaire_type",
+            "beneficiaire_identifiant",
+            "beneficiaire_profession_code",
+            "profession_libelle",
+            "structure_exercice",
+            "pays_code",
+            "adresse",
+            "code_postal",
+            "ville",
+            "demande_de_rectification",
+            "statut",
+            "date_publication",
+            "date_transmission",
+            "raison_sociale",
+            "numero_siren",
+            "secteur_activite",
+            "mere_id",
+            "Ville de l'entreprise",
+            "Département de l'entreprise",
+            "Région de l'entreprise",
+            "entreprise_nom_pays",
+            "code_postal_entreprise",
+            "ville_sanscedex",
+            "dep_code",
+            "reg_code",
+            "reg_name",
+            "dep_name",
+            "beneficiaire_nom_prenom_com_name",
+            "semestre_annee",
+            "pays_libelle",
+            "Nom Pays (Bénéficiaire)",
         };
 
         private const string TruncateSql = """
@@ -59,7 +93,12 @@ namespace Adex.Data.Import
 
         // Integrity is guaranteed by construction (every id written comes from the same
         // dictionaries), so the foreign keys are dropped for the load and recreated NOT VALID.
-        private static readonly (string Table, string Name, string Column, string Principal)[] ForeignKeys =
+        private static readonly (
+            string Table,
+            string Name,
+            string Column,
+            string Principal
+        )[] ForeignKeys =
         {
             ("Companies", "FK_Companies_Entities_Id", "Id", "Entities"),
             ("Persons", "FK_Persons_Entities_Id", "Id", "Entities"),
@@ -74,23 +113,60 @@ namespace Adex.Data.Import
         // Uniqueness of the EntityAttributes key is guaranteed by the importer (one row per entity).
         private static readonly (string Name, string Sql, string Drop)[] Indexes =
         {
-            ("PK_EntityAttributes", """ALTER TABLE "EntityAttributes" ADD CONSTRAINT "PK_EntityAttributes" PRIMARY KEY ("EntityId")""", """ALTER TABLE "EntityAttributes" DROP CONSTRAINT IF EXISTS "PK_EntityAttributes" """),
-            ("IX_Links_From_Id_Date", """CREATE INDEX "IX_Links_From_Id_Date" ON "Links" ("From_Id", "Date")""", null),
-            ("IX_Links_To_Id_Date", """CREATE INDEX "IX_Links_To_Id_Date" ON "Links" ("To_Id", "Date")""", null),
-            ("IX_Companies_Designation", """CREATE INDEX "IX_Companies_Designation" ON "Companies" USING gin ("Designation" gin_trgm_ops)""", null),
-            ("IX_Persons_LastName", """CREATE INDEX "IX_Persons_LastName" ON "Persons" USING gin ("LastName" gin_trgm_ops)""", null),
-            ("IX_Persons_FirstName", """CREATE INDEX "IX_Persons_FirstName" ON "Persons" USING gin ("FirstName" gin_trgm_ops)""", null),
-            ("IX_EntityTotals_Total", """CREATE INDEX "IX_EntityTotals_Total" ON "EntityTotals" ("Total")""", null),
+            (
+                "PK_EntityAttributes",
+                """ALTER TABLE "EntityAttributes" ADD CONSTRAINT "PK_EntityAttributes" PRIMARY KEY ("EntityId")""",
+                """ALTER TABLE "EntityAttributes" DROP CONSTRAINT IF EXISTS "PK_EntityAttributes" """
+            ),
+            (
+                "IX_Links_From_Id_Date",
+                """CREATE INDEX "IX_Links_From_Id_Date" ON "Links" ("From_Id", "Date")""",
+                null
+            ),
+            (
+                "IX_Links_To_Id_Date",
+                """CREATE INDEX "IX_Links_To_Id_Date" ON "Links" ("To_Id", "Date")""",
+                null
+            ),
+            (
+                "IX_Companies_Designation",
+                """CREATE INDEX "IX_Companies_Designation" ON "Companies" USING gin ("Designation" gin_trgm_ops)""",
+                null
+            ),
+            (
+                "IX_Persons_LastName",
+                """CREATE INDEX "IX_Persons_LastName" ON "Persons" USING gin ("LastName" gin_trgm_ops)""",
+                null
+            ),
+            (
+                "IX_Persons_FirstName",
+                """CREATE INDEX "IX_Persons_FirstName" ON "Persons" USING gin ("FirstName" gin_trgm_ops)""",
+                null
+            ),
+            (
+                "IX_EntityTotals_Total",
+                """CREATE INDEX "IX_EntityTotals_Total" ON "EntityTotals" ("Total")""",
+                null
+            ),
         };
 
         private static readonly string[] Tables =
         {
-            "Entities", "Companies", "Persons", "Links", "FinancialLinks", "EntityAttributes", "EntityTotals", "FinancialLinkTypeTotals",
+            "Entities",
+            "Companies",
+            "Persons",
+            "Links",
+            "FinancialLinks",
+            "EntityAttributes",
+            "EntityTotals",
+            "FinancialLinkTypeTotals",
         };
 
         private static readonly string[] DateFormats =
         {
-            "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd",
         };
 
         private const int MaxParallelMaintenance = 3;
@@ -108,11 +184,22 @@ namespace Adex.Data.Import
 
         private readonly record struct PersonRow(Guid Id, string LastName, string FirstName);
 
-        private readonly record struct LinkRow(Guid Id, Guid From, Guid To, string Kind, DateTime Date);
+        private readonly record struct LinkRow(
+            Guid Id,
+            Guid From,
+            Guid To,
+            string Kind,
+            DateTime Date
+        );
 
         private readonly record struct FinancialRow(Guid Id, decimal Amount, string Type);
 
-        private readonly record struct TotalRow(Guid Id, int Count, decimal Outgoing, decimal Incoming);
+        private readonly record struct TotalRow(
+            Guid Id,
+            int Count,
+            decimal Outgoing,
+            decimal Incoming
+        );
 
         private readonly Stopwatch _total = new();
 
@@ -142,9 +229,29 @@ namespace Adex.Data.Import
                 _total.Elapsed
             );
 
-            await ExecuteAsync(dataSource, "Suppression des clés étrangères", ForeignKeys.Select(x => $"""ALTER TABLE "{x.Table}" DROP CONSTRAINT IF EXISTS "{x.Name}" """), progress, cancellationToken);
-            await ExecuteAsync(dataSource, "Suppression des index", Indexes.Select(x => x.Drop ?? $"""DROP INDEX IF EXISTS "{x.Name}" """), progress, cancellationToken);
-            await ExecuteAsync(dataSource, "Réinitialisation des tables", new[] { TruncateSql }, progress, cancellationToken);
+            await ExecuteAsync(
+                dataSource,
+                "Suppression des clés étrangères",
+                ForeignKeys.Select(x =>
+                    $"""ALTER TABLE "{x.Table}" DROP CONSTRAINT IF EXISTS "{x.Name}" """
+                ),
+                progress,
+                cancellationToken
+            );
+            await ExecuteAsync(
+                dataSource,
+                "Suppression des index",
+                Indexes.Select(x => x.Drop ?? $"""DROP INDEX IF EXISTS "{x.Name}" """),
+                progress,
+                cancellationToken
+            );
+            await ExecuteAsync(
+                dataSource,
+                "Réinitialisation des tables",
+                new[] { TruncateSql },
+                progress,
+                cancellationToken
+            );
 
             progress?.Report("Chargement des données (passe 2/2)");
             await LoadAsync(path, dataSource, scan, progress, cancellationToken);
@@ -169,14 +276,24 @@ namespace Adex.Data.Import
             return result;
         }
 
-        private ScanResult Scan(string path, IProgress<string> progress, CancellationToken cancellationToken)
+        private ScanResult Scan(
+            string path,
+            IProgress<string> progress,
+            CancellationToken cancellationToken
+        )
         {
             using var file = OpenFile(path);
-            using var reader = new CsvRecordReader(new StreamReader(file, new UTF8Encoding(false), true, 1 << 20));
+            using var reader = new CsvRecordReader(
+                new StreamReader(file, new UTF8Encoding(false), true, 1 << 20)
+            );
             ReadHeader(reader);
 
             var keep = new bool[ExpectedColumns.Length];
-            keep[Col.Id] = keep[Col.CompanyId] = keep[Col.PersonId] = keep[Col.PublicationDate] = true;
+            keep[Col.Id] =
+                keep[Col.CompanyId] =
+                keep[Col.PersonId] =
+                keep[Col.PublicationDate] =
+                    true;
             var fields = new string[ExpectedColumns.Length];
             var scan = new ScanResult();
             var watch = Stopwatch.StartNew();
@@ -209,7 +326,11 @@ namespace Adex.Data.Import
                 Pick(scan.Companies, Hash(companyKey), currentRow, date);
                 Pick(scan.Persons, Hash(personKey), currentRow, date);
 
-                ref var link = ref CollectionsMarshal.GetValueRefOrAddDefault(scan.Links, Hash(linkKey), out var exists);
+                ref var link = ref CollectionsMarshal.GetValueRefOrAddDefault(
+                    scan.Links,
+                    Hash(linkKey),
+                    out var exists
+                );
                 if (!exists || date > link.Date)
                 {
                     link.Row = currentRow;
@@ -223,7 +344,11 @@ namespace Adex.Data.Import
 
         private static void Pick(Dictionary<long, Winner> winners, long hash, long row, long date)
         {
-            ref var winner = ref CollectionsMarshal.GetValueRefOrAddDefault(winners, hash, out var exists);
+            ref var winner = ref CollectionsMarshal.GetValueRefOrAddDefault(
+                winners,
+                hash,
+                out var exists
+            );
             if (!exists)
             {
                 winner.Row = row;
@@ -298,17 +423,30 @@ namespace Adex.Data.Import
                 },
                 failure
             );
-            const string attributeSql = """COPY "EntityAttributes"("EntityId", "Data") FROM STDIN (FORMAT BINARY)""";
+            const string attributeSql =
+                """COPY "EntityAttributes"("EntityId", "Data") FROM STDIN (FORMAT BINARY)""";
             Action<NpgsqlBinaryImporter, AttributeRow> writeAttribute = (w, v) =>
             {
                 w.Write(v.EntityId, NpgsqlDbType.Uuid);
                 w.Write(v.Json, NpgsqlDbType.Jsonb);
             };
-            var entityShards = Enumerable.Range(0, LinkAttributeWriters)
-                .Select(_ => new ImportTableWriter<AttributeRow>(dataSource, attributeSql, writeAttribute, failure))
+            var entityShards = Enumerable
+                .Range(0, LinkAttributeWriters)
+                .Select(_ => new ImportTableWriter<AttributeRow>(
+                    dataSource,
+                    attributeSql,
+                    writeAttribute,
+                    failure
+                ))
                 .ToArray();
-            var linkShards = Enumerable.Range(0, LinkAttributeWriters)
-                .Select(_ => new ImportTableWriter<AttributeRow>(dataSource, attributeSql, writeAttribute, failure))
+            var linkShards = Enumerable
+                .Range(0, LinkAttributeWriters)
+                .Select(_ => new ImportTableWriter<AttributeRow>(
+                    dataSource,
+                    attributeSql,
+                    writeAttribute,
+                    failure
+                ))
                 .ToArray();
 
             var totals = new Dictionary<Guid, Totals>();
@@ -319,7 +457,21 @@ namespace Adex.Data.Import
                 {
                     try
                     {
-                        Produce(path, scan, salt, totals, entities, companies, persons, links, financialLinks, entityShards, linkShards, progress, failure.Token);
+                        Produce(
+                            path,
+                            scan,
+                            salt,
+                            totals,
+                            entities,
+                            companies,
+                            persons,
+                            links,
+                            financialLinks,
+                            entityShards,
+                            linkShards,
+                            progress,
+                            failure.Token
+                        );
                         entities.Complete();
                         companies.Complete();
                         persons.Complete();
@@ -343,10 +495,14 @@ namespace Adex.Data.Import
 
             var tasks = new List<Task>
             {
-                producer, entities.Completion, companies.Completion, persons.Completion, links.Completion,
+                producer,
+                entities.Completion,
+                companies.Completion,
+                persons.Completion,
+                links.Completion,
                 financialLinks.Completion,
             };
-                            tasks.AddRange(entityShards.Concat(linkShards).Select(x => x.Completion));
+            tasks.AddRange(entityShards.Concat(linkShards).Select(x => x.Completion));
             await WhenAllRethrowRootCauseAsync(tasks);
             logger.LogInformation(
                 "Import: données écrites (entités {Entities}, attributs {Attributes}, liens {Links}) en {Elapsed}",
@@ -379,8 +535,14 @@ namespace Adex.Data.Import
 
                 totalRows.Complete();
             });
-            await WhenAllRethrowRootCauseAsync(new List<Task> { totalsProducer, totalRows.Completion });
-            logger.LogInformation("Import: {Rows} totaux écrits (total {Total})", totalRows.Rows, _total.Elapsed);
+            await WhenAllRethrowRootCauseAsync(
+                new List<Task> { totalsProducer, totalRows.Completion }
+            );
+            logger.LogInformation(
+                "Import: {Rows} totaux écrits (total {Total})",
+                totalRows.Rows,
+                _total.Elapsed
+            );
         }
 
         private void Produce(
@@ -400,19 +562,54 @@ namespace Adex.Data.Import
         )
         {
             using var file = OpenFile(path);
-            using var reader = new CsvRecordReader(new StreamReader(file, new UTF8Encoding(false), true, 1 << 20));
+            using var reader = new CsvRecordReader(
+                new StreamReader(file, new UTF8Encoding(false), true, 1 << 20)
+            );
             ReadHeader(reader);
 
             var keep = new bool[ExpectedColumns.Length];
-            foreach (var column in new[]
-            {
-                Col.Id, Col.CompanyId, Col.Kind, Col.UniqueId, Col.LinkedConvention, Col.Reason, Col.OtherReason,
-                Col.EventInfo, Col.Amount, Col.Date, Col.StartDate, Col.EndDate, Col.PersonId, Col.LastName,
-                Col.FirstName, Col.Category, Col.PersonType, Col.PersonIdentifier, Col.Profession, Col.Structure,
-                Col.Address, Col.PersonZip, Col.PersonCity, Col.Status, Col.PublicationDate, Col.CompanyName,
-                Col.Siren, Col.Sector, Col.Parent, Col.CompanyCity, Col.CompanyDepartment, Col.CompanyRegion,
-                Col.CompanyCountry, Col.CompanyZip, Col.Semester, Col.CountryLabel, Col.PersonCountry,
-            })
+            foreach (
+                var column in new[]
+                {
+                    Col.Id,
+                    Col.CompanyId,
+                    Col.Kind,
+                    Col.UniqueId,
+                    Col.LinkedConvention,
+                    Col.Reason,
+                    Col.OtherReason,
+                    Col.EventInfo,
+                    Col.Amount,
+                    Col.Date,
+                    Col.StartDate,
+                    Col.EndDate,
+                    Col.PersonId,
+                    Col.LastName,
+                    Col.FirstName,
+                    Col.Category,
+                    Col.PersonType,
+                    Col.PersonIdentifier,
+                    Col.Profession,
+                    Col.Structure,
+                    Col.Address,
+                    Col.PersonZip,
+                    Col.PersonCity,
+                    Col.Status,
+                    Col.PublicationDate,
+                    Col.CompanyName,
+                    Col.Siren,
+                    Col.Sector,
+                    Col.Parent,
+                    Col.CompanyCity,
+                    Col.CompanyDepartment,
+                    Col.CompanyRegion,
+                    Col.CompanyCountry,
+                    Col.CompanyZip,
+                    Col.Semester,
+                    Col.CountryLabel,
+                    Col.PersonCountry,
+                }
+            )
             {
                 keep[column] = true;
             }
@@ -452,14 +649,31 @@ namespace Adex.Data.Import
                 if (company.Row == currentRow)
                 {
                     entities.Add(company.Id);
-                    companies.Add(new CompanyRow(company.Id, Truncate(Clean(fields[Col.CompanyName]))));
+                    companies.Add(
+                        new CompanyRow(company.Id, Truncate(Clean(fields[Col.CompanyName])))
+                    );
                     AddAttribute(entityAttributes, company.Id, "Référence", companyKey);
                     AddAttribute(entityAttributes, company.Id, "SIREN", fields[Col.Siren]);
-                    AddAttribute(entityAttributes, company.Id, "Secteur d'activité", fields[Col.Sector]);
+                    AddAttribute(
+                        entityAttributes,
+                        company.Id,
+                        "Secteur d'activité",
+                        fields[Col.Sector]
+                    );
                     AddAttribute(entityAttributes, company.Id, "Société mère", fields[Col.Parent]);
                     AddAttribute(entityAttributes, company.Id, "Ville", fields[Col.CompanyCity]);
-                    AddAttribute(entityAttributes, company.Id, "Code postal", fields[Col.CompanyZip]);
-                    AddAttribute(entityAttributes, company.Id, "Département", fields[Col.CompanyDepartment]);
+                    AddAttribute(
+                        entityAttributes,
+                        company.Id,
+                        "Code postal",
+                        fields[Col.CompanyZip]
+                    );
+                    AddAttribute(
+                        entityAttributes,
+                        company.Id,
+                        "Département",
+                        fields[Col.CompanyDepartment]
+                    );
                     AddAttribute(entityAttributes, company.Id, "Région", fields[Col.CompanyRegion]);
                     AddAttribute(entityAttributes, company.Id, "Pays", fields[Col.CompanyCountry]);
                 }
@@ -467,17 +681,48 @@ namespace Adex.Data.Import
                 if (person.Row == currentRow)
                 {
                     entities.Add(person.Id);
-                    persons.Add(new PersonRow(person.Id, Truncate(Clean(fields[Col.LastName])), Truncate(Clean(fields[Col.FirstName]))));
+                    persons.Add(
+                        new PersonRow(
+                            person.Id,
+                            Truncate(Clean(fields[Col.LastName])),
+                            Truncate(Clean(fields[Col.FirstName]))
+                        )
+                    );
                     AddAttribute(entityAttributes, person.Id, "Référence", personKey);
                     AddAttribute(entityAttributes, person.Id, "Catégorie", fields[Col.Category]);
-                    AddAttribute(entityAttributes, person.Id, "Type d'identifiant", fields[Col.PersonType]);
-                    AddAttribute(entityAttributes, person.Id, "Identifiant", fields[Col.PersonIdentifier]);
+                    AddAttribute(
+                        entityAttributes,
+                        person.Id,
+                        "Type d'identifiant",
+                        fields[Col.PersonType]
+                    );
+                    AddAttribute(
+                        entityAttributes,
+                        person.Id,
+                        "Identifiant",
+                        fields[Col.PersonIdentifier]
+                    );
                     AddAttribute(entityAttributes, person.Id, "Profession", fields[Col.Profession]);
-                    AddAttribute(entityAttributes, person.Id, "Structure d'exercice", fields[Col.Structure]);
-                    AddAttribute(entityAttributes, person.Id, "Adresse", fields[Col.Address]?.Replace("==", ", "));
+                    AddAttribute(
+                        entityAttributes,
+                        person.Id,
+                        "Structure d'exercice",
+                        fields[Col.Structure]
+                    );
+                    AddAttribute(
+                        entityAttributes,
+                        person.Id,
+                        "Adresse",
+                        fields[Col.Address]?.Replace("==", ", ")
+                    );
                     AddAttribute(entityAttributes, person.Id, "Code postal", fields[Col.PersonZip]);
                     AddAttribute(entityAttributes, person.Id, "Ville", fields[Col.PersonCity]);
-                    AddAttribute(entityAttributes, person.Id, "Pays", Clean(fields[Col.CountryLabel]) ?? fields[Col.PersonCountry]);
+                    AddAttribute(
+                        entityAttributes,
+                        person.Id,
+                        "Pays",
+                        Clean(fields[Col.CountryLabel]) ?? fields[Col.PersonCountry]
+                    );
                 }
 
                 if (scan.Links[Hash(linkKey)].Row != currentRow)
@@ -488,30 +733,63 @@ namespace Adex.Data.Import
                 var linkId = LinkGuid(currentRow, salt);
                 var linkAttributes = linkSinks[(int)(currentRow % linkSinks.Length)];
                 var amount = ParseAmount(fields[Col.Amount]);
-                var date = SafeTimestamp(fields[Col.Date])
+                var date =
+                    SafeTimestamp(fields[Col.Date])
                     ?? SafeTimestamp(fields[Col.StartDate])
                     ?? SafeTimestamp(fields[Col.PublicationDate])
                     ?? new DateTime(1900, 1, 1);
 
                 entities.Add(linkId);
-                links.Add(new LinkRow(linkId, company.Id, person.Id, Clean(fields[Col.Kind]), date));
-                financialLinks.Add(new FinancialRow(linkId, amount, DeclarationType(fields[Col.Kind])));
+                links.Add(
+                    new LinkRow(linkId, company.Id, person.Id, Clean(fields[Col.Kind]), date)
+                );
+                financialLinks.Add(
+                    new FinancialRow(linkId, amount, DeclarationType(fields[Col.Kind]))
+                );
                 AddAttribute(linkAttributes, linkId, "Référence", fields[Col.Id]);
                 AddAttribute(linkAttributes, linkId, "Statut", fields[Col.Status]);
                 AddAttribute(linkAttributes, linkId, "Motif", fields[Col.Reason]);
                 AddAttribute(linkAttributes, linkId, "Autre motif", fields[Col.OtherReason]);
-                AddAttribute(linkAttributes, linkId, "Information sur l'événement", fields[Col.EventInfo]);
-                AddAttribute(linkAttributes, linkId, "Date de début", Left(fields[Col.StartDate], 10));
+                AddAttribute(
+                    linkAttributes,
+                    linkId,
+                    "Information sur l'événement",
+                    fields[Col.EventInfo]
+                );
+                AddAttribute(
+                    linkAttributes,
+                    linkId,
+                    "Date de début",
+                    Left(fields[Col.StartDate], 10)
+                );
                 AddAttribute(linkAttributes, linkId, "Date de fin", Left(fields[Col.EndDate], 10));
-                AddAttribute(linkAttributes, linkId, "Date de publication", Left(fields[Col.PublicationDate], 10));
-                AddAttribute(linkAttributes, linkId, "Convention liée", fields[Col.LinkedConvention]);
+                AddAttribute(
+                    linkAttributes,
+                    linkId,
+                    "Date de publication",
+                    Left(fields[Col.PublicationDate], 10)
+                );
+                AddAttribute(
+                    linkAttributes,
+                    linkId,
+                    "Convention liée",
+                    fields[Col.LinkedConvention]
+                );
                 AddAttribute(linkAttributes, linkId, "Identifiant unique", fields[Col.UniqueId]);
                 AddAttribute(linkAttributes, linkId, "Semestre", fields[Col.Semester]);
 
-                ref var from = ref CollectionsMarshal.GetValueRefOrAddDefault(totals, company.Id, out _);
+                ref var from = ref CollectionsMarshal.GetValueRefOrAddDefault(
+                    totals,
+                    company.Id,
+                    out _
+                );
                 from.Count++;
                 from.Outgoing += amount;
-                ref var to = ref CollectionsMarshal.GetValueRefOrAddDefault(totals, person.Id, out _);
+                ref var to = ref CollectionsMarshal.GetValueRefOrAddDefault(
+                    totals,
+                    person.Id,
+                    out _
+                );
                 to.Count++;
                 to.Incoming += amount;
             }
@@ -554,7 +832,12 @@ namespace Adex.Data.Import
                         await ExecuteAsync(
                             dataSource,
                             $"Création de l'index {index.Name}",
-                            new[] { "SET maintenance_work_mem = '1GB'", "SET max_parallel_maintenance_workers = 4", index.Sql },
+                            new[]
+                            {
+                                "SET maintenance_work_mem = '1GB'",
+                                "SET max_parallel_maintenance_workers = 4",
+                                index.Sql,
+                            },
                             progress,
                             cancellationToken
                         );
@@ -572,7 +855,8 @@ namespace Adex.Data.Import
                 dataSource,
                 "Création des clés étrangères",
                 ForeignKeys.Select(x =>
-                    $"""ALTER TABLE "{x.Table}" ADD CONSTRAINT "{x.Name}" FOREIGN KEY ("{x.Column}") REFERENCES "{x.Principal}" ("Id") ON DELETE CASCADE NOT VALID"""),
+                    $"""ALTER TABLE "{x.Table}" ADD CONSTRAINT "{x.Name}" FOREIGN KEY ("{x.Column}") REFERENCES "{x.Principal}" ("Id") ON DELETE CASCADE NOT VALID"""
+                ),
                 progress,
                 cancellationToken
             );
@@ -618,10 +902,21 @@ namespace Adex.Data.Import
                 await command.ExecuteNonQueryAsync(cancellationToken);
             }
 
-            logger.LogInformation("Import: {Label} terminé en {Elapsed} (total {Total})", label, watch.Elapsed, _total.Elapsed);
+            logger.LogInformation(
+                "Import: {Label} terminé en {Elapsed} (total {Total})",
+                label,
+                watch.Elapsed,
+                _total.Elapsed
+            );
         }
 
-        private void Report(IProgress<string> progress, string label, FileStream file, TimeSpan elapsed, long rows)
+        private void Report(
+            IProgress<string> progress,
+            string label,
+            FileStream file,
+            TimeSpan elapsed,
+            long rows
+        )
         {
             var done = file.Position;
             var percent = done * 100 / Math.Max(1, file.Length);
@@ -656,7 +951,14 @@ namespace Adex.Data.Import
 
         private static FileStream OpenFile(string path)
         {
-            return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 1 << 20, FileOptions.SequentialScan);
+            return new FileStream(
+                path,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                1 << 20,
+                FileOptions.SequentialScan
+            );
         }
 
         private static void ReadHeader(CsvRecordReader reader)
@@ -687,7 +989,12 @@ namespace Adex.Data.Import
             }
         }
 
-        private static void AddAttribute(AttributeSink sink, Guid entityId, string name, string value)
+        private static void AddAttribute(
+            AttributeSink sink,
+            Guid entityId,
+            string name,
+            string value
+        )
         {
             var cleaned = Clean(value);
             if (cleaned is not null)
@@ -792,7 +1099,13 @@ namespace Adex.Data.Import
 
             var text = value.Length > 19 ? value[..19] : value;
             text = text.Replace('T', ' ');
-            return DateTime.TryParseExact(text, DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
+            return DateTime.TryParseExact(
+                text,
+                DateFormats,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var date
+            )
                 ? date
                 : null;
         }
@@ -819,8 +1132,14 @@ namespace Adex.Data.Import
                 }
             }
 
-            return text.Length > start
-                && decimal.TryParse(text, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var amount)
+            return
+                text.Length > start
+                && decimal.TryParse(
+                    text,
+                    NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                    CultureInfo.InvariantCulture,
+                    out var amount
+                )
                 ? amount
                 : 0;
         }
@@ -837,5 +1156,4 @@ namespace Adex.Data.Import
             };
         }
     }
-
 }

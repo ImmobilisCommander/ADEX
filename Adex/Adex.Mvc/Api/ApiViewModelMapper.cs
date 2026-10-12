@@ -15,44 +15,60 @@ namespace Adex.Mvc.Api
                 EntityCount = source.EntityCount,
                 FinancialLinkCount = source.FinancialLinkCount,
                 TotalAmount = source.TotalAmount,
-                EntityTypes = source.EntityTypes.Select(item => new EntityTypeCountViewModel
-                {
-                    Type = item.Type,
-                    Count = item.Count,
-                }).ToList(),
-                FinancialLinkTypes = source.FinancialLinkTypes.Select(item => new FinancialLinkTypeViewModel
-                {
-                    Type = item.Type,
-                    Count = item.Count,
-                    Amount = item.Amount,
-                }).ToList(),
-                TopContributors = source.TopContributors.Select(item => item.ToViewModel()).ToList(),
-                TopBeneficiaries = source.TopBeneficiaries.Select(item => item.ToViewModel()).ToList(),
-                MonthlyDeclarations = source.MonthlyDeclarations.Select(item => new MonthlyDeclarationViewModel
-                {
-                    Year = item.Year,
-                    Month = item.Month,
-                    Count = item.Count,
-                }).ToList(),
-                Concentration = source.Concentration.Select(item => new ConcentrationCurveViewModel
-                {
-                    Label = item.Label,
-                    Count = item.Count,
-                    Total = item.Total,
-                    TopOnePercentShare = item.TopOnePercentShare,
-                    TopTenShare = item.TopTenShare,
-                    Points = item.Points.Select(point => new ConcentrationPointViewModel
+                EntityTypes = source
+                    .EntityTypes.Select(item => new EntityTypeCountViewModel
                     {
-                        PopulationPercent = point.PopulationPercent,
-                        AmountPercent = point.AmountPercent,
-                    }).ToList(),
-                }).ToList(),
-                AmountHistogram = source.AmountHistogram.Select(item => new AmountHistogramBinViewModel
-                {
-                    LowerBound = item.LowerBound,
-                    UpperBound = item.UpperBound,
-                    Count = item.Count,
-                }).ToList(),
+                        Type = item.Type,
+                        Count = item.Count,
+                    })
+                    .ToList(),
+                FinancialLinkTypes = source
+                    .FinancialLinkTypes.Select(item => new FinancialLinkTypeViewModel
+                    {
+                        Type = item.Type,
+                        Count = item.Count,
+                        Amount = item.Amount,
+                    })
+                    .ToList(),
+                TopContributors = source
+                    .TopContributors.Select(item => item.ToViewModel())
+                    .ToList(),
+                TopBeneficiaries = source
+                    .TopBeneficiaries.Select(item => item.ToViewModel())
+                    .ToList(),
+                MonthlyDeclarations = source
+                    .MonthlyDeclarations.Select(item => new MonthlyDeclarationViewModel
+                    {
+                        Year = item.Year,
+                        Month = item.Month,
+                        Count = item.Count,
+                    })
+                    .ToList(),
+                Concentration = source
+                    .Concentration.Select(item => new ConcentrationCurveViewModel
+                    {
+                        Label = item.Label,
+                        Count = item.Count,
+                        Total = item.Total,
+                        TopOnePercentShare = item.TopOnePercentShare,
+                        TopTenShare = item.TopTenShare,
+                        Points = item
+                            .Points.Select(point => new ConcentrationPointViewModel
+                            {
+                                PopulationPercent = point.PopulationPercent,
+                                AmountPercent = point.AmountPercent,
+                            })
+                            .ToList(),
+                    })
+                    .ToList(),
+                AmountHistogram = source
+                    .AmountHistogram.Select(item => new AmountHistogramBinViewModel
+                    {
+                        LowerBound = item.LowerBound,
+                        UpperBound = item.UpperBound,
+                        Count = item.Count,
+                    })
+                    .ToList(),
             };
         }
 
@@ -85,31 +101,37 @@ namespace Adex.Mvc.Api
                 Descending = source.Descending,
                 PageSize = source.PageSize,
                 PageCount = source.PageCount,
-                YearlyActivity = source.YearlyActivity.Select(item => new EntityYearActivityViewModel
-                {
-                    Year = item.Year,
-                    Count = item.Count,
-                    Amount = item.Amount,
-                }).ToList(),
-                TypeBreakdown = source.TypeBreakdown.Select(item => new EntityTypeBreakdownViewModel
-                {
-                    Type = item.Type,
-                    Count = item.Count,
-                    Amount = item.Amount,
-                }).ToList(),
+                YearlyActivity = source
+                    .YearlyActivity.Select(item => new EntityYearActivityViewModel
+                    {
+                        Year = item.Year,
+                        Count = item.Count,
+                        Amount = item.Amount,
+                    })
+                    .ToList(),
+                TypeBreakdown = source
+                    .TypeBreakdown.Select(item => new EntityTypeBreakdownViewModel
+                    {
+                        Type = item.Type,
+                        Count = item.Count,
+                        Amount = item.Amount,
+                    })
+                    .ToList(),
                 Attributes = source.Attributes.Select(item => item.ToViewModel()).ToList(),
-                FinancialLinks = source.FinancialLinks.Select(item => new FinancialLinkViewModel
-                {
-                    Id = item.Id,
-                    CounterpartyId = item.CounterpartyId,
-                    CounterpartyName = item.CounterpartyName,
-                    DeclarationType = item.DeclarationType,
-                    Kind = item.Kind,
-                    Date = item.Date,
-                    Amount = item.Amount,
-                    Outgoing = item.Outgoing,
-                    Justification = item.Justification.Select(j => j.ToViewModel()).ToList(),
-                }).ToList(),
+                FinancialLinks = source
+                    .FinancialLinks.Select(item => new FinancialLinkViewModel
+                    {
+                        Id = item.Id,
+                        CounterpartyId = item.CounterpartyId,
+                        CounterpartyName = item.CounterpartyName,
+                        DeclarationType = item.DeclarationType,
+                        Kind = item.Kind,
+                        Date = item.Date,
+                        Amount = item.Amount,
+                        Outgoing = item.Outgoing,
+                        Justification = item.Justification.Select(j => j.ToViewModel()).ToList(),
+                    })
+                    .ToList(),
             };
         }
 
@@ -126,11 +148,7 @@ namespace Adex.Mvc.Api
 
         public static EntityAttributeViewModel ToViewModel(this EntityAttributeDetails source)
         {
-            return new EntityAttributeViewModel
-            {
-                Name = source.Name,
-                Value = source.Value,
-            };
+            return new EntityAttributeViewModel { Name = source.Name, Value = source.Value };
         }
     }
 }

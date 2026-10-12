@@ -1,17 +1,17 @@
-using System.Diagnostics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Adex.Mvc.Hosting;
 using Adex.Mvc.Api;
 using Adex.Mvc.Entities;
 using Adex.Mvc.Home;
+using Adex.Mvc.Hosting;
 using Adex.Mvc.Shared;
 using Adex.WebApi.Client;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
 
 namespace Adex.Mvc.Home
 {
@@ -60,10 +60,15 @@ namespace Adex.Mvc.Home
             query ??= string.Empty;
             ViewData["Title"] = "Résultats de recherche";
             var results = await apiClient.SearchEntitiesAsync(query, cancellationToken);
-            List<EntitySearchResultViewModel> viewModels =
-                results.Select(r => r.ToViewModel()).ToList();
+            List<EntitySearchResultViewModel> viewModels = results
+                .Select(r => r.ToViewModel())
+                .ToList();
 
-            if (Request.Headers.Accept.ToString().Contains("application/json", System.StringComparison.OrdinalIgnoreCase))
+            if (
+                Request
+                    .Headers.Accept.ToString()
+                    .Contains("application/json", System.StringComparison.OrdinalIgnoreCase)
+            )
             {
                 return Ok(viewModels);
             }

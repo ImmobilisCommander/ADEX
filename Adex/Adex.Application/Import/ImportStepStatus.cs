@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Adex.Application.Import
 {
-
     public class ImportStepStatus
     {
         public string Name { get; set; } = string.Empty;

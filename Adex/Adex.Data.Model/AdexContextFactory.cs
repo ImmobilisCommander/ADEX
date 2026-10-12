@@ -8,7 +8,8 @@ namespace Adex.Data.Model
     {
         public AdexContext CreateDbContext(string[] args)
         {
-            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Adex")
+            var connectionString =
+                Environment.GetEnvironmentVariable("ConnectionStrings__Adex")
                 ?? throw new InvalidOperationException(
                     "Set ConnectionStrings__Adex before creating or applying Adex migrations."
                 );

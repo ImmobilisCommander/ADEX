@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Adex.Application.Import
 {
-
     public class ImportStatus
     {
         public ImportState State { get; set; } = ImportState.Idle;

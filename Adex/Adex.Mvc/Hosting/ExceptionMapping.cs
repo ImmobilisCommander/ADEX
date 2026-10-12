@@ -1,8 +1,7 @@
-using Microsoft.AspNetCore.Http;
-
 using System;
 using System.Net;
 using System.Net.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace Adex.Mvc.Hosting
 {

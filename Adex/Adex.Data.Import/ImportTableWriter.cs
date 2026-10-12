@@ -14,7 +14,10 @@ namespace Adex.Data.Import
     {
         private const int BatchSize = 1024;
 
-        private readonly Channel<(T[] Items, int Count)> _channel = Channel.CreateBounded<(T[], int)>(
+        private readonly Channel<(T[] Items, int Count)> _channel = Channel.CreateBounded<(
+            T[],
+            int
+        )>(
             new BoundedChannelOptions(16)
             {
                 SingleReader = true,
@@ -81,10 +84,16 @@ namespace Adex.Data.Import
             _channel.Writer.WriteAsync(full, _token).AsTask().GetAwaiter().GetResult();
         }
 
-        private async Task RunAsync(NpgsqlDataSource dataSource, string copySql, Action<NpgsqlBinaryImporter, T> write)
+        private async Task RunAsync(
+            NpgsqlDataSource dataSource,
+            string copySql,
+            Action<NpgsqlBinaryImporter, T> write
+        )
         {
             await using var connection = await dataSource.OpenConnectionAsync(_token);
-            await using (var command = new NpgsqlCommand("SET synchronous_commit = off", connection))
+            await using (
+                var command = new NpgsqlCommand("SET synchronous_commit = off", connection)
+            )
             {
                 await command.ExecuteNonQueryAsync(_token);
             }

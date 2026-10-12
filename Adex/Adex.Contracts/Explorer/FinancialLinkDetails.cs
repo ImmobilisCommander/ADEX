@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace Adex.Contracts.Explorer
 {
-
     public sealed class FinancialLinkDetails
     {
         public Guid Id { get; set; }

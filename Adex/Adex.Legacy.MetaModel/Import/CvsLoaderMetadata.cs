@@ -3,15 +3,6 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using Adex.Legacy.MetaModel.Graph;
-using Adex.Data.MetaModel;
-
-using CsvHelper.Configuration;
-
-using Dapper;
-
-using Npgsql;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,10 +11,19 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Data.MetaModel;
+using Adex.Legacy.MetaModel.Graph;
+using CsvHelper.Configuration;
+using Dapper;
+using Npgsql;
 
 namespace Adex.Legacy.MetaModel.Import
 {
-    public class CvsLoaderMetadata(string dbConnectionString) : IDisposable, ICsvLoader, ILinkSearchService, IMetadataLookupService
+    public class CvsLoaderMetadata(string dbConnectionString)
+        : IDisposable,
+            ICsvLoader,
+            ILinkSearchService,
+            IMetadataLookupService
     {
         public event EventHandler<MessageEventArgs> OnMessage;
 
@@ -35,11 +35,11 @@ namespace Adex.Legacy.MetaModel.Import
         private bool _disposedValue;
 
         private readonly string _dbConnectionString = string.IsNullOrWhiteSpace(dbConnectionString)
-                ? throw new ArgumentException(
-                    "A metadata database connection string is required.",
-                    nameof(dbConnectionString)
-                )
-                : dbConnectionString;
+            ? throw new ArgumentException(
+                "A metadata database connection string is required.",
+                nameof(dbConnectionString)
+            )
+            : dbConnectionString;
 
         private CsvConfiguration CreateConfiguration()
         {
@@ -85,8 +85,7 @@ namespace Adex.Legacy.MetaModel.Import
                             cancellationToken: cancellationToken
                         )
                     )
-                )
-                    .ToDictionary(x => x.Reference);
+                ).ToDictionary(x => x.Reference);
                 _existingMembers = (
                     await con.QueryAsync<Member>(
                         new CommandDefinition(
@@ -94,8 +93,7 @@ namespace Adex.Legacy.MetaModel.Import
                             cancellationToken: cancellationToken
                         )
                     )
-                )
-                    .ToDictionary(x => x.Name);
+                ).ToDictionary(x => x.Name);
             }
 
             OnMessage?.Invoke(this, new MessageEventArgs { Message = $"Reference data loaded" });
@@ -450,7 +448,8 @@ namespace Adex.Legacy.MetaModel.Import
                                 }
                             }
                         }
-                        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                        catch (OperationCanceledException)
+                            when (cancellationToken.IsCancellationRequested)
                         {
                             throw;
                         }

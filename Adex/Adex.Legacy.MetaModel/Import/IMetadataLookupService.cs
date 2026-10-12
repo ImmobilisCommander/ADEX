@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Adex.Legacy.MetaModel.Import
 {
-
     public interface IMetadataLookupService
     {
         Task<Dictionary<string, string>> SearchAsync(

@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Adex.Mvc.Home
 {
-
     public sealed class DashboardViewModel
     {
         public string ErrorMessage { get; set; }
@@ -34,11 +33,9 @@ namespace Adex.Mvc.Home
 
         public DashboardMonthlyChartViewModel MonthlyChart => new(MonthlyDeclarations);
 
-        public AmountHistogramChartViewModel AmountHistogramChart =>
-            new(AmountHistogram);
+        public AmountHistogramChartViewModel AmountHistogramChart => new(AmountHistogram);
 
-        public ConcentrationChartViewModel ConcentrationChart =>
-            new(Concentration);
+        public ConcentrationChartViewModel ConcentrationChart => new(Concentration);
 
         public string EntityCountDisplay =>
             EntityCount.ToString("N0", CultureInfo.GetCultureInfo("fr-FR"));
@@ -74,17 +71,9 @@ namespace Adex.Mvc.Home
                 .ToList();
 
         public RankingModel TopBeneficiariesRanking =>
-            new(
-                "top-beneficiaries",
-                "Top 10 des bénéficiaires par montant reçu",
-                TopBeneficiaries
-            );
+            new("top-beneficiaries", "Top 10 des bénéficiaires par montant reçu", TopBeneficiaries);
 
         public RankingModel TopContributorsRanking =>
-            new(
-                "top-contributors",
-                "Top 10 des contributeurs par montant versé",
-                TopContributors
-            );
+            new("top-contributors", "Top 10 des contributeurs par montant versé", TopContributors);
     }
 }

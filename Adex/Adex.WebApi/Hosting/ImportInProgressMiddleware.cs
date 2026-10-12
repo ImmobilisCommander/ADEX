@@ -1,9 +1,7 @@
-using Adex.Application.Import;
-
-using Microsoft.AspNetCore.Http;
-
 using System;
 using System.Threading.Tasks;
+using Adex.Application.Import;
+using Microsoft.AspNetCore.Http;
 
 namespace Adex.WebApi.Hosting
 {
@@ -12,8 +10,14 @@ namespace Adex.WebApi.Hosting
         public async Task InvokeAsync(HttpContext context, ImportJobService importJob)
         {
             if (
-                !context.Request.Path.StartsWithSegments("/api/import", StringComparison.OrdinalIgnoreCase)
-                && !context.Request.Path.StartsWithSegments("/swagger", StringComparison.OrdinalIgnoreCase)
+                !context.Request.Path.StartsWithSegments(
+                    "/api/import",
+                    StringComparison.OrdinalIgnoreCase
+                )
+                && !context.Request.Path.StartsWithSegments(
+                    "/swagger",
+                    StringComparison.OrdinalIgnoreCase
+                )
                 && importJob.IsRunning
             )
             {

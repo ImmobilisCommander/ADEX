@@ -8,7 +8,8 @@ namespace Adex.Contracts.Csv
 
         public IReadOnlyList<string> FilterableColumns { get; init; } = new List<string>();
 
-        public IReadOnlyList<IReadOnlyList<string>> Rows { get; init; } = new List<IReadOnlyList<string>>();
+        public IReadOnlyList<IReadOnlyList<string>> Rows { get; init; } =
+            new List<IReadOnlyList<string>>();
 
         public bool HasNextPage { get; init; }
     }

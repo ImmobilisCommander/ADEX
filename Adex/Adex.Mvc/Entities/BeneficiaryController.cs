@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
-using Adex.WebApi.Client;
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.WebApi.Client;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.Mvc.Entities
 {

@@ -21,9 +21,9 @@ namespace Adex.Legacy.MetaModel.Import
     /// </remarks>
     /// <param name="sr">Stream of the file</param>
     /// <param name="inf">Culture of the file</param>
-    internal class CustomCsvReader(StreamReader sr, CsvConfiguration configuration) : CsvReader(sr, configuration)
+    internal class CustomCsvReader(StreamReader sr, CsvConfiguration configuration)
+        : CsvReader(sr, configuration)
     {
-
         /// <summary>
         /// Get the filed by index if index greater than or equal to 0
         /// </summary>

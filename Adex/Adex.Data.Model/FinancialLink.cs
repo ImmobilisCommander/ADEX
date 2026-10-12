@@ -3,8 +3,8 @@
 //   <author>Julien LEFEVRE</author>
 // </copyright>
 
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Adex.Data.Model
 {

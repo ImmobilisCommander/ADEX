@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Hosting;
-
 using Serilog;
 
 namespace Adex.Mvc.Hosting

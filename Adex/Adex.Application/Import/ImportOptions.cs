@@ -6,10 +6,16 @@ namespace Adex.Application.Import
     {
         public const string SectionName = "Import";
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Le paramètre « Import:DataDirectory » est obligatoire.")]
+        [Required(
+            AllowEmptyStrings = false,
+            ErrorMessage = "Le paramètre « Import:DataDirectory » est obligatoire."
+        )]
         public string DataDirectory { get; set; } = string.Empty;
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Le paramètre « Import:FileName » est obligatoire.")]
+        [Required(
+            AllowEmptyStrings = false,
+            ErrorMessage = "Le paramètre « Import:FileName » est obligatoire."
+        )]
         public string FileName { get; set; } = "declarations.csv";
 
         // Une clé vide désactive volontairement l'API d'import.

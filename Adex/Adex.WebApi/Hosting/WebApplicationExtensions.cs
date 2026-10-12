@@ -1,19 +1,15 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Adex.Data.Model;
 using Adex.WebApi.Dashboard;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
 using Npgsql;
-
 using Serilog;
-
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Adex.WebApi.Hosting
 {
@@ -46,8 +42,8 @@ namespace Adex.WebApi.Hosting
             CancellationToken cancellationToken
         )
         {
-            await using var migrationContext = app.Services
-                .GetRequiredService<IDbContextFactory<AdexContext>>()
+            await using var migrationContext = app
+                .Services.GetRequiredService<IDbContextFactory<AdexContext>>()
                 .CreateDbContext();
             migrationContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
             await migrationContext.Database.MigrateAsync(cancellationToken);

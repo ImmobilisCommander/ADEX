@@ -28,7 +28,10 @@ namespace Adex.WebApi.Client
             CancellationToken cancellationToken = default
         );
 
-        Task<JsonElement> GetEntityJsonAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<JsonElement> GetEntityJsonAsync(
+            Guid id,
+            CancellationToken cancellationToken = default
+        );
 
         Task<CsvPage> GetCsvPageAsync(
             int page,

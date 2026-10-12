@@ -20,7 +20,14 @@ namespace Adex.Mvc.Entities
             [FromQuery] bool descending = true
         )
         {
-            var entity = await apiClient.GetEntityAsync(id, page, pageSize, sort ?? "date", descending, cancellationToken);
+            var entity = await apiClient.GetEntityAsync(
+                id,
+                page,
+                pageSize,
+                sort ?? "date",
+                descending,
+                cancellationToken
+            );
             if (entity is null)
             {
                 ViewData["Title"] = "Entité introuvable";

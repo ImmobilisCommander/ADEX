@@ -9,7 +9,9 @@ namespace Adex.Application.Csv
     /// </summary>
     public static class CsvFilterableColumns
     {
-        public static readonly IReadOnlySet<string> Names = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        public static readonly IReadOnlySet<string> Names = new HashSet<string>(
+            StringComparer.OrdinalIgnoreCase
+        )
         {
             "adresse",
             "autre_motif",

@@ -4,7 +4,6 @@ using System.Globalization;
 
 namespace Adex.Mvc.Entities
 {
-
     public sealed class EntitySearchResultViewModel
     {
         public Guid Id { get; set; }
@@ -21,7 +20,8 @@ namespace Adex.Mvc.Entities
 
         public Dictionary<string, string> Attributes { get; set; } = new();
 
-        public string LinkCountDisplay => LinkCount.ToString("N0", CultureInfo.GetCultureInfo("fr-FR"));
+        public string LinkCountDisplay =>
+            LinkCount.ToString("N0", CultureInfo.GetCultureInfo("fr-FR"));
 
         public string AmountDisplay => Amount.ToString("C0", CultureInfo.GetCultureInfo("fr-FR"));
 

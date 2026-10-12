@@ -1,10 +1,9 @@
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.Mvc.Hosting
 {
@@ -35,10 +34,9 @@ namespace Adex.Mvc.Hosting
             var (status, message) = exception.Map();
             httpContext.Response.StatusCode = status;
             if (
-                !httpContext.Request.Headers.Accept.ToString().Contains(
-                    "application/json",
-                    StringComparison.OrdinalIgnoreCase
-                )
+                !httpContext
+                    .Request.Headers.Accept.ToString()
+                    .Contains("application/json", StringComparison.OrdinalIgnoreCase)
             )
             {
                 return false;

@@ -1,15 +1,13 @@
-using Adex.Application.Import;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Application.Import;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Adex.Application.Import
 {
@@ -19,7 +17,7 @@ namespace Adex.Application.Import
         IHostEnvironment environment,
         IOptions<ImportOptions> options,
         ILogger<ImportJobService> logger
-        )
+    )
     {
         private const string StepName = "Declarations";
         private readonly ImportOptions _options = options.Value;
@@ -112,8 +110,8 @@ namespace Adex.Application.Import
                 logger.LogInformation("Full import of {Path} started", path);
 
                 await using var scope = scopeFactory.CreateAsyncScope();
-                var result = await scope.ServiceProvider
-                    .GetRequiredService<IDeclarationsImporter>()
+                var result = await scope
+                    .ServiceProvider.GetRequiredService<IDeclarationsImporter>()
                     .ImportAsync(
                         path,
                         new Progress<string>(message =>
@@ -128,7 +126,6 @@ namespace Adex.Application.Import
                         cancellationToken
                     );
 
-
                 using (Acquire())
                 {
                     step.ErrorCount = (int)Math.Min(result.SkippedRows, int.MaxValue);
@@ -136,9 +133,10 @@ namespace Adex.Application.Import
                         $"{result.Rows} lignes lues, {result.Companies} entreprises, "
                         + $"{result.Beneficiaries} bénéficiaires, {result.Links} liens financiers, "
                         + $"{result.SkippedRows} lignes ignorées";
-                    step.State = step.ErrorCount == 0
-                        ? ImportState.Completed
-                        : ImportState.CompletedWithErrors;
+                    step.State =
+                        step.ErrorCount == 0
+                            ? ImportState.Completed
+                            : ImportState.CompletedWithErrors;
                     run.State = step.State;
                 }
 

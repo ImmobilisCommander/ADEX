@@ -35,7 +35,8 @@ namespace Adex.Mvc.Entities
                 var slot = plotWidth / years.Count;
                 var barWidth = Math.Min(Math.Max(slot * 0.7, 2), 40);
                 var labelEvery = Math.Max(1, (int)Math.Ceiling(years.Count / 8d));
-                YearlyChartLabel = $"Montants déclarés par année, de {years[0].Year} à {years[^1].Year}";
+                YearlyChartLabel =
+                    $"Montants déclarés par année, de {years[0].Year} à {years[^1].Year}";
                 YearTicks = Enumerable
                     .Range(0, tickCount + 1)
                     .Select(tick =>
@@ -50,20 +51,27 @@ namespace Adex.Mvc.Entities
                     })
                     .ToList();
                 YearBars = years
-                    .Select((item, index) =>
-                    {
-                        var x = Left + slot * index + (slot - barWidth) / 2;
-                        var height = plotHeight * (double)Math.Max(item.Amount, 0m) / axisMax;
-                        return (
-                            X: x.ToString("0.##", invariantCulture),
-                            LabelX: (Left + slot * index + slot / 2).ToString("0.##", invariantCulture),
-                            Y: (Top + plotHeight - height).ToString("0.##", invariantCulture),
-                            Width: barWidth.ToString("0.##", invariantCulture),
-                            Height: height.ToString("0.##", invariantCulture),
-                            Title: $"{item.Year} : {item.Amount.ToString("C0", frenchCulture)} · {item.Count.ToString("N0", frenchCulture)} liens",
-                            Year: index % labelEvery == 0 ? item.Year.ToString(invariantCulture) : null
-                        );
-                    })
+                    .Select(
+                        (item, index) =>
+                        {
+                            var x = Left + slot * index + (slot - barWidth) / 2;
+                            var height = plotHeight * (double)Math.Max(item.Amount, 0m) / axisMax;
+                            return (
+                                X: x.ToString("0.##", invariantCulture),
+                                LabelX: (Left + slot * index + slot / 2).ToString(
+                                    "0.##",
+                                    invariantCulture
+                                ),
+                                Y: (Top + plotHeight - height).ToString("0.##", invariantCulture),
+                                Width: barWidth.ToString("0.##", invariantCulture),
+                                Height: height.ToString("0.##", invariantCulture),
+                                Title: $"{item.Year} : {item.Amount.ToString("C0", frenchCulture)} · {item.Count.ToString("N0", frenchCulture)} liens",
+                                Year: index % labelEvery == 0
+                                    ? item.Year.ToString(invariantCulture)
+                                    : null
+                            );
+                        }
+                    )
                     .ToList();
             }
 
@@ -99,10 +107,25 @@ namespace Adex.Mvc.Entities
         public IReadOnlyList<(string Y, string LabelY, string Value)> YearTicks { get; } =
             Array.Empty<(string, string, string)>();
 
-        public IReadOnlyList<(string X, string LabelX, string Y, string Width, string Height, string Title, string Year)> YearBars { get; } =
+        public IReadOnlyList<(
+            string X,
+            string LabelX,
+            string Y,
+            string Width,
+            string Height,
+            string Title,
+            string Year
+        )> YearBars { get; } =
             Array.Empty<(string, string, string, string, string, string, string)>();
 
-        public IReadOnlyList<(EntityTypeBreakdownViewModel Item, string CssClass, string CountShare, string AmountShare, string CountTitle, string AmountTitle)> TypeBreakdown { get; } =
+        public IReadOnlyList<(
+            EntityTypeBreakdownViewModel Item,
+            string CssClass,
+            string CountShare,
+            string AmountShare,
+            string CountTitle,
+            string AmountTitle
+        )> TypeBreakdown { get; } =
             Array.Empty<(EntityTypeBreakdownViewModel, string, string, string, string, string)>();
 
         public string YearlyChartViewBox { get; } = $"0 0 {ChartWidth} {ChartHeight}";
@@ -111,10 +134,8 @@ namespace Adex.Mvc.Entities
             total <= 0 ? "0" : (value * 100d / total).ToString("0.##", culture);
 
         private static string Compact(double value, CultureInfo culture) =>
-            value >= 1_000_000d
-                ? (value / 1_000_000d).ToString("0.##", culture) + " M€"
-                : value >= 1_000d
-                    ? (value / 1_000d).ToString("0.##", culture) + " k€"
-                    : value.ToString("0", culture) + " €";
+            value >= 1_000_000d ? (value / 1_000_000d).ToString("0.##", culture) + " M€"
+            : value >= 1_000d ? (value / 1_000d).ToString("0.##", culture) + " k€"
+            : value.ToString("0", culture) + " €";
     }
 }

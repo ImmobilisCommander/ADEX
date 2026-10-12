@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Adex.Mvc.Entities
 {
-
     public sealed class FinancialLinkViewModel
     {
         public Guid Id { get; set; }
@@ -28,8 +27,7 @@ namespace Adex.Mvc.Entities
 
         public bool HasJustification => Justification.Count > 0;
 
-        public string Motif =>
-            Justification.FirstOrDefault(item => item.Name == "Motif")?.Value;
+        public string Motif => Justification.FirstOrDefault(item => item.Name == "Motif")?.Value;
 
         public string MotifDisplay => string.IsNullOrWhiteSpace(Motif) ? "—" : Motif;
 
@@ -37,11 +35,9 @@ namespace Adex.Mvc.Entities
 
         public string KindDisplay => string.IsNullOrWhiteSpace(Kind) ? "—" : Kind;
 
-        public string DateDisplay =>
-            Date.ToString("d", CultureInfo.GetCultureInfo("fr-FR"));
+        public string DateDisplay => Date.ToString("d", CultureInfo.GetCultureInfo("fr-FR"));
 
-        public string AmountDisplay =>
-            Amount.ToString("C0", CultureInfo.GetCultureInfo("fr-FR"));
+        public string AmountDisplay => Amount.ToString("C0", CultureInfo.GetCultureInfo("fr-FR"));
 
         public string DateSortValue => Date.Ticks.ToString(CultureInfo.InvariantCulture);
 

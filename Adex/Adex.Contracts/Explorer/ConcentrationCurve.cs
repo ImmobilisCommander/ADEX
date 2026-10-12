@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Adex.Contracts.Explorer
 {
-
     public sealed class ConcentrationCurve
     {
         public string Label { get; set; } = string.Empty;
@@ -18,5 +17,4 @@ namespace Adex.Contracts.Explorer
 
         public List<ConcentrationPoint> Points { get; set; } = new();
     }
-
 }

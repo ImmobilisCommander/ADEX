@@ -29,7 +29,7 @@ namespace Adex.Mvc.Home
                                 " ",
                                 new[]
                                 {
-                                    $"{X(0).ToString("0.##", invariantCulture)},{Y(0).ToString("0.##", invariantCulture)}"
+                                    $"{X(0).ToString("0.##", invariantCulture)},{Y(0).ToString("0.##", invariantCulture)}",
                                 }.Concat(
                                     curve.Points.Select(point =>
                                         $"{X(point.PopulationPercent).ToString("0.##", invariantCulture)},{Y(point.AmountPercent).ToString("0.##", invariantCulture)}"
@@ -51,8 +51,11 @@ namespace Adex.Mvc.Home
                 .ToList();
         }
 
-        public IReadOnlyList<(ConcentrationCurveViewModel Curve, string CssClass, string Points)> Curves { get; } =
-            Array.Empty<(ConcentrationCurveViewModel, string, string)>();
+        public IReadOnlyList<(
+            ConcentrationCurveViewModel Curve,
+            string CssClass,
+            string Points
+        )> Curves { get; } = Array.Empty<(ConcentrationCurveViewModel, string, string)>();
 
         public IReadOnlyList<(string Label, string X, string Y, string AxisY)> Ticks { get; } =
             Array.Empty<(string, string, string, string)>();

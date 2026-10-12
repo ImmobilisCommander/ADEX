@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Adex.Mvc.Entities
 {
-
     public sealed class EntityYearActivityViewModel
     {
         public int Year { get; set; }

@@ -1,9 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Data.ReadModel.Explorer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Adex.Data.ReadModel.Explorer;
 
 namespace Adex.WebApi.Dashboard
 {
@@ -19,13 +19,13 @@ namespace Adex.WebApi.Dashboard
         )
         {
             await using var scope = app.Services.CreateAsyncScope();
-            var logger = scope.ServiceProvider
-                .GetRequiredService<ILoggerFactory>()
+            var logger = scope
+                .ServiceProvider.GetRequiredService<ILoggerFactory>()
                 .CreateLogger(typeof(DashboardStartupExtensions));
 
             logger.LogInformation("Checking the dashboard snapshot");
-            await scope.ServiceProvider
-                .GetRequiredService<DataExplorerService>()
+            await scope
+                .ServiceProvider.GetRequiredService<DataExplorerService>()
                 .EnsureDashboardAsync(cancellationToken);
             logger.LogInformation("Dashboard snapshot is up to date");
         }

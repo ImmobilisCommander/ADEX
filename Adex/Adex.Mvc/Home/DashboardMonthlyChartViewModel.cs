@@ -53,20 +53,22 @@ namespace Adex.Mvc.Home
                 })
                 .ToList();
             Bars = months
-                .Select((month, index) =>
-                {
-                    var x = Left + slot * index + (slot - barWidth) / 2;
-                    var height = axisMax == 0 ? 0 : plotHeight * month.Count / axisMax;
-                    return (
-                        X: x.ToString("0.##", invariantCulture),
-                        YearX: (Left + slot * index).ToString("0.##", invariantCulture),
-                        Y: (Top + plotHeight - height).ToString("0.##", invariantCulture),
-                        Width: barWidth.ToString("0.##", invariantCulture),
-                        Height: height.ToString("0.##", invariantCulture),
-                        Title: $"{MonthName(month, frenchCulture)} : {month.Count.ToString("N0", frenchCulture)}",
-                        Year: month.Month == 1 ? month.Year.ToString(invariantCulture) : null
-                    );
-                })
+                .Select(
+                    (month, index) =>
+                    {
+                        var x = Left + slot * index + (slot - barWidth) / 2;
+                        var height = axisMax == 0 ? 0 : plotHeight * month.Count / axisMax;
+                        return (
+                            X: x.ToString("0.##", invariantCulture),
+                            YearX: (Left + slot * index).ToString("0.##", invariantCulture),
+                            Y: (Top + plotHeight - height).ToString("0.##", invariantCulture),
+                            Width: barWidth.ToString("0.##", invariantCulture),
+                            Height: height.ToString("0.##", invariantCulture),
+                            Title: $"{MonthName(month, frenchCulture)} : {month.Count.ToString("N0", frenchCulture)}",
+                            Year: month.Month == 1 ? month.Year.ToString(invariantCulture) : null
+                        );
+                    }
+                )
                 .ToList();
         }
 
@@ -77,8 +79,15 @@ namespace Adex.Mvc.Home
         public IReadOnlyList<(string Y, string LabelY, string Value)> Ticks { get; } =
             Array.Empty<(string, string, string)>();
 
-        public IReadOnlyList<(string X, string YearX, string Y, string Width, string Height, string Title, string Year)> Bars { get; } =
-            Array.Empty<(string, string, string, string, string, string, string)>();
+        public IReadOnlyList<(
+            string X,
+            string YearX,
+            string Y,
+            string Width,
+            string Height,
+            string Title,
+            string Year
+        )> Bars { get; } = Array.Empty<(string, string, string, string, string, string, string)>();
 
         private static string MonthName(MonthlyDeclarationViewModel month, CultureInfo culture)
         {

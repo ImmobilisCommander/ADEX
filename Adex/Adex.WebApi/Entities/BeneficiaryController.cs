@@ -1,12 +1,10 @@
-using Adex.Contracts.Explorer;
-using Adex.Data.ReadModel.Explorer;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Contracts.Explorer;
+using Adex.Data.ReadModel.Explorer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.WebApi.Entities
 {
@@ -29,12 +27,16 @@ namespace Adex.WebApi.Entities
         [Route("info/{id:guid}")]
         [ProducesResponseType(typeof(EntityDetails), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetInformation(
-            Guid id,
-            CancellationToken cancellationToken
-        )
+        public async Task<ActionResult> GetInformation(Guid id, CancellationToken cancellationToken)
         {
-            var entity = await explorer.GetEntityAsync(id, 1, DataExplorerService.DefaultPageSize, "date", true, cancellationToken);
+            var entity = await explorer.GetEntityAsync(
+                id,
+                1,
+                DataExplorerService.DefaultPageSize,
+                "date",
+                true,
+                cancellationToken
+            );
             return entity is null ? NotFound() : Ok(entity);
         }
     }

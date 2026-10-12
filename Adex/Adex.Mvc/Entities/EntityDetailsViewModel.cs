@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Adex.Mvc.Entities
 {
-
     public sealed class EntityDetailsViewModel
     {
         public string ErrorMessage { get; set; }
@@ -42,8 +41,7 @@ namespace Adex.Mvc.Entities
 
         public EntityChartsViewModel EntityCharts => new(this);
 
-        public string FinancialLinkCountDisplay =>
-            FinancialLinkCount.ToString("N0", FrenchCulture);
+        public string FinancialLinkCountDisplay => FinancialLinkCount.ToString("N0", FrenchCulture);
 
         public string IncomingAmountDisplay => IncomingAmount.ToString("C0", FrenchCulture);
 
@@ -120,8 +118,7 @@ namespace Adex.Mvc.Entities
 
         private string PageUrl(int number)
         {
-            return
-                $"/{Id}?page={number}&pageSize={PageSize}&sort={Sort}&descending={DescendingDisplay}#links-title";
+            return $"/{Id}?page={number}&pageSize={PageSize}&sort={Sort}&descending={DescendingDisplay}#links-title";
         }
     }
 }

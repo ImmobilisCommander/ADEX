@@ -32,7 +32,10 @@ namespace Adex.Data.Model
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.HasPostgresExtension("pg_trgm");
-            modelBuilder.Entity<DashboardSnapshot>().Property(snapshot => snapshot.Json).HasColumnType("jsonb");
+            modelBuilder
+                .Entity<DashboardSnapshot>()
+                .Property(snapshot => snapshot.Json)
+                .HasColumnType("jsonb");
             modelBuilder.Entity<EntityTotal>().HasKey(total => total.EntityId);
             modelBuilder.Entity<EntityTotal>().HasIndex(total => total.Total);
             modelBuilder

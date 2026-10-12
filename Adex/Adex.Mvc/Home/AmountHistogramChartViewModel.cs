@@ -49,21 +49,24 @@ namespace Adex.Mvc.Home
                     );
                 })
                 .ToList();
-            Bars = bins
-                .Select((bin, index) =>
-                {
-                    var x = Left + slot * index + (slot - barWidth) / 2;
-                    var height = axisMax == 0 ? 0 : plotHeight * bin.Count / axisMax;
-                    return (
-                        X: x.ToString("0.##", invariantCulture),
-                        Y: (Top + plotHeight - height).ToString("0.##", invariantCulture),
-                        Width: barWidth.ToString("0.##", invariantCulture),
-                        Height: height.ToString("0.##", invariantCulture),
-                        Title: $"{Range(bin, frenchCulture)} : {bin.Count.ToString("N0", frenchCulture)} liens",
-                        ShowLabel: IsDecade(bin) || bin.UpperBound == 0m,
-                        Label: bin.UpperBound == 0m ? "≤ 0" : Money(bin.LowerBound, frenchCulture)
-                    );
-                })
+            Bars = bins.Select(
+                    (bin, index) =>
+                    {
+                        var x = Left + slot * index + (slot - barWidth) / 2;
+                        var height = axisMax == 0 ? 0 : plotHeight * bin.Count / axisMax;
+                        return (
+                            X: x.ToString("0.##", invariantCulture),
+                            Y: (Top + plotHeight - height).ToString("0.##", invariantCulture),
+                            Width: barWidth.ToString("0.##", invariantCulture),
+                            Height: height.ToString("0.##", invariantCulture),
+                            Title: $"{Range(bin, frenchCulture)} : {bin.Count.ToString("N0", frenchCulture)} liens",
+                            ShowLabel: IsDecade(bin) || bin.UpperBound == 0m,
+                            Label: bin.UpperBound == 0m
+                                ? "≤ 0"
+                                : Money(bin.LowerBound, frenchCulture)
+                        );
+                    }
+                )
                 .ToList();
             HasNonPositiveBin = bins.Any(bin => bin.UpperBound == 0m);
         }
@@ -75,18 +78,23 @@ namespace Adex.Mvc.Home
         public IReadOnlyList<(string Y, string LabelY, string Value)> Ticks { get; } =
             Array.Empty<(string, string, string)>();
 
-        public IReadOnlyList<(string X, string Y, string Width, string Height, string Title, bool ShowLabel, string Label)> Bars { get; } =
-            Array.Empty<(string, string, string, string, string, bool, string)>();
+        public IReadOnlyList<(
+            string X,
+            string Y,
+            string Width,
+            string Height,
+            string Title,
+            bool ShowLabel,
+            string Label
+        )> Bars { get; } = Array.Empty<(string, string, string, string, string, bool, string)>();
 
         public bool HasNonPositiveBin { get; }
 
         private static string Money(decimal value, CultureInfo culture)
         {
-            return value >= 1_000_000m
-                ? (value / 1_000_000m).ToString("0.##", culture) + " M€"
-                : value >= 1_000m
-                    ? (value / 1_000m).ToString("0.##", culture) + " k€"
-                    : value.ToString("0.##", culture) + " €";
+            return value >= 1_000_000m ? (value / 1_000_000m).ToString("0.##", culture) + " M€"
+                : value >= 1_000m ? (value / 1_000m).ToString("0.##", culture) + " k€"
+                : value.ToString("0.##", culture) + " €";
         }
 
         private static string Range(AmountHistogramBinViewModel bin, CultureInfo culture)

@@ -14,13 +14,21 @@ namespace Adex.Data.ReadModel.Explorer
     public sealed class DataExplorerService(
         IDbContextFactory<AdexContext> contextFactory,
         IOptionsMonitor<DashboardOptions> dashboardOptions
-        )
+    )
     {
         private const string DashboardSnapshotKey = "adex-dashboard";
 
         private const int SearchResultLimit = 100;
         private const int SearchMinimumLength = 3;
-        public static readonly string[] SortKeys = { "date", "amount", "type", "kind", "direction", "name" };
+        public static readonly string[] SortKeys =
+        {
+            "date",
+            "amount",
+            "type",
+            "kind",
+            "direction",
+            "name",
+        };
         public const int DefaultPageSize = 20;
         public static readonly int[] PageSizes = { 10, 20, 50 };
 
@@ -50,7 +58,9 @@ namespace Adex.Data.ReadModel.Explorer
                     _dashboardBuildTask = null;
                 }
 
-                build = _dashboardBuildTask ??= Task.Run(() => EnsureDashboardAsync(CancellationToken.None));
+                build = _dashboardBuildTask ??= Task.Run(() =>
+                    EnsureDashboardAsync(CancellationToken.None)
+                );
             }
             finally
             {
@@ -106,8 +116,8 @@ namespace Adex.Data.ReadModel.Explorer
         private async Task<DashboardModel> ReadSnapshotAsync(CancellationToken cancellationToken)
         {
             await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
-            var snapshot = await db.DashboardSnapshots
-                .AsNoTracking()
+            var snapshot = await db
+                .DashboardSnapshots.AsNoTracking()
                 .FirstOrDefaultAsync(item => item.Key == DashboardSnapshotKey, cancellationToken);
             if (snapshot is null || snapshot.ComputedAtUtc + DashboardTimeToLive <= DateTime.UtcNow)
             {
@@ -117,27 +127,33 @@ namespace Adex.Data.ReadModel.Explorer
             return JsonSerializer.Deserialize<DashboardModel>(snapshot.Json);
         }
 
-        private async Task SaveSnapshotAsync(DashboardModel dashboard, CancellationToken cancellationToken)
+        private async Task SaveSnapshotAsync(
+            DashboardModel dashboard,
+            CancellationToken cancellationToken
+        )
         {
             await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
             var json = JsonSerializer.Serialize(dashboard);
             var computedAtUtc = DateTime.UtcNow;
-            var updated = await db.DashboardSnapshots
-                .Where(item => item.Key == DashboardSnapshotKey)
+            var updated = await db
+                .DashboardSnapshots.Where(item => item.Key == DashboardSnapshotKey)
                 .ExecuteUpdateAsync(
-                    setters => setters
-                        .SetProperty(item => item.Json, json)
-                        .SetProperty(item => item.ComputedAtUtc, computedAtUtc),
+                    setters =>
+                        setters
+                            .SetProperty(item => item.Json, json)
+                            .SetProperty(item => item.ComputedAtUtc, computedAtUtc),
                     cancellationToken
                 );
             if (updated == 0)
             {
-                db.DashboardSnapshots.Add(new DashboardSnapshot
-                {
-                    Key = DashboardSnapshotKey,
-                    Json = json,
-                    ComputedAtUtc = computedAtUtc,
-                });
+                db.DashboardSnapshots.Add(
+                    new DashboardSnapshot
+                    {
+                        Key = DashboardSnapshotKey,
+                        Json = json,
+                        ComputedAtUtc = computedAtUtc,
+                    }
+                );
                 await db.SaveChangesAsync(cancellationToken);
             }
         }
@@ -256,12 +272,14 @@ namespace Adex.Data.ReadModel.Explorer
             var now = DateTime.UtcNow;
             var end = new DateTime(now.Year, now.Month, 1).AddMonths(1);
 
-            var rows = await db.Database
-                .SqlQuery<MonthRow>(
+            var rows = await db
+                .Database.SqlQuery<MonthRow>(
                     $"""
                     SELECT date_part('year', "Date")::int AS "Year", date_part('month', "Date")::int AS "Month", count(*)::int AS "Count"
                     FROM public."Links"
-                    WHERE "Date" >= {MonthlyChartStart.ToString("yyyy-MM-dd")}::timestamp AND "Date" < {end.ToString("yyyy-MM-dd")}::timestamp
+                    WHERE "Date" >= {MonthlyChartStart.ToString(
+                        "yyyy-MM-dd"
+                    )}::timestamp AND "Date" < {end.ToString("yyyy-MM-dd")}::timestamp
                     GROUP BY 1, 2
                     """
                 )
@@ -278,7 +296,14 @@ namespace Adex.Data.ReadModel.Explorer
             for (var month = first; month <= last; month = month.AddMonths(1))
             {
                 counts.TryGetValue((month.Year, month.Month), out var count);
-                months.Add(new MonthlyDeclarationCount { Year = month.Year, Month = month.Month, Count = count });
+                months.Add(
+                    new MonthlyDeclarationCount
+                    {
+                        Year = month.Year,
+                        Month = month.Month,
+                        Count = count,
+                    }
+                );
             }
 
             return months;
@@ -286,7 +311,34 @@ namespace Adex.Data.ReadModel.Explorer
 
         // Agrégats globaux en SQL direct : l'héritage TPT ferait joindre Entities, Links et FinancialLinks sur des millions de lignes.
         private static readonly double[] ConcentrationPercents =
-            { 0.1, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100 };
+        {
+            0.1,
+            0.25,
+            0.5,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            15,
+            20,
+            25,
+            30,
+            35,
+            40,
+            45,
+            50,
+            60,
+            70,
+            80,
+            90,
+            100,
+        };
 
         // Courbe de Pareto : part cumulée du montant détenue par les x % les plus importants.
         private static ConcentrationCurve BuildConcentration(string label, List<decimal> amounts)
@@ -313,11 +365,13 @@ namespace Adex.Data.ReadModel.Explorer
             foreach (var percent in ConcentrationPercents)
             {
                 var count = (int)Math.Ceiling(amounts.Count * percent / 100d);
-                curve.Points.Add(new ConcentrationPoint
-                {
-                    PopulationPercent = percent,
-                    AmountPercent = ShareOfTop(count),
-                });
+                curve.Points.Add(
+                    new ConcentrationPoint
+                    {
+                        PopulationPercent = percent,
+                        AmountPercent = ShareOfTop(count),
+                    }
+                );
             }
 
             curve.TopOnePercentShare = ShareOfTop((int)Math.Ceiling(amounts.Count / 100d));
@@ -331,8 +385,8 @@ namespace Adex.Data.ReadModel.Explorer
             CancellationToken cancellationToken
         )
         {
-            var rows = await db.Database
-                .SqlQuery<HistogramRow>(
+            var rows = await db
+                .Database.SqlQuery<HistogramRow>(
                     $"""
                     SELECT CASE WHEN "Amount" <= 0 THEN -1000 ELSE floor(log10("Amount"::double precision) * 2)::int END AS "Key",
                            count(*)::int AS "Count"
@@ -363,12 +417,14 @@ namespace Adex.Data.ReadModel.Explorer
             for (var key = counts.Keys.Min(); key <= counts.Keys.Max(); key++)
             {
                 counts.TryGetValue(key, out var count);
-                bins.Add(new AmountHistogramBin
-                {
-                    LowerBound = HalfDecade(key),
-                    UpperBound = HalfDecade(key + 1),
-                    Count = count,
-                });
+                bins.Add(
+                    new AmountHistogramBin
+                    {
+                        LowerBound = HalfDecade(key),
+                        UpperBound = HalfDecade(key + 1),
+                        Count = count,
+                    }
+                );
             }
 
             return bins;
@@ -379,27 +435,41 @@ namespace Adex.Data.ReadModel.Explorer
             return Math.Round((decimal)Math.Pow(10d, key / 2d), 2);
         }
 
-        private static async Task<(List<EntityYearActivity> Activity, List<EntityTypeBreakdown> Breakdown)> GetEntityActivityAsync(
+        private static async Task<(
+            List<EntityYearActivity> Activity,
+            List<EntityTypeBreakdown> Breakdown
+        )> GetEntityActivityAsync(
             AdexContext db,
             Guid entityId,
             CancellationToken cancellationToken
         )
         {
             // Une requête par sens pour utiliser les index (entité, date) plutôt qu'un OR sur les deux colonnes.
-            var outgoing = await db.FinancialLinks
-                .Where(link => link.From_Id == entityId)
+            var outgoing = await db
+                .FinancialLinks.Where(link => link.From_Id == entityId)
                 .GroupBy(link => new { link.DeclarationType, link.Date.Year })
-                .Select(group => new { group.Key.DeclarationType, group.Key.Year, Count = group.Count(), Amount = group.Sum(link => link.Amount) })
+                .Select(group => new
+                {
+                    group.Key.DeclarationType,
+                    group.Key.Year,
+                    Count = group.Count(),
+                    Amount = group.Sum(link => link.Amount),
+                })
                 .ToListAsync(cancellationToken);
-            var incoming = await db.FinancialLinks
-                .Where(link => link.To_Id == entityId)
+            var incoming = await db
+                .FinancialLinks.Where(link => link.To_Id == entityId)
                 .GroupBy(link => new { link.DeclarationType, link.Date.Year })
-                .Select(group => new { group.Key.DeclarationType, group.Key.Year, Count = group.Count(), Amount = group.Sum(link => link.Amount) })
+                .Select(group => new
+                {
+                    group.Key.DeclarationType,
+                    group.Key.Year,
+                    Count = group.Count(),
+                    Amount = group.Sum(link => link.Amount),
+                })
                 .ToListAsync(cancellationToken);
             var rows = outgoing.Concat(incoming).ToList();
 
-            var breakdown = rows
-                .GroupBy(row => row.DeclarationType ?? "Non renseigné")
+            var breakdown = rows.GroupBy(row => row.DeclarationType ?? "Non renseigné")
                 .Select(group => new EntityTypeBreakdown
                 {
                     Type = group.Key,
@@ -409,8 +479,9 @@ namespace Adex.Data.ReadModel.Explorer
                 .OrderByDescending(item => item.Count)
                 .ToList();
 
-            var byYear = rows
-                .Where(row => row.Year >= MonthlyChartStart.Year && row.Year <= DateTime.UtcNow.Year)
+            var byYear = rows.Where(row =>
+                    row.Year >= MonthlyChartStart.Year && row.Year <= DateTime.UtcNow.Year
+                )
                 .GroupBy(row => row.Year)
                 .ToDictionary(
                     group => group.Key,
@@ -419,13 +490,18 @@ namespace Adex.Data.ReadModel.Explorer
                         Year = group.Key,
                         Count = group.Sum(row => row.Count),
                         Amount = group.Sum(row => row.Amount),
-                    });
+                    }
+                );
             var activity = new List<EntityYearActivity>();
             if (byYear.Count > 0)
             {
                 for (var year = byYear.Keys.Min(); year <= byYear.Keys.Max(); year++)
                 {
-                    activity.Add(byYear.TryGetValue(year, out var item) ? item : new EntityYearActivity { Year = year });
+                    activity.Add(
+                        byYear.TryGetValue(year, out var item)
+                            ? item
+                            : new EntityYearActivity { Year = year }
+                    );
                 }
             }
 
@@ -447,8 +523,8 @@ namespace Adex.Data.ReadModel.Explorer
             var results = new List<EntitySearchResult>();
 
             var queryId = Guid.TryParse(query, out var parsedId) ? parsedId : Guid.Empty;
-            var byReference = await db.Companies
-                .Where(company => company.Id == queryId)
+            var byReference = await db
+                .Companies.Where(company => company.Id == queryId)
                 .Select(company => new EntitySearchResult
                 {
                     Id = company.Id,
@@ -458,8 +534,8 @@ namespace Adex.Data.ReadModel.Explorer
                 .ToListAsync(cancellationToken);
             results.AddRange(byReference);
 
-            var personByReference = await db.Persons
-                .Where(person => person.Id == queryId)
+            var personByReference = await db
+                .Persons.Where(person => person.Id == queryId)
                 .Select(person => new
                 {
                     Id = person.Id,
@@ -482,8 +558,8 @@ namespace Adex.Data.ReadModel.Explorer
                 var pattern = $"%{EscapeLikePattern(query)}%";
                 const string escapeCharacter = "\\";
 
-                var companies = await db.Companies
-                    .Where(company =>
+                var companies = await db
+                    .Companies.Where(company =>
                         company.Designation != null
                         && EF.Functions.ILike(company.Designation, pattern, escapeCharacter)
                     )
@@ -546,8 +622,8 @@ namespace Adex.Data.ReadModel.Explorer
 
             // Homonyms are distinct entities: show profession and city to tell them apart.
             var ids = found.Select(result => result.Id).ToList();
-            var attributeRows = await db.EntityAttributes
-                .Where(attribute => ids.Contains(attribute.EntityId))
+            var attributeRows = await db
+                .EntityAttributes.Where(attribute => ids.Contains(attribute.EntityId))
                 .Select(attribute => new { attribute.EntityId, attribute.Data })
                 .ToListAsync(cancellationToken);
             foreach (var row in attributeRows)
@@ -565,9 +641,15 @@ namespace Adex.Data.ReadModel.Explorer
                 result.Detail = string.Join(" · ", parts);
             }
 
-            var totalRows = await db.EntityTotals
-                .Where(total => ids.Contains(total.EntityId))
-                .Select(total => new { total.EntityId, total.LinkCount, total.IncomingAmount, total.OutgoingAmount })
+            var totalRows = await db
+                .EntityTotals.Where(total => ids.Contains(total.EntityId))
+                .Select(total => new
+                {
+                    total.EntityId,
+                    total.LinkCount,
+                    total.IncomingAmount,
+                    total.OutgoingAmount,
+                })
                 .ToListAsync(cancellationToken);
             foreach (var total in totalRows)
             {
@@ -590,16 +672,23 @@ namespace Adex.Data.ReadModel.Explorer
         {
             await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
 
-            var company = await db.Companies
-                .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken);
+            var company = await db.Companies.SingleOrDefaultAsync(
+                entity => entity.Id == id,
+                cancellationToken
+            );
             var person = company is null
-                ? await db.Persons
-                    .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken)
+                ? await db.Persons.SingleOrDefaultAsync(
+                    entity => entity.Id == id,
+                    cancellationToken
+                )
                 : null;
-            var otherEntity = company is null && person is null
-                ? await db.Entities
-                    .SingleOrDefaultAsync(entity => entity.Id == id, cancellationToken)
-                : null;
+            var otherEntity =
+                company is null && person is null
+                    ? await db.Entities.SingleOrDefaultAsync(
+                        entity => entity.Id == id,
+                        cancellationToken
+                    )
+                    : null;
             if (company is null && person is null && otherEntity is null)
             {
                 return null;
@@ -607,21 +696,24 @@ namespace Adex.Data.ReadModel.Explorer
 
             var entity = (Entity)company ?? person ?? otherEntity;
             var entityId = entity.Id;
-            var attributeData = await db.EntityAttributes
-                .Where(attribute => attribute.EntityId == entityId)
+            var attributeData = await db
+                .EntityAttributes.Where(attribute => attribute.EntityId == entityId)
                 .Select(attribute => attribute.Data)
                 .SingleOrDefaultAsync(cancellationToken);
             var attributes = (attributeData ?? new Dictionary<string, string>())
                 .OrderBy(pair => pair.Key, StringComparer.CurrentCulture)
                 .Select(pair => new EntityAttributeDetails { Name = pair.Key, Value = pair.Value })
                 .ToList();
-            var name = company?.Designation
-                ?? (person is null
-                    ? FindAttributeName(attributes)
-                    : JoinName(person.FirstName, person.LastName));
+            var name =
+                company?.Designation
+                ?? (
+                    person is null
+                        ? FindAttributeName(attributes)
+                        : JoinName(person.FirstName, person.LastName)
+                );
 
-            var totals = await db.EntityTotals
-                .Where(total => total.EntityId == entityId)
+            var totals = await db
+                .EntityTotals.Where(total => total.EntityId == entityId)
                 .SingleOrDefaultAsync(cancellationToken);
 
             pageSize = Array.IndexOf(PageSizes, pageSize) >= 0 ? pageSize : DefaultPageSize;
@@ -630,39 +722,54 @@ namespace Adex.Data.ReadModel.Explorer
             var pageCount = Math.Max(1, (linkCount + pageSize - 1) / pageSize);
             page = Math.Clamp(page, 1, pageCount);
             var skip = (page - 1) * pageSize;
-            var links = await LoadLinksPageAsync(db, entityId, sort, descending, skip, pageSize, cancellationToken);
+            var links = await LoadLinksPageAsync(
+                db,
+                entityId,
+                sort,
+                descending,
+                skip,
+                pageSize,
+                cancellationToken
+            );
 
             var linkIds = links.Select(link => link.Id).ToList();
-            var justificationRows = await db.EntityAttributes
-                .Where(attribute => linkIds.Contains(attribute.EntityId))
+            var justificationRows = await db
+                .EntityAttributes.Where(attribute => linkIds.Contains(attribute.EntityId))
                 .Select(attribute => new { attribute.EntityId, attribute.Data })
                 .ToListAsync(cancellationToken);
             var justifications = justificationRows.ToDictionary(
                 row => row.EntityId,
-                row => JustificationNames
-                    .Where(name => row.Data.ContainsKey(name))
-                    .Select(name => new EntityAttributeDetails { Name = name, Value = row.Data[name] })
-                    .ToList()
+                row =>
+                    JustificationNames
+                        .Where(name => row.Data.ContainsKey(name))
+                        .Select(name => new EntityAttributeDetails
+                        {
+                            Name = name,
+                            Value = row.Data[name],
+                        })
+                        .ToList()
             );
             foreach (var link in links)
             {
-                link.Justification = justifications.GetValueOrDefault(link.Id) ?? new List<EntityAttributeDetails>();
+                link.Justification =
+                    justifications.GetValueOrDefault(link.Id) ?? new List<EntityAttributeDetails>();
             }
 
-            var counterparties = links
-                .Select(link => link.CounterpartyId)
-                .Distinct()
-                .ToList();
-            var companyNames = await db.Companies
-                .Where(candidate => counterparties.Contains(candidate.Id))
+            var counterparties = links.Select(link => link.CounterpartyId).Distinct().ToList();
+            var companyNames = await db
+                .Companies.Where(candidate => counterparties.Contains(candidate.Id))
                 .Select(candidate => new
                 {
                     candidate.Id,
                     Name = candidate.Designation ?? "(sans nom)",
                 })
-                .ToDictionaryAsync(candidate => candidate.Id, candidate => candidate.Name, cancellationToken);
-            var personNameRows = await db.Persons
-                .Where(candidate => counterparties.Contains(candidate.Id))
+                .ToDictionaryAsync(
+                    candidate => candidate.Id,
+                    candidate => candidate.Name,
+                    cancellationToken
+                );
+            var personNameRows = await db
+                .Persons.Where(candidate => counterparties.Contains(candidate.Id))
                 .Select(candidate => new
                 {
                     candidate.Id,
@@ -691,7 +798,11 @@ namespace Adex.Data.ReadModel.Explorer
                 }
             }
 
-            var (activity, breakdown) = await GetEntityActivityAsync(db, entityId, cancellationToken);
+            var (activity, breakdown) = await GetEntityActivityAsync(
+                db,
+                entityId,
+                cancellationToken
+            );
 
             return new EntityDetails
             {
@@ -699,9 +810,10 @@ namespace Adex.Data.ReadModel.Explorer
                 TypeBreakdown = breakdown,
                 Id = entity.Id,
                 Name = string.IsNullOrWhiteSpace(name) ? "(sans nom)" : name,
-                Type = company is not null
-                    ? "Entreprise"
-                    : person is not null ? "Bénéficiaire" : "Entité",
+                Type =
+                    company is not null ? "Entreprise"
+                    : person is not null ? "Bénéficiaire"
+                    : "Entité",
                 OutgoingAmount = totals?.OutgoingAmount ?? 0m,
                 IncomingAmount = totals?.IncomingAmount ?? 0m,
                 FinancialLinkCount = linkCount,
@@ -728,25 +840,45 @@ namespace Adex.Data.ReadModel.Explorer
         )
         {
             var byName = sort == "name";
-            var outgoing = Project(db, db.FinancialLinks.Where(link => link.From_Id == entityId), true, byName);
-            var incoming = Project(db, db.FinancialLinks.Where(link => link.To_Id == entityId), false, byName);
+            var outgoing = Project(
+                db,
+                db.FinancialLinks.Where(link => link.From_Id == entityId),
+                true,
+                byName
+            );
+            var incoming = Project(
+                db,
+                db.FinancialLinks.Where(link => link.To_Id == entityId),
+                false,
+                byName
+            );
 
             if (sort == "date")
             {
                 // Fast path: each branch uses its (entity, date) index for a top-N, then the two are merged.
                 var limit = skip + take;
-                var outgoingTop = await (descending
-                    ? outgoing.OrderByDescending(link => link.Date)
-                    : outgoing.OrderBy(link => link.Date))
-                    .ThenBy(link => link.Id).Take(limit).ToListAsync(cancellationToken);
-                var incomingTop = await (descending
-                    ? incoming.OrderByDescending(link => link.Date)
-                    : incoming.OrderBy(link => link.Date))
-                    .ThenBy(link => link.Id).Take(limit).ToListAsync(cancellationToken);
+                var outgoingTop = await (
+                    descending
+                        ? outgoing.OrderByDescending(link => link.Date)
+                        : outgoing.OrderBy(link => link.Date)
+                )
+                    .ThenBy(link => link.Id)
+                    .Take(limit)
+                    .ToListAsync(cancellationToken);
+                var incomingTop = await (
+                    descending
+                        ? incoming.OrderByDescending(link => link.Date)
+                        : incoming.OrderBy(link => link.Date)
+                )
+                    .ThenBy(link => link.Id)
+                    .Take(limit)
+                    .ToListAsync(cancellationToken);
                 var merged = outgoingTop.Concat(incomingTop);
-                return (descending
-                    ? merged.OrderByDescending(link => link.Date)
-                    : merged.OrderBy(link => link.Date))
+                return (
+                    descending
+                        ? merged.OrderByDescending(link => link.Date)
+                        : merged.OrderBy(link => link.Date)
+                )
                     .ThenBy(link => link.Id)
                     .Skip(skip)
                     .Take(take)
@@ -757,12 +889,24 @@ namespace Adex.Data.ReadModel.Explorer
 
             var ordered = sort switch
             {
-                "amount" => descending ? all.OrderByDescending(link => link.Amount) : all.OrderBy(link => link.Amount),
-                "type" => descending ? all.OrderByDescending(link => link.DeclarationType) : all.OrderBy(link => link.DeclarationType),
-                "kind" => descending ? all.OrderByDescending(link => link.Kind) : all.OrderBy(link => link.Kind),
-                "direction" => descending ? all.OrderByDescending(link => link.Outgoing) : all.OrderBy(link => link.Outgoing),
-                "name" => descending ? all.OrderByDescending(link => link.SortName) : all.OrderBy(link => link.SortName),
-                _ => descending ? all.OrderByDescending(link => link.Date) : all.OrderBy(link => link.Date),
+                "amount" => descending
+                    ? all.OrderByDescending(link => link.Amount)
+                    : all.OrderBy(link => link.Amount),
+                "type" => descending
+                    ? all.OrderByDescending(link => link.DeclarationType)
+                    : all.OrderBy(link => link.DeclarationType),
+                "kind" => descending
+                    ? all.OrderByDescending(link => link.Kind)
+                    : all.OrderBy(link => link.Kind),
+                "direction" => descending
+                    ? all.OrderByDescending(link => link.Outgoing)
+                    : all.OrderBy(link => link.Outgoing),
+                "name" => descending
+                    ? all.OrderByDescending(link => link.SortName)
+                    : all.OrderBy(link => link.SortName),
+                _ => descending
+                    ? all.OrderByDescending(link => link.Date)
+                    : all.OrderBy(link => link.Date),
             };
 
             return await ordered
@@ -790,17 +934,20 @@ namespace Adex.Data.ReadModel.Explorer
                 Outgoing = outgoing,
                 SortName = !byName
                     ? null
-                    : db.Companies
-                        .Where(company => company.Id == (outgoing ? link.To_Id : link.From_Id))
+                    : db.Companies.Where(company =>
+                            company.Id == (outgoing ? link.To_Id : link.From_Id)
+                        )
                         .Select(company => company.Designation)
                         .FirstOrDefault()
-                        ?? db.Persons
-                            .Where(person => person.Id == (outgoing ? link.To_Id : link.From_Id))
+                        ?? db.Persons.Where(person =>
+                                person.Id == (outgoing ? link.To_Id : link.From_Id)
+                            )
                             .Select(person => person.FirstName + " " + person.LastName)
                             .FirstOrDefault()
                         ?? string.Empty,
             });
         }
+
         private static readonly string[] JustificationNames =
         {
             "Motif",
@@ -825,15 +972,16 @@ namespace Adex.Data.ReadModel.Explorer
         {
             return string.Join(
                 " ",
-                new[] { firstName, lastName }.Where(value =>
-                    !string.IsNullOrWhiteSpace(value)
-                )
+                new[] { firstName, lastName }.Where(value => !string.IsNullOrWhiteSpace(value))
             );
         }
 
         private static string FindAttributeName(IEnumerable<EntityAttributeDetails> attributes)
         {
-            var values = attributes.ToDictionary(attribute => attribute.Name, attribute => attribute.Value);
+            var values = attributes.ToDictionary(
+                attribute => attribute.Name,
+                attribute => attribute.Value
+            );
             if (values.TryGetValue("denomination_sociale", out var companyName))
             {
                 return companyName;
