@@ -1,6 +1,6 @@
 # Règles métier
 
-Cette page consigne les comportements observables dans l’import et les lectures actifs. Le traitement de `Adex.Legacy.MetaModel` est historique et ne définit pas les règles de l’API actuelle.
+Cette page consigne les comportements observables dans l’import et les lectures actifs.
 
 ## Import normalisé
 
@@ -28,7 +28,3 @@ Le pipeline remplace les données normalisées et n’utilise pas de transaction
 - La concentration est calculée pour les bénéficiaires (montants reçus) et les entreprises (montants versés) avec total strictement positif ; les entités sont classées par montant décroissant.
 - L’histogramme répartit les liens financiers par tranches logarithmiques d’une demi-décade. Les montants nuls et négatifs sont présentés séparément.
 - La fiche affiche les montants annuels des liens des deux sens depuis 2012, ainsi que le nombre et le montant par typologie.
-
-## Code historique
-
-`Adex.Legacy.MetaModel/Import` conserve l’ancien chargeur CSV, ses méthodes d’identification et ses contrats ; les opérations incomplètes qui s’y trouvent ne sont pas exposées par les hôtes actifs. Les règles propres à ce chargeur ne doivent pas être interprétées comme des règles actuelles sans réactivation et validation.

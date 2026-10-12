@@ -54,6 +54,7 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
   - Création de la bibliothèque cliente autonome `Adex.WebApi.Client` (`IAdexWebApiClient`, `AdexWebApiClient`) avec résilience HTTP (Polly retry/circuit-breaker) et découplage total d'ASP.NET Core MVC.
   - Transformation des méthodes statiques de mapping (`ApiViewModelMapper`) et de gestion des exceptions (`ExceptionMapping`) en méthodes d'extension C# (`ToViewModel()`, `Map()`).
   - Intégration de la documentation XML OpenAPI/Swagger sur l'API (`Adex.WebApi` et `Adex.Contracts`) avec commentaires des contrôleurs, paramètres, codes retours et modèles.
+  - Retrait du projet historique `Adex.Legacy.MetaModel` non utilisé, éliminant tout code mort et le dernier avertissement de compilation CA2024.
   - Audit et alignement complet de la documentation (`000` à `008`).
 - API CSV : résultat de chaque page/combinaison de filtres conservé 1 minute dans IMemoryCache.
 - API CSV : un SemaphoreSlim limite à une seule lecture du fichier à la fois ; les requêtes en attente restent annulables.

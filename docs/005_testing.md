@@ -2,7 +2,7 @@
 
 ## État observé dans le dépôt
 
-L’inspection de la solution actuelle (`Adex/Adex.slnx`) n’a révélé aucun projet de tests dédié. Le projet `Adex.App`, qui contenait un banc d’essai manuel, a été supprimé. Le chargeur historique isolé dans `Adex/Adex.Legacy.MetaModel/` conserve `CvsLoaderMetadata.SaveAsync`, qui lève `NotImplementedException`; cette opération n’est pas utilisée par les hôtes actifs.
+L’inspection de la solution actuelle (`Adex/Adex.slnx`) n’a révélé aucun projet de tests dédié. Le projet `Adex.App`, qui contenait un banc d’essai manuel, a été supprimé.
 
 Ce constat décrit le contenu actuel inspecté ; il n’affirme pas qu’aucun contrôle manuel ou externe n’existe.
 

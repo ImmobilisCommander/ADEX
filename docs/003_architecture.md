@@ -13,7 +13,6 @@ La solution `Adex/Adex.slnx` regroupe les projets suivants :
 | `Adex.Data.ReadModel` | Requêtes et projections de lecture du tableau de bord, de la recherche et des fiches ; dépend du modèle normalisé et des contrats de réponse. |
 | `Adex.Data.Import` | Pipeline spécialisé d’import `declarations.csv`, lecture en flux, COPY binaire Npgsql et reconstruction des index/contraintes. |
 | `Adex.Data.MetaModel` | Ancien modèle générique et son contexte EF Core, conservés pour le transfert temporaire des métadonnées. |
-| `Adex.Legacy.MetaModel` | Ancien chargeur, ses contrats et ses objets de graphe ; seul consommateur du modèle `Adex.Data.MetaModel`. |
 | `Adex.WebApi` | Hôte HTTP ASP.NET Core : contrôleurs groupés par domaine, configuration et middleware de maintenance. |
 | `Adex.Mvc` | Hôte MVC/Razor : vues, contrôleurs et ViewModels organisés par domaine ; consommation de `Adex.WebApi.Client` et conversion des contrats API vers les modèles de présentation. |
 
@@ -27,7 +26,6 @@ Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuG
 - `Adex.Data.Import` implémente le port `IDeclarationsImporter` défini par `Adex.Application.Import`; l’API ne lie son orchestrateur qu’à ce contrat.
 - `Adex.Data.ReadModel` dépend du modèle normalisé et des DTO de réponse, pas de l’hôte API.
 - `Adex.Data.Import` reçoit le `NpgsqlDataSource` configuré par l’API et n’accède pas au contexte EF Core.
-- `Adex.Legacy.MetaModel` référence le modèle métadonnées historique ; il n’est pas référencé par les hôtes actifs.
 - Les types API et MVC suivent leurs namespaces racines par domaine, par exemple `Adex.WebApi.Entities`, `Adex.WebApi.Csv`, `Adex.Mvc.Home`, `Adex.Mvc.Entities` et `Adex.Mvc.Csv`. Les répertoires source correspondants suivent ces namespaces. Les contrats utilisent `Adex.Contracts.Explorer` et `Adex.Contracts.Csv`.
 
 `Adex.Data.ReadModel.Explorer.DataExplorerService` porte encore à la fois les requêtes EF/SQL et la composition des résultats de lecture. Il a été retiré de l’hôte API, mais son découpage interne en cas d’usage et adaptateurs de requête pourra être poursuivi si d’autres consommateurs apparaissent.
@@ -37,7 +35,6 @@ Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuG
 - **Lecture :** les contrôleurs API délèguent les recherches, fiches et agrégats à `DataExplorerService`. Les réponses utilisent `Adex.Contracts`; `Adex.WebApi.Client` permet aux consommateurs .NET (dont `Adex.Mvc`) de récupérer ces contrats, et `ApiViewModelMapper` les convertit en ViewModels MVC. Les agrégats mensuels et l’histogramme sont calculés en SQL direct pour éviter les jointures TPT coûteuses.
 - **Import :** `Adex.Application.Import.ImportJobService` vérifie l’état et le contrôle d’accès, puis appelle le port applicatif `Adex.Application.Import.IDeclarationsImporter`. Son adaptateur `Adex.Data.Import.DeclarationsImporter` lit deux fois le CSV, conserve les lignes les plus récemment publiées, puis écrit les tables normalisées par COPY binaire Npgsql. En cas d’échec ou d’annulation, la base peut être partielle ; l’import doit être relancé depuis le début.
 - **CSV à la demande :** `Adex.Application.Csv.CsvService` gère le cache et la pagination avec `CsvPageReader`; les réponses sont des contrats `CsvPage`. Le contrôleur API `CsvController` expose ce service, `AdexWebApiClient` le consomme et le MVC traduit les pages et erreurs reçues vers ses propres ViewModels.
-- **Métamodèle historique :** le chargeur et les modèles de graphe sont regroupés dans `Adex.Legacy.MetaModel`. Ce projet n’est pas enregistré dans le démarrage API et ne participe pas aux lectures de l’interface.
 
 ## Hôtes et configuration
 
@@ -52,7 +49,6 @@ Les deux hôtes utilisent Serilog, sorties console et fichiers sous `D:\Logs`, j
 ## Limites connues
 
 - Le pipeline optimisé de `Adex.Data.Import` reste spécifique à PostgreSQL et regroupe encore sélection, transformation et persistance dans un même composant d’import ; son contrat applicatif est toutefois indépendant de cet adaptateur.
-- `Adex.Legacy.MetaModel` conserve du code non raccordé aux hôtes actifs, notamment des opérations incomplètes ; il est isolé mais pas encore supprimé.
 - Les migrations sont des migrations EF Core propres, sans reprise de l’historique EF6. Tester leur application sur des bases dédiées avant tout déploiement.
 - Le modèle normalisé ne contient que les champs reconnus ; les attributs JSON bruts gardent les données complémentaires.
 - Des scénarios de validation restent documentés dans [Tests](005_testing.md) et les travaux ouverts dans [Recommandations](006_recommendations.md).

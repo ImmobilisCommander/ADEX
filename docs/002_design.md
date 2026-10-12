@@ -4,7 +4,7 @@
 
 Le modèle relationnel canonique est dans `Adex/Adex.Data.Model/` : `Entity`, `Company`, `Person`, `Link`, `FinancialLink` et `AdexContext`. Les contrats `IEntity` et `ILink` résident dans le même projet que les entités qu’ils décrivent.
 
-Le modèle de métadonnées historique est séparé dans `Adex/Adex.Data.MetaModel/`. Son chargeur, ses contrats CSV et ses types de visualisation sont isolés dans `Adex/Adex.Legacy.MetaModel/`; ils ne sont pas partagés par les hôtes actifs.
+Le modèle de métadonnées historique est conservé dans `Adex/Adex.Data.MetaModel/`. Il n'est pas utilisé par les hôtes actifs.
 
 Les réponses HTTP communes au serveur API et au client MVC sont des DTO dans `Adex/Adex.Contracts/`. Le client HTTP réutilisable est dans `Adex/Adex.WebApi.Client/`. Le service de lecture `DataExplorerService` et ses requêtes EF Core sont dans `Adex/Adex.Data.ReadModel/`. Les règles de filtrage CSV et le service applicatif d’import sont dans `Adex/Adex.Application/`. Les contrôleurs API regroupés par domaine ne contiennent que la logique HTTP et délèguent à ces services applicatifs. Les ViewModels MVC restent distincts des DTO et sont produits par le client web.
 

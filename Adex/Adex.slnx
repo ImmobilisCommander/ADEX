@@ -20,7 +20,6 @@
   <Project Path="Adex.Data.MetaModel/Adex.Data.MetaModel.csproj" />
   <Project Path="Adex.Data.Model/Adex.Data.Model.csproj" />
   <Project Path="Adex.Data.ReadModel/Adex.Data.ReadModel.csproj" />
-  <Project Path="Adex.Legacy.MetaModel/Adex.Legacy.MetaModel.csproj" />
   <Project Path="Adex.Mvc/Adex.Mvc.csproj" />
   <Project Path="Adex.WebApi.Client/Adex.WebApi.Client.csproj" />
   <Project Path="Adex.WebApi/Adex.WebApi.csproj" />

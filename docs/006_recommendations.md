@@ -14,7 +14,7 @@ Les propositions qui suivent distinguent les changements d’architecture déjà
 - Retrait de `Adex.Common` et `Adex.Business` : interfaces d’entités replacées dans `Adex.Data.Model`, pipeline actif dans `Adex.Data.Import`, contrats JSON dans `Adex.Contracts`.
 - Déplacement de `DataExplorerService` et de ses requêtes hors de l’hôte API vers `Adex.Data.ReadModel`.
 - DTO de transport séparés des ViewModels Razor ; `AdexApiClient` convertit explicitement les contrats vers les modèles de présentation.
-- Chargeur CSV historique, contrat de chargement, métamodèle et types de graphe isolés dans `Adex.Legacy.MetaModel`, hors du graphe de dépendances des hôtes actifs.
+- Retrait du projet historique `Adex.Legacy.MetaModel` (chargeur CSV incomplet et anciens modèles de graphe non connectés).
 - Contrôleurs et modèles MVC/API regroupés par domaine, avec namespaces racines et chemins de fichiers alignés.
 - Port et résultat applicatifs d’import, moteur de lecture CSV (`CsvPageReader`, `CsvService`) et gestionnaire d’arrière-plan (`ImportJobService`) regroupés dans `Adex.Application`.
 - Extraction de `Adex.WebApi.Client` : client HTTP fortement typé (`IAdexWebApiClient`, `AdexWebApiClient`) indépendant de MVC et réutilisable dans d’autres applications .NET.
@@ -22,7 +22,6 @@ Les propositions qui suivent distinguent les changements d’architecture déjà
 
 ## Priorité 1 — Fiabiliser les parcours actuels
 
-- **Clarifier le cycle de vie de l’import historique.** `CvsLoaderMetadata.SaveAsync` lève `NotImplementedException` dans le projet isolé `Adex.Legacy.MetaModel`; décider s’il faut l’achever ou retirer ce chemin après vérification du transfert des données.
 - **Ajouter des tests automatisés.** Tester les imports, les règles de date, le rapprochement, la persistance, les recherches et les routes (voir [Tests](005_testing.md)).
 
 ## Priorité 2 — Préparer une exécution maintenable
