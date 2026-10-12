@@ -3,6 +3,17 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
+  <Folder Name="/Éléments de solution/Documentation/">
+    <File Path="../docs/000_change_log.md" />
+    <File Path="../docs/001_description.md" />
+    <File Path="../docs/002_design.md" />
+    <File Path="../docs/003_architecture.md" />
+    <File Path="../docs/004_business_rules.md" />
+    <File Path="../docs/005_testing.md" />
+    <File Path="../docs/006_recommendations.md" />
+    <File Path="../docs/007_postgresql_migrations.md" />
+    <File Path="../docs/008_deployment_onpremise.md" />
+  </Folder>
   <Project Path="Adex.Application/Adex.Application.csproj" />
   <Project Path="Adex.Contracts/Adex.Contracts.csproj" />
   <Project Path="Adex.Data.Import/Adex.Data.Import.csproj" />
