@@ -1,5 +1,4 @@
 using Adex.Data.Model;
-using Adex.Data.ReadModel.Explorer;
 using Adex.WebApi.Dashboard;
 
 using Microsoft.AspNetCore.Builder;
@@ -28,11 +27,12 @@ namespace Adex.WebApi.Hosting
             );
             app.UseSerilogRequestLogging();
             app.UseExceptionHandler();
-            if (app.Environment.IsDevelopment())
+            app.UseSwagger();
+            app.UseSwaggerUI(o =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                o.RoutePrefix = string.Empty;
+                o.SwaggerEndpoint("/swagger/v1/swagger.json", "Adex.WebApi v1");
+            });
 
             app.UseHttpsRedirection();
             app.UseMiddleware<ImportInProgressMiddleware>();
