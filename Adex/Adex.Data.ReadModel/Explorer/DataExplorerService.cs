@@ -950,6 +950,7 @@ namespace Adex.Data.ReadModel.Explorer
 
         private static readonly string[] JustificationNames =
         {
+            "Identifiant unique",
             "Motif",
             "Autre motif",
             "Information sur l'événement",
