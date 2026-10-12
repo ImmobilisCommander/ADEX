@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Adex.Application.Csv;
 using Adex.Application.Import;
+using Adex.Application.Search;
 using Adex.Data.Import;
 using Adex.Data.ReadModel.Explorer;
 using Adex.WebApi.Dashboard;
@@ -63,6 +64,12 @@ namespace Adex.WebApi.Hosting
                 .ValidateOnStart();
             services.AddSingleton<CsvPageReader>();
             services.AddSingleton<ICsvService, CsvService>();
+
+            services
+                .AddOptions<SearchOptions>()
+                .BindConfiguration(SearchOptions.SectionName)
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             services
                 .AddOptions<ImportOptions>()

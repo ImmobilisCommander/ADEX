@@ -13,7 +13,7 @@
             <p class="entity-type">@Model.Type</p>
             <h1>@Model.Name</h1>
         </div>
-        <a class="plain-link" href="/Search">Rechercher une autre entité</a>
+        <a class="plain-link" href="@Model.SearchUrl">Rechercher une autre entité</a>
     </header>
 
     <section class="summary-register entity-totals" aria-label="Synthèse des liens">
@@ -144,6 +144,10 @@
                         <label for="page-size">Par page</label>
                         <input type="hidden" name="sort" value="@Model.Sort" />
                         <input type="hidden" name="descending" value="@Model.DescendingDisplay" />
+                        @if (Model.HasSearchQuery)
+                        {
+                            <input type="hidden" name="fromQuery" value="@Model.SearchQuery" />
+                        }
                         <select id="page-size" name="pageSize" data-autosubmit>
                             @foreach (var size in Model.PageSizeOptions)
                             {

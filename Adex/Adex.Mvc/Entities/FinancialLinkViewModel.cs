@@ -23,6 +23,8 @@ namespace Adex.Mvc.Entities
 
         public bool Outgoing { get; set; }
 
+        public string SearchQuery { get; set; }
+
         public List<EntityAttributeViewModel> Justification { get; set; } = new();
 
         public bool HasJustification => Justification.Count > 0;
@@ -43,7 +45,10 @@ namespace Adex.Mvc.Entities
 
         public string AmountSortValue => Amount.ToString(CultureInfo.InvariantCulture);
 
-        public string CounterpartyUrl => $"/{CounterpartyId}";
+        public string CounterpartyUrl =>
+            string.IsNullOrWhiteSpace(SearchQuery)
+                ? $"/{CounterpartyId}"
+                : $"/{CounterpartyId}?fromQuery={Uri.EscapeDataString(SearchQuery)}";
 
         public string RowClass => HasJustification ? "row-detail" : null;
 

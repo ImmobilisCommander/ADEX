@@ -57,12 +57,16 @@ namespace Adex.Mvc.Home
             CancellationToken cancellationToken
         )
         {
-            query ??= string.Empty;
-            ViewData["Title"] = "Résultats de recherche";
-            var results = await apiClient.SearchEntitiesAsync(query, cancellationToken);
-            List<EntitySearchResultViewModel> viewModels = results
-                .Select(r => r.ToViewModel())
-                .ToList();
+            query = query?.Trim() ?? string.Empty;
+            List<EntitySearchResultViewModel> viewModels = new();
+
+            if (!string.IsNullOrEmpty(query))
+            {
+                var results = await apiClient.SearchEntitiesAsync(query, cancellationToken);
+                viewModels = results
+                    .Select(r => r.ToViewModel())
+                    .ToList();
+            }
 
             if (
                 Request
@@ -73,10 +77,10 @@ namespace Adex.Mvc.Home
                 return Ok(viewModels);
             }
 
-            return View(
-                "Search",
-                new EntitySearchPageViewModel { Query = query, Results = viewModels }
-            );
+            var model = new EntitySearchPageViewModel { Query = query, Results = viewModels };
+            ViewData["Title"] = model.PageTitle;
+
+            return View("Search", model);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

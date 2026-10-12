@@ -1817,6 +1817,11 @@ input:focus-visible {
     font-size: 0.74rem;
 }
 
+.search-page .entity-search {
+    margin-bottom: 28px;
+    max-width: 640px;
+}
+
 .search-page .register-section {
     max-width: none;
 }

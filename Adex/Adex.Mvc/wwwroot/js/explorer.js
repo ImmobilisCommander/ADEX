@@ -115,7 +115,10 @@
         const name = document.createElement("span");
         const meta = document.createElement("span");
 
-        link.href = `/${encodeURIComponent(entity.id)}`;
+        const query = input.value.trim();
+        link.href = query
+            ? `/${encodeURIComponent(entity.id)}?fromQuery=${encodeURIComponent(query)}`
+            : `/${encodeURIComponent(entity.id)}`;
         name.className = "search-result-name";
         name.textContent = entity.name;
         meta.className = "search-result-meta";
@@ -170,8 +173,9 @@
         event.preventDefault();
         window.clearTimeout(timer);
         await search();
-        if (input.value.trim().length >= 2) {
-            window.location.assign(`/Search?query=${encodeURIComponent(input.value.trim())}`);
+        const query = input.value.trim();
+        if (query.length >= 2) {
+            window.location.assign(`/Search?query=${encodeURIComponent(query)}`);
         }
     });
 

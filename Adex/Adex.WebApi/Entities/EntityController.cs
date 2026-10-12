@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Application.Search;
 using Adex.Contracts.Explorer;
 using Adex.Data.ReadModel.Explorer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Adex.WebApi.Entities
 {
@@ -14,7 +17,11 @@ namespace Adex.WebApi.Entities
     /// </summary>
     [ApiController]
     [Route("api/entity")]
-    public sealed class EntityController(DataExplorerService explorer) : ControllerBase
+    public sealed class EntityController(
+        DataExplorerService explorer,
+        IMemoryCache cache,
+        IOptionsMonitor<SearchOptions> searchOptions
+    ) : ControllerBase
     {
         /// <summary>
         /// Recherche les entités (entreprises ou bénéficiaires) par mots-clés sur l'identité ou la dénomination.
@@ -30,7 +37,27 @@ namespace Adex.WebApi.Entities
             CancellationToken cancellationToken
         )
         {
-            return await explorer.SearchEntitiesAsync(query, cancellationToken);
+            var trimmed = query?.Trim() ?? string.Empty;
+            if (string.IsNullOrEmpty(trimmed))
+            {
+                return new List<EntitySearchResult>();
+            }
+
+            var duration = searchOptions.CurrentValue.CacheDurationSeconds;
+            if (duration <= 0)
+            {
+                return await explorer.SearchEntitiesAsync(trimmed, cancellationToken);
+            }
+
+            var cacheKey = $"entity_search:{trimmed.ToLowerInvariant()}";
+            if (cache.TryGetValue(cacheKey, out List<EntitySearchResult> cached))
+            {
+                return cached;
+            }
+
+            var results = await explorer.SearchEntitiesAsync(trimmed, cancellationToken);
+            cache.Set(cacheKey, results, TimeSpan.FromSeconds(duration));
+            return results;
         }
 
         /// <summary>

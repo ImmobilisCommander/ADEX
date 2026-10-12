@@ -18,7 +18,9 @@ Le pipeline remplace les données normalisées et n’utilise pas de transaction
 
 ## Recherche et présentation
 
-- La recherche exacte par GUID est disponible même pour une requête courte. La recherche par nom exige au moins trois caractères ; tous les mots doivent apparaître dans le prénom ou le nom. Les résultats sont limités à 100 et incluent les attributs disponibles.
+- La recherche exacte par GUID est disponible même pour une requête courte. La recherche par nom exige au moins trois caractères ; tous les mots doivent apparaître dans le prénom ou le nom. Les résultats sont limités à 100 et incluent les attributs disponibles. Les résultats de recherche sont mis en cache mémoire côté API selon la durée configurée (`Search:CacheDurationSeconds`).
+- La page `/Search` intègre un formulaire de recherche avec autocomplétion ; appelée sans terme (ex. via « Rechercher une autre entité »), elle présente le formulaire avec focus pour démarrer une nouvelle saisie.
+- Le terme de recherche actif est transmis sans état ni variable de session via l'URL (`fromQuery`) ou l'en-tête Referer, permettant au lien « Rechercher une autre entité » de réafficher immédiatement la liste de résultats en cache. Ce paramètre d'URL est maintenu lors des changements de page, des tris et de la consultation d'une contrepartie.
 - Une fiche entité combine les liens entrants et sortants. La page et le tri sont appliqués en base ; les tailles de page acceptées sont 10, 20 et 50.
 - Sur la fiche d'une entité, la modale de justification d'un lien financier présente les attributs associés disponibles (identifiant unique issu de `identifiant_unique`, motifs, informations sur l'événement, convention liée, dates et statut).
 - Les lignes de déclaration du CSV sont filtrées avec « contient », sans distinction de casse ou d’accents. Les filtres sont cumulés par « et » et limités aux colonnes explicitement autorisées.

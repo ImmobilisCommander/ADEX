@@ -39,6 +39,15 @@ namespace Adex.Mvc.Entities
 
         public List<FinancialLinkViewModel> FinancialLinks { get; set; } = new();
 
+        public string SearchQuery { get; set; }
+
+        public bool HasSearchQuery => !string.IsNullOrWhiteSpace(SearchQuery);
+
+        public string SearchUrl =>
+            HasSearchQuery
+                ? $"/Search?query={Uri.EscapeDataString(SearchQuery)}"
+                : "/Search";
+
         public EntityChartsViewModel EntityCharts => new(this);
 
         public string FinancialLinkCountDisplay => FinancialLinkCount.ToString("N0", FrenchCulture);
@@ -111,14 +120,16 @@ namespace Adex.Mvc.Entities
         {
             var state = Sort == key ? (Descending ? "descending" : "ascending") : null;
             var descending = Sort == key ? !Descending : key is "date" or "amount";
+            var queryParam = HasSearchQuery ? $"&fromQuery={Uri.EscapeDataString(SearchQuery)}" : string.Empty;
             var url =
-                $"/{Id}?page=1&pageSize={PageSize}&sort={key}&descending={descending.ToString().ToLowerInvariant()}#links-title";
+                $"/{Id}?page=1&pageSize={PageSize}&sort={key}&descending={descending.ToString().ToLowerInvariant()}{queryParam}#links-title";
             return (state, url);
         }
 
         private string PageUrl(int number)
         {
-            return $"/{Id}?page={number}&pageSize={PageSize}&sort={Sort}&descending={DescendingDisplay}#links-title";
+            var queryParam = HasSearchQuery ? $"&fromQuery={Uri.EscapeDataString(SearchQuery)}" : string.Empty;
+            return $"/{Id}?page={number}&pageSize={PageSize}&sort={Sort}&descending={DescendingDisplay}{queryParam}#links-title";
         }
     }
 }

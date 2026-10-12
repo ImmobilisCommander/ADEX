@@ -1,18 +1,40 @@
 @model Adex.Mvc.Entities.EntitySearchPageViewModel
 <main class="explorer-page search-page">
     <a class="back-link" href="/">← Tableau de bord</a>
+
+    <form class="entity-search" action="/Search" method="get" role="search" data-entity-search>
+        <label for="entity-query">Rechercher une entité</label>
+        <div class="search-controls">
+            <input id="entity-query" name="query" type="search" autocomplete="off"
+                   placeholder="Nom, identifiant…" aria-controls="search-results"
+                   value="@Model.Query" autofocus />
+            <button class="search-submit" type="submit" aria-label="Rechercher">
+                <span class="search-submit-label">Rechercher</span>
+                <svg class="search-submit-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="10.8" cy="10.8" r="6.3"></circle>
+                    <path d="m15.5 15.5 4.2 4.2"></path>
+                </svg>
+            </button>
+        </div>
+        <p class="search-status" aria-live="polite" data-search-status></p>
+        <ul id="search-results" class="search-results" role="listbox" hidden data-search-results></ul>
+    </form>
+
     <section class="register-section">
         <div class="section-heading">
-            <h1>Résultats de recherche</h1>
-            <span class="section-unit">« @Model.Query »</span>
+            <h1>@Model.HeadingTitle</h1>
+            @if (Model.HasQuery)
+            {
+                <span class="section-unit">@Model.QueryDisplay</span>
+            }
         </div>
-        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        @if (Model.HasErrorMessage)
         {
             <p class="error-state" role="alert">@Model.ErrorMessage</p>
         }
-        else if (Model.Results.Count == 0)
+        else if (!Model.HasResults)
         {
-            <p class="empty-state">Aucune entité ne correspond à cette recherche. Essayez un nom ou un identifiant différent.</p>
+            <p class="empty-state">@Model.EmptyStateMessage</p>
         }
         else
         {
@@ -34,7 +56,7 @@
                 @foreach (var result in Model.Results)
                 {
                     <tr>
-                        <th scope="row"><a href="/@result.Id">@result.Name</a></th>
+                        <th scope="row"><a href="@Model.EntityUrl(result)">@result.Name</a></th>
                         <td>@result.Type</td>
                         <td>@result.LinkCountDisplay</td>
                         <td>@result.AmountDisplay</td>
@@ -50,3 +72,7 @@
         }
     </section>
 </main>
+
+@section Scripts {
+    <script src="~/js/explorer.js" asp-append-version="true"></script>
+}
