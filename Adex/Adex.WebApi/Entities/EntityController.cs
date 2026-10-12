@@ -1,6 +1,7 @@
 using Adex.Contracts.Explorer;
 using Adex.Data.ReadModel.Explorer;
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using System;
@@ -10,11 +11,22 @@ using System.Threading.Tasks;
 
 namespace Adex.WebApi.Entities
 {
+    /// <summary>
+    /// Contrôleur de recherche et de consultation détaillée des entités (entreprises et bénéficiaires).
+    /// </summary>
     [ApiController]
     [Route("api/entity")]
     public sealed class EntityController(DataExplorerService explorer) : ControllerBase
     {
+        /// <summary>
+        /// Recherche les entités (entreprises ou bénéficiaires) par mots-clés sur l'identité ou la dénomination.
+        /// </summary>
+        /// <param name="query">Terme textuel recherché (nom, prénom ou raison sociale).</param>
+        /// <param name="cancellationToken">Jeton d'annulation de la requête HTTP.</param>
+        /// <returns>Liste des résultats correspondants avec montants globaux et typologies.</returns>
+        /// <response code="200">Liste des entités trouvées (plafonnée à 100 résultats).</response>
         [HttpGet("search")]
+        [ProducesResponseType(typeof(List<EntitySearchResult>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<EntitySearchResult>>> Search(
             [FromQuery] string query,
             CancellationToken cancellationToken
@@ -23,7 +35,21 @@ namespace Adex.WebApi.Entities
             return await explorer.SearchEntitiesAsync(query, cancellationToken);
         }
 
+        /// <summary>
+        /// Récupère la fiche complète d'une entité et la liste paginée de ses liens financiers.
+        /// </summary>
+        /// <param name="id">Identifiant unique (GUID) de l'entité.</param>
+        /// <param name="cancellationToken">Jeton d'annulation de la requête HTTP.</param>
+        /// <param name="page">Numéro de page pour la liste des liens d'intérêt (défaut : 1).</param>
+        /// <param name="pageSize">Nombre d'éléments par page (défaut : 20).</param>
+        /// <param name="sort">Propriété de tri des liens ("date", "amount", etc., défaut : "date").</param>
+        /// <param name="descending">Indique si le tri doit être décroissant (défaut : true).</param>
+        /// <returns>Fiche détaillée avec répartition annuelle, répartition par typologie et liens financiers.</returns>
+        /// <response code="200">Entité trouvée et retournée.</response>
+        /// <response code="404">Aucune entité trouvée pour cet identifiant.</response>
         [HttpGet("{id:guid}")]
+        [ProducesResponseType(typeof(EntityDetails), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EntityDetails>> Get(
             Guid id,
             CancellationToken cancellationToken,

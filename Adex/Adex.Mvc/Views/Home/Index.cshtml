@@ -18,7 +18,13 @@ FORM: Dense register mosaic, assigned direction 4; staging keeps every summary a
             <div class="search-controls">
                 <input id="entity-query" name="query" type="search" autocomplete="off"
                        placeholder="Nom, identifiant…" aria-controls="search-results" />
-                <button type="submit">Rechercher</button>
+                <button class="search-submit" type="submit" aria-label="Rechercher">
+                    <span class="search-submit-label">Rechercher</span>
+                    <svg class="search-submit-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="10.8" cy="10.8" r="6.3"></circle>
+                        <path d="m15.5 15.5 4.2 4.2"></path>
+                    </svg>
+                </button>
             </div>
             <p class="search-status" aria-live="polite" data-search-status></p>
             <ul id="search-results" class="search-results" role="listbox" hidden data-search-results></ul>

@@ -6,6 +6,9 @@ using Adex.WebApi.Dashboard;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using System;
+using System.IO;
+using System.Reflection;
 using System.Text.Json.Serialization;
 
 namespace Adex.WebApi.Hosting
@@ -22,8 +25,21 @@ namespace Adex.WebApi.Hosting
             services.AddMemoryCache();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>
-                options.SwaggerDoc("v1", new() { Title = "ADEX API", Version = "v1" })
-            );
+            {
+                options.SwaggerDoc("v1", new() { Title = "ADEX API", Version = "v1" });
+
+                var webApiXml = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+                if (File.Exists(webApiXml))
+                {
+                    options.IncludeXmlComments(webApiXml, includeControllerXmlComments: true);
+                }
+
+                var contractsXml = Path.Combine(AppContext.BaseDirectory, "Adex.Contracts.xml");
+                if (File.Exists(contractsXml))
+                {
+                    options.IncludeXmlComments(contractsXml);
+                }
+            });
             return services;
         }
 
