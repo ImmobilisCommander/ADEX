@@ -48,6 +48,13 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 Les recommandations sont des propositions, pas des travaux déjà réalisés. Les constats décrivent les sources inspectées et devront être actualisés si l’implémentation évolue.
 - Page d'interrogation du CSV : lecture asynchrone (CsvPageReader.ReadAsync, CsvRecordCursor) annulée via le jeton de la requête HTTP, indicateur « Recherche en cours » côté MVC, filtres sur les colonnes texte et identifiants, et règle sur les méthodes asynchrones ajoutée à AGENTS.md.
 - Page CSV : affichage immédiat de la page, contenu (tableau, filtres, pagination) chargé ensuite par /Csv/Content via csv-loader.js, requête annulée quand l'utilisateur quitte la page.
+- Refonte architecturale et séparation des responsabilités :
+  - Organisation des contrôleurs, vues et modèles par domaine fonctionnel (`Home`, `Entities`, `Csv`, `Dashboard`, `Import`) avec mise en conformité des espaces de nommage et de l’arborescence des fichiers.
+  - Extraction du moteur de lecture et filtrage CSV (`Adex.Application.Csv`) ainsi que de l’orchestration des tâches d’import en arrière-plan (`Adex.Application.Import`) dans la bibliothèque `Adex.Application`.
+  - Création de la bibliothèque cliente autonome `Adex.WebApi.Client` (`IAdexWebApiClient`, `AdexWebApiClient`) avec résilience HTTP (Polly retry/circuit-breaker) et découplage total d'ASP.NET Core MVC.
+  - Transformation des méthodes statiques de mapping (`ApiViewModelMapper`) et de gestion des exceptions (`ExceptionMapping`) en méthodes d'extension C# (`ToViewModel()`, `Map()`).
+  - Intégration de la documentation XML OpenAPI/Swagger sur l'API (`Adex.WebApi` et `Adex.Contracts`) avec commentaires des contrôleurs, paramètres, codes retours et modèles.
+  - Audit et alignement complet de la documentation (`000` à `008`).
 - API CSV : résultat de chaque page/combinaison de filtres conservé 1 minute dans IMemoryCache.
 - API CSV : un SemaphoreSlim limite à une seule lecture du fichier à la fois ; les requêtes en attente restent annulables.
 - API CSV : durée du cache (Csv:CacheDurationSeconds, 60 s par défaut, 0 = pas de cache) lue via IOptionsMonitor pour être prise en compte à chaud ; contrôleurs CSV passés au constructeur principal ; règle correspondante ajoutée à AGENTS.md.

@@ -4,9 +4,9 @@
 
 La persistance est séparée en deux bases PostgreSQL :
 
-| Base | Contexte EF Core | Projet de données | Migration initiale |
+| Base | Contexte EF Core | Projet de données | Migrations |
 |---|---|---|---|
-| `Adex` | `AdexContext` | `Adex/Adex.Data.Model` | `20261006154048_InitialPostgreSqlSchema` |
+| `Adex` | `AdexContext` | `Adex/Adex.Data.Model` | `20261007135213_InitialPostgreSqlSchema` (suivie de `EntityAttributesAsJsonb`, `FinancialLinkTypeTotals`, `DashboardSnapshots`) |
 | `AdexMeta` | `AdexMetaContext` | `Adex/Adex.Data.MetaModel` | `20261006154056_InitialPostgreSqlSchema` |
 
 Les anciens fichiers de migrations EF6 ont été supprimés. Ces migrations sont des créations de schémas initiaux, et non une conversion des anciennes migrations ou des données historiques.
@@ -37,7 +37,7 @@ Relire et tester chaque script sur une base de validation avant de le transmettr
 
 ## Application et précautions
 
-Aucune migration n’est appliquée automatiquement au démarrage. La génération des migrations et scripts ne crée pas les bases et ne modifie pas leur schéma.
+Au démarrage de l'hôte `Adex.WebApi`, les migrations en attente pour `AdexContext` (base `Adex`) sont appliquées automatiquement via `app.MigrateDatabaseAsync()` avant la préparation du snapshot du tableau de bord. En revanche, `AdexMetaContext` (base `AdexMeta`) n’est pas migré automatiquement au démarrage. La génération des migrations et scripts ne crée pas les bases et ne modifie pas leur schéma.
 
 La vérification locale en lecture seule confirme que le serveur PostgreSQL répond avec l’utilisateur configuré, mais que les bases `Adex` et `AdexMeta` ne sont pas encore créées.
 

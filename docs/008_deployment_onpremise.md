@@ -32,7 +32,7 @@ Le socle commun reste dans `appsettings.json` (Serilog, journaux sous `D:\Logs`,
 | `AdexApi:BaseAddress` (MVC) | `https://localhost:44330/` | `https://localhost:5002/` |
 | `Import:DataDirectory`, `Csv:FilePath` | `D:\publish\adex\data` | `D:\publish\adex\data` |
 | `AllowedHosts` | `*` | MVC : `adex.laboratoires.dev;localhost` ; API : `127.0.0.1;localhost` |
-| Niveau `Adex.WebApi.Csv` | `Debug` | `Information` |
+| Niveau `Adex.Application.Csv` | `Debug` | `Information` |
 
 Lancer avec `ASPNETCORE_ENVIRONMENT=Production`.
 

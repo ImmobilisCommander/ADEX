@@ -41,7 +41,7 @@ Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuG
 
 ## Hôtes et configuration
 
-L’API et le MVC utilisent l’hébergement minimal ASP.NET Core. L’API applique au démarrage les migrations de `AdexContext`; elle ne migre pas `AdexMetaContext`. Les fabriques de contextes, `NpgsqlDataSource`, services d’import et services de lecture sont enregistrés dans `Adex.WebApi.Hosting`. Le client HTTP typé du MVC utilise `AddHttpClient` et une stratégie de résilience avec backoff exponentiel plafonné à 30 secondes.
+L’API et le MVC utilisent l’hébergement minimal ASP.NET Core. L’API applique au démarrage les migrations de `AdexContext`; elle ne migre pas `AdexMetaContext`. Les fabriques de contextes, `NpgsqlDataSource`, services d’import et services de lecture sont enregistrés dans `Adex.WebApi.Hosting`. La documentation XML OpenAPI/Swagger est générée à la compilation pour `Adex.WebApi` et `Adex.Contracts`, et exposée par Swagger UI sur `/`. Le client HTTP typé du MVC utilise la bibliothèque `Adex.WebApi.Client` (`AddAdexWebApiClient`) avec une stratégie de résilience Polly (backoff exponentiel plafonné à 30 secondes).
 
 Les routes principales sont `GET /api/dashboard`, `GET /api/entity/search?query=...`, `GET /api/entity/{id}` et `GET /api/csv`. MVC utilise `AdexApi:BaseAddress`. L’import accepte `POST`, `GET` et `DELETE /api/import`, protégés par `X-Api-Key`; le nom et le dossier du CSV viennent de la configuration `Import`.
 
@@ -59,8 +59,8 @@ Les deux hôtes utilisent Serilog, sorties console et fichiers sous `D:\Logs`, j
 
 ## Interrogation directe du CSV
 
-- `GET api/csv?page=N&filters[colonne]=valeur` (`Adex/WebApi/Csv/CsvController.cs`) renvoie des pages de 10 lignes. MVC sert `/Csv`, puis `/Csv/Content` charge le tableau via `csv-loader.js`; la requête est annulée à la navigation.
+- `GET api/csv?page=N&filters[colonne]=valeur` (`Adex/Adex.WebApi/Csv/CsvController.cs`) renvoie des pages de 10 lignes. MVC sert `/Csv`, puis `/Csv/Content` charge le tableau via `csv-loader.js`; la requête est annulée à la navigation.
 - La lecture asynchrone est strictement vers l’avant et s’arrête après la page plus une ligne correspondante. Le jeton d’annulation HTTP est transmis jusqu’à la lecture du fichier.
-- Les filtres « contient » sont insensibles à la casse et aux accents, cumulés par « et ». Seules les colonnes de `CsvFilterableColumns` sont autorisées ; les autres donnent 400.
+- Les filtres « contient » sont insensibles à la casse et aux accents, cumulés par « et ». Seules les colonnes de `Adex.Application.Csv.CsvFilterableColumns` sont autorisées ; les autres donnent 400.
 - Un `SemaphoreSlim` limite à une lecture simultanée. Les pages filtrées sont mises en cache pendant `Csv:CacheDurationSeconds` (60 secondes par défaut, 0 sans cache).
-- `CsvOptions` valide `Csv:FilePath` et `Csv:CacheDurationSeconds` au démarrage. `AdexApi:BaseAddress` est également validée au démarrage côté MVC ; le délai HTTP est infini et l’annulation dépend du jeton de la requête.
+- `Adex.Application.Csv.CsvOptions` valide `Csv:FilePath` et `Csv:CacheDurationSeconds` au démarrage. `AdexApi:BaseAddress` est également validée au démarrage côté MVC ; le délai HTTP est infini et l’annulation dépend du jeton de la requête.
