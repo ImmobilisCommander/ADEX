@@ -18,6 +18,7 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- API : suppression de `BeneficiaryController`, qui ne servait qu’à maintenir une ancienne route de fiche bénéficiaire. L’application MVC utilise déjà `GET /api/entity/{id}` via `EntityController`, lequel prend en charge les bénéficiaires ; aucun autre appel ni référence à l’ancienne route n’a été trouvé. La documentation des contrôleurs API est mise à jour.
 - Recherche d'entités : formulaire étendu à toute la largeur disponible sur les écrans jusqu'à 800 px ; hauteur du champ et du bouton harmonisée et loupe positionnée au centre géométrique du bouton en portrait mobile. La feuille CSS est versionnée pour éviter que le navigateur conserve une ancienne mise en page ; le bouton texte reste utilisé dans les autres formats.
 - Première édition : création de cette documentation à partir de l’inspection du dépôt.
 - Réorganisation : adoption d’une numérotation sur trois chiffres et séparation description, conception, architecture, règles métier, tests et recommandations.
