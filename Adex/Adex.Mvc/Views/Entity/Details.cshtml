@@ -13,7 +13,10 @@
             <p class="entity-type">@Model.Type</p>
             <h1>@Model.Name</h1>
         </div>
-        <a class="plain-link" href="@Model.SearchUrl">Rechercher une autre entité</a>
+        @if (Model.ShowSearchLink)
+        {
+            <a class="plain-link" href="@Model.SearchUrl">Rechercher une autre entité</a>
+        }
     </header>
 
     <section class="summary-register entity-totals" aria-label="Synthèse des liens">

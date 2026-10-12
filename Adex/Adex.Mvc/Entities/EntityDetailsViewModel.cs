@@ -43,6 +43,8 @@ namespace Adex.Mvc.Entities
 
         public bool HasSearchQuery => !string.IsNullOrWhiteSpace(SearchQuery);
 
+        public bool ShowSearchLink => HasSearchQuery;
+
         public string SearchUrl =>
             HasSearchQuery
                 ? $"/Search?query={Uri.EscapeDataString(SearchQuery)}"

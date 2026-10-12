@@ -37,26 +37,6 @@ namespace Adex.Mvc.Entities
             }
 
             fromQuery = fromQuery?.Trim();
-            if (
-                string.IsNullOrEmpty(fromQuery)
-                && Request.Headers.TryGetValue("Referer", out var refererValues)
-            )
-            {
-                var referer = refererValues.ToString();
-                if (
-                    Uri.TryCreate(referer, UriKind.Absolute, out var refererUri)
-                    && refererUri.AbsolutePath.Equals("/Search", StringComparison.OrdinalIgnoreCase)
-                )
-                {
-                    var parsed = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(
-                        refererUri.Query
-                    );
-                    if (parsed.TryGetValue("query", out var q))
-                    {
-                        fromQuery = q.ToString().Trim();
-                    }
-                }
-            }
 
             var model = entity.ToViewModel();
             if (!string.IsNullOrEmpty(fromQuery))
