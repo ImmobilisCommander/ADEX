@@ -14,3 +14,4 @@ Data/declarations.csv
 Data/declarations_10pct.csv
 Data/declarations_2pct.csv
 .playwright-mcp
+*.user

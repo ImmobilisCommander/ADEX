@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <meta http-equiv="refresh" content="60">
+    <title>Maintenance - ADEX</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --ink: #202b36;
+            --ink-muted: #586978;
+            --line: #d9e1e6;
+            --paper: #ffffff;
+            --paper-cool: #f1f6f8;
+            --accent: #aa3028;
+            --accent-soft: #fff1ee;
+            --focus: #174e78;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ink: #e6edf2;
+                --ink-muted: #b2c0ca;
+                --line: #3c4b56;
+                --paper: #202b34;
+                --paper-cool: #182129;
+                --accent: #ef897f;
+                --accent-soft: #3d292b;
+                --focus: #9bcfff;
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--paper-cool);
+            color: var(--ink);
+            font-family: "Segoe UI", Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        header {
+            padding: 14px 24px;
+            background: var(--paper);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .brand span { color: var(--accent); }
+
+        main {
+            flex: 1;
+            display: grid;
+            place-items: center;
+            padding: 32px 20px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 560px;
+            padding: 36px 32px;
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .status::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        h1 {
+            margin: 18px 0 10px;
+            font-size: clamp(1.6rem, 5vw, 2.1rem);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+        }
+
+        p { margin: 0 0 12px; color: var(--ink-muted); }
+
+        a { color: var(--focus); }
+
+        .hint { margin-top: 22px; font-size: 0.875rem; }
+
+        footer {
+            padding: 16px 24px;
+            font-size: 0.8125rem;
+            color: var(--ink-muted);
+            border-top: 1px solid var(--line);
+        }
+
+        @keyframes pulse {
+            50% { opacity: 0.3; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .status::before { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">ADEX<span>.</span></div>
+    </header>
+    <main>
+        <section class="card" aria-labelledby="title">
+            <span class="status" role="status">Service momentanément indisponible</span>
+            <h1 id="title">Le site est en maintenance</h1>
+            <p>
+                ADEX est temporairement hors ligne. Vos données ne sont pas affectées :
+                le service reprendra dès que possible.
+            </p>
+            <p class="hint">
+                Cette page se recharge automatiquement toutes les minutes. Vous pouvez aussi
+                <a href="">actualiser maintenant</a>.
+            </p>
+        </section>
+    </main>
+    <footer>ADEX · Exploration des données déclaratives</footer>
+</body>
+</html>
