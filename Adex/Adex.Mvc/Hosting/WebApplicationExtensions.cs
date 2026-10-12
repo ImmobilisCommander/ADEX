@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Hosting;
 
 using Serilog;
@@ -14,6 +15,12 @@ namespace Adex.Mvc.Hosting
     {
         public static WebApplication UseAdexPipeline(this WebApplication app)
         {
+            // Le tunnel Cloudflare arrive en HTTP depuis loopback : restaurer le schéma et l'IP d'origine.
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                    | ForwardedHeaders.XForwardedHost,
+            });
             app.UseSerilogRequestLogging();
             app.UseExceptionHandler("/Home/Error");
             if (!app.Environment.IsDevelopment())
