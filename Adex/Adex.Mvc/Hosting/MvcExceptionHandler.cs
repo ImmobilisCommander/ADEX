@@ -32,7 +32,7 @@ namespace Adex.Mvc.Hosting
                 return true;
             }
 
-            var (status, message) = ExceptionMapping.Map(exception);
+            var (status, message) = exception.Map();
             httpContext.Response.StatusCode = status;
             if (
                 !httpContext.Request.Headers.Accept.ToString().Contains(

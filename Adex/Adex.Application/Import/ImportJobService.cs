@@ -1,6 +1,5 @@
 using Adex.Application.Import;
 
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,12 +11,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Adex.WebApi.Import
+namespace Adex.Application.Import
 {
     public class ImportJobService(
         IServiceScopeFactory scopeFactory,
         IHostApplicationLifetime lifetime,
-        IWebHostEnvironment environment,
+        IHostEnvironment environment,
         IOptions<ImportOptions> options,
         ILogger<ImportJobService> logger
         )

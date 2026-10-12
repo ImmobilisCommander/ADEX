@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Adex.WebApi.Csv
+namespace Adex.Application.Csv
 {
     /// <summary>
     /// Columns whose business value is free text and can be searched with a "contains" filter.

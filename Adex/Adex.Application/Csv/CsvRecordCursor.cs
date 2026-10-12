@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Adex.WebApi.Csv
+namespace Adex.Application.Csv
 {
     /// <summary>
     /// Forward-only asynchronous reader of semicolon-separated, double-quote-escaped CSV records.

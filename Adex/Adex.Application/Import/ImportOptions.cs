@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Adex.WebApi.Import
+namespace Adex.Application.Import
 {
     public class ImportOptions
     {

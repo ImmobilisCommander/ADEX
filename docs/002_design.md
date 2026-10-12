@@ -6,11 +6,11 @@ Le modèle relationnel canonique est dans `Adex/Adex.Data.Model/` : `Entity`, `C
 
 Le modèle de métadonnées historique est séparé dans `Adex/Adex.Data.MetaModel/`. Son chargeur, ses contrats CSV et ses types de visualisation sont isolés dans `Adex/Adex.Legacy.MetaModel/`; ils ne sont pas partagés par les hôtes actifs.
 
-Les réponses HTTP communes au serveur API et au client MVC sont des DTO dans `Adex/Adex.Contracts/`. Le service de lecture `DataExplorerService` et ses requêtes EF Core sont dans `Adex/Adex.Data.ReadModel/`. Les contrôleurs API regroupés par domaine ne contiennent que la logique HTTP et délèguent à ce service. Les ViewModels MVC restent distincts des DTO et sont produits par le client API.
+Les réponses HTTP communes au serveur API et au client MVC sont des DTO dans `Adex/Adex.Contracts/`. Le client HTTP réutilisable est dans `Adex/Adex.WebApi.Client/`. Le service de lecture `DataExplorerService` et ses requêtes EF Core sont dans `Adex/Adex.Data.ReadModel/`. Les règles de filtrage CSV et le service applicatif d’import sont dans `Adex/Adex.Application/`. Les contrôleurs API regroupés par domaine ne contiennent que la logique HTTP et délèguent à ces services applicatifs. Les ViewModels MVC restent distincts des DTO et sont produits par le client web.
 
 ## Parcours d’import
 
-`ImportJobService` gère le cycle de vie de l’import en arrière-plan dans l’hôte API. Il utilise le port applicatif `Adex.Application.Import.IDeclarationsImporter`; l’adaptateur `Adex.Data.Import.DeclarationsImporter` lit le fichier consolidé, applique les règles de sélection et écrit les lignes avec le COPY binaire Npgsql via un `NpgsqlDataSource`.
+`ImportJobService` (dans `Adex.Application.Import`) gère le cycle de vie de l’import en arrière-plan. Il utilise le port applicatif `Adex.Application.Import.IDeclarationsImporter`; l’adaptateur `Adex.Data.Import.DeclarationsImporter` lit le fichier consolidé, applique les règles de sélection et écrit les lignes avec le COPY binaire Npgsql via un `NpgsqlDataSource`.
 
 Ce pipeline est volontairement spécialisé pour les volumes élevés et la base PostgreSQL. Il ne dépend plus du contexte EF Core, mais l’analyse des règles, la transformation des lignes et les opérations de persistance restent regroupées dans l’implémentation d’import. Une séparation plus fine n’est justifiée que si des consommateurs ou des variantes d’import apparaissent.
 

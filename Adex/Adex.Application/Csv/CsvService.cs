@@ -5,17 +5,17 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Adex.Contracts.Csv;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Adex.WebApi.Csv
+namespace Adex.Application.Csv
 {
     public sealed class CsvService(
         CsvPageReader reader,
         IMemoryCache cache,
         IOptionsMonitor<CsvOptions> options,
-        IWebHostEnvironment environment
+        IHostEnvironment environment
     ) : ICsvService
     {
         private const int PageSize = 10;

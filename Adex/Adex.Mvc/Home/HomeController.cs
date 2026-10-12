@@ -1,11 +1,13 @@
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Adex.Mvc.Hosting;
 using Adex.Mvc.Api;
 using Adex.Mvc.Entities;
 using Adex.Mvc.Home;
 using Adex.Mvc.Shared;
+using Adex.WebApi.Client;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +15,7 @@ using System.Threading;
 
 namespace Adex.Mvc.Home
 {
-    public class HomeController(AdexApiClient apiClient) : Controller
+    public class HomeController(IAdexWebApiClient apiClient) : Controller
     {
         public IActionResult Index()
         {
@@ -28,7 +30,7 @@ namespace Adex.Mvc.Home
             var model = await apiClient.TryGetDashboardAsync(cancellationToken);
             return model is null
                 ? StatusCode(StatusCodes.Status202Accepted)
-                : PartialView("_DashboardContent", model);
+                : PartialView("_DashboardContent", model.ToViewModel());
         }
 
         [HttpGet]
@@ -57,17 +59,18 @@ namespace Adex.Mvc.Home
         {
             query ??= string.Empty;
             ViewData["Title"] = "Résultats de recherche";
-            List<EntitySearchResultViewModel> results =
-                await apiClient.SearchEntitiesAsync(query, cancellationToken);
+            var results = await apiClient.SearchEntitiesAsync(query, cancellationToken);
+            List<EntitySearchResultViewModel> viewModels =
+                results.Select(r => r.ToViewModel()).ToList();
 
             if (Request.Headers.Accept.ToString().Contains("application/json", System.StringComparison.OrdinalIgnoreCase))
             {
-                return Ok(results);
+                return Ok(viewModels);
             }
 
             return View(
                 "Search",
-                new EntitySearchPageViewModel { Query = query, Results = results }
+                new EntitySearchPageViewModel { Query = query, Results = viewModels }
             );
         }
 
@@ -78,7 +81,7 @@ namespace Adex.Mvc.Home
             var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
             var message = exception is null
                 ? "Une erreur inattendue s’est produite."
-                : ExceptionMapping.Map(exception).Message;
+                : exception.Map().Message;
             return View(
                 new ErrorViewModel
                 {

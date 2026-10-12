@@ -3,11 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Adex.Mvc.Api;
 using Adex.Mvc.Entities;
+using Adex.WebApi.Client;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.Mvc.Entities
 {
-    public sealed class EntityController(AdexApiClient apiClient) : Controller
+    public sealed class EntityController(IAdexWebApiClient apiClient) : Controller
     {
         [HttpGet("/{id:guid}")]
         public async Task<IActionResult> Details(
@@ -27,8 +28,9 @@ namespace Adex.Mvc.Entities
                 return View("NotFound", new NotFoundViewModel { Identifier = id.ToString() });
             }
 
-            ViewData["Title"] = entity.Name;
-            return View(entity);
+            var model = entity.ToViewModel();
+            ViewData["Title"] = model.Name;
+            return View(model);
         }
     }
 }

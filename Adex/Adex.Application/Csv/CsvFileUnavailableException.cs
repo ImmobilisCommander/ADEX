@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Adex.WebApi.Csv
+namespace Adex.Application.Csv
 {
     public sealed class CsvFileUnavailableException(string path, Exception innerException)
         : Exception(

@@ -1,5 +1,4 @@
 using System.Linq;
-using Adex.Contracts.Csv;
 using Adex.Contracts.Explorer;
 using Adex.Mvc.Csv;
 using Adex.Mvc.Entities;
@@ -9,7 +8,7 @@ namespace Adex.Mvc.Api
 {
     internal static class ApiViewModelMapper
     {
-        public static DashboardViewModel ToViewModel(DashboardModel source)
+        public static DashboardViewModel ToViewModel(this DashboardModel source)
         {
             return new DashboardViewModel
             {
@@ -27,8 +26,8 @@ namespace Adex.Mvc.Api
                     Count = item.Count,
                     Amount = item.Amount,
                 }).ToList(),
-                TopContributors = source.TopContributors.Select(ToViewModel).ToList(),
-                TopBeneficiaries = source.TopBeneficiaries.Select(ToViewModel).ToList(),
+                TopContributors = source.TopContributors.Select(item => item.ToViewModel()).ToList(),
+                TopBeneficiaries = source.TopBeneficiaries.Select(item => item.ToViewModel()).ToList(),
                 MonthlyDeclarations = source.MonthlyDeclarations.Select(item => new MonthlyDeclarationViewModel
                 {
                     Year = item.Year,
@@ -57,7 +56,7 @@ namespace Adex.Mvc.Api
             };
         }
 
-        public static EntitySearchResultViewModel ToViewModel(EntitySearchResult source)
+        public static EntitySearchResultViewModel ToViewModel(this EntitySearchResult source)
         {
             return new EntitySearchResultViewModel
             {
@@ -71,7 +70,7 @@ namespace Adex.Mvc.Api
             };
         }
 
-        public static EntityDetailsViewModel ToViewModel(EntityDetails source)
+        public static EntityDetailsViewModel ToViewModel(this EntityDetails source)
         {
             return new EntityDetailsViewModel
             {
@@ -98,7 +97,7 @@ namespace Adex.Mvc.Api
                     Count = item.Count,
                     Amount = item.Amount,
                 }).ToList(),
-                Attributes = source.Attributes.Select(ToViewModel).ToList(),
+                Attributes = source.Attributes.Select(item => item.ToViewModel()).ToList(),
                 FinancialLinks = source.FinancialLinks.Select(item => new FinancialLinkViewModel
                 {
                     Id = item.Id,
@@ -109,23 +108,12 @@ namespace Adex.Mvc.Api
                     Date = item.Date,
                     Amount = item.Amount,
                     Outgoing = item.Outgoing,
-                    Justification = item.Justification.Select(ToViewModel).ToList(),
+                    Justification = item.Justification.Select(j => j.ToViewModel()).ToList(),
                 }).ToList(),
             };
         }
 
-        public static CsvPageResponse ToViewModel(CsvPage source)
-        {
-            return new CsvPageResponse
-            {
-                Columns = source.Columns,
-                FilterableColumns = source.FilterableColumns,
-                Rows = source.Rows,
-                HasNextPage = source.HasNextPage,
-            };
-        }
-
-        private static TopEntityViewModel ToViewModel(TopEntity source)
+        public static TopEntityViewModel ToViewModel(this TopEntity source)
         {
             return new TopEntityViewModel
             {
@@ -136,7 +124,7 @@ namespace Adex.Mvc.Api
             };
         }
 
-        private static EntityAttributeViewModel ToViewModel(EntityAttributeDetails source)
+        public static EntityAttributeViewModel ToViewModel(this EntityAttributeDetails source)
         {
             return new EntityAttributeViewModel
             {

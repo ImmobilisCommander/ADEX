@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Adex.Mvc.Api;
+using Adex.WebApi.Client;
 
 using System;
 using System.Threading;
@@ -9,7 +9,7 @@ namespace Adex.Mvc.Entities
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BeneficiaryController(AdexApiClient apiClient) : ControllerBase
+    public class BeneficiaryController(IAdexWebApiClient apiClient) : ControllerBase
     {
         [HttpGet]
         [Route("{id:guid}")]

@@ -16,7 +16,9 @@ Les propositions qui suivent distinguent les changements d’architecture déjà
 - DTO de transport séparés des ViewModels Razor ; `AdexApiClient` convertit explicitement les contrats vers les modèles de présentation.
 - Chargeur CSV historique, contrat de chargement, métamodèle et types de graphe isolés dans `Adex.Legacy.MetaModel`, hors du graphe de dépendances des hôtes actifs.
 - Contrôleurs et modèles MVC/API regroupés par domaine, avec namespaces racines et chemins de fichiers alignés.
-- Port et résultat applicatifs d’import déplacés vers `Adex.Application`; l’API dépend du contrat applicatif, tandis que `Adex.Data.Import` en fournit l’adaptateur PostgreSQL.
+- Port et résultat applicatifs d’import, moteur de lecture CSV (`CsvPageReader`, `CsvService`) et gestionnaire d’arrière-plan (`ImportJobService`) regroupés dans `Adex.Application`.
+- Extraction de `Adex.WebApi.Client` : client HTTP fortement typé (`IAdexWebApiClient`, `AdexWebApiClient`) indépendant de MVC et réutilisable dans d’autres applications .NET.
+- MVC recentré sur la présentation Razor : consommation du client HTTP d’API et conversion des contrats vers les ViewModels dédiés.
 
 ## Priorité 1 — Fiabiliser les parcours actuels
 

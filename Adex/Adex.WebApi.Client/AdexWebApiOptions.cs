@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Adex.Mvc.Api
+namespace Adex.WebApi.Client
 {
-    public sealed class AdexApiOptions
+    public sealed class AdexWebApiOptions
     {
         public const string SectionName = "AdexApi";
 

@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Adex.Mvc.Api;
 using Adex.Mvc.Csv;
+using Adex.WebApi.Client;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Adex.Mvc.Csv
 {
-    public class CsvController(AdexApiClient apiClient) : Controller
+    public class CsvController(IAdexWebApiClient apiClient) : Controller
     {
         private const int PageSize = 10;
 
@@ -53,30 +54,32 @@ namespace Adex.Mvc.Csv
             CancellationToken cancellationToken
         )
         {
-            var csv = await apiClient.GetCsvPageAsync(page, filters, cancellationToken);
-            if (csv.ErrorMessage is not null)
+            try
             {
-                return new CsvPageViewModel { ErrorMessage = csv.ErrorMessage };
+                var csv = await apiClient.GetCsvPageAsync(page, filters, cancellationToken);
+                var filterable = csv.FilterableColumns.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                return new CsvPageViewModel
+                {
+                    Page = page,
+                    PageSize = PageSize,
+                    Columns = csv.Columns
+                        .Select(name => new CsvColumnViewModel
+                        {
+                            Name = name,
+                            IsFilterable = filterable.Contains(name),
+                            FilterValue = filters.GetValueOrDefault(name, string.Empty),
+                        })
+                        .ToList(),
+                    Rows = csv.Rows,
+                    PreviousPageUrl = page > 1 ? ActionUrl(nameof(Index), page - 1, filters) : null,
+                    NextPageUrl = csv.HasNextPage ? ActionUrl(nameof(Index), page + 1, filters) : null,
+                    ClearFiltersUrl = filters.Count > 0 ? Url.Action(nameof(Index)) : null,
+                };
             }
-
-            var filterable = csv.FilterableColumns.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            return new CsvPageViewModel
+            catch (Exception exception) when (exception is AdexApiException or HttpRequestException)
             {
-                Page = page,
-                PageSize = PageSize,
-                Columns = csv.Columns
-                    .Select(name => new CsvColumnViewModel
-                    {
-                        Name = name,
-                        IsFilterable = filterable.Contains(name),
-                        FilterValue = filters.GetValueOrDefault(name, string.Empty),
-                    })
-                    .ToList(),
-                Rows = csv.Rows,
-                PreviousPageUrl = page > 1 ? ActionUrl(nameof(Index), page - 1, filters) : null,
-                NextPageUrl = csv.HasNextPage ? ActionUrl(nameof(Index), page + 1, filters) : null,
-                ClearFiltersUrl = filters.Count > 0 ? Url.Action(nameof(Index)) : null,
-            };
+                return new CsvPageViewModel { ErrorMessage = exception.Message };
+            }
         }
 
         private string ActionUrl(string action, int page, Dictionary<string, string> filters)

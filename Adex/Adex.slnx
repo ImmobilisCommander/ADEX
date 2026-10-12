@@ -11,5 +11,6 @@
   <Project Path="Adex.Data.ReadModel/Adex.Data.ReadModel.csproj" />
   <Project Path="Adex.Legacy.MetaModel/Adex.Legacy.MetaModel.csproj" />
   <Project Path="Adex.Mvc/Adex.Mvc.csproj" />
+  <Project Path="Adex.WebApi.Client/Adex.WebApi.Client.csproj" />
   <Project Path="Adex.WebApi/Adex.WebApi.csproj" />
 </Solution>

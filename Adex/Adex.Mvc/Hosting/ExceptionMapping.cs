@@ -8,7 +8,7 @@ namespace Adex.Mvc.Hosting
 {
     public static class ExceptionMapping
     {
-        public static (int StatusCode, string Message) Map(Exception exception)
+        public static (int StatusCode, string Message) Map(this Exception exception)
         {
             if (exception is not HttpRequestException http)
             {

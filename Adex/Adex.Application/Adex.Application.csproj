@@ -2,4 +2,8 @@
   <PropertyGroup>
     <RootNamespace>Adex.Application</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\Adex.Contracts\Adex.Contracts.csproj" />
+  </ItemGroup>
 </Project>

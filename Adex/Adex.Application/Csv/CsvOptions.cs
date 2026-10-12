@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Adex.WebApi.Csv
+namespace Adex.Application.Csv
 {
     public sealed class CsvOptions
     {

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Adex.Contracts.Csv;
 
-namespace Adex.WebApi.Csv
+namespace Adex.Application.Csv
 {
     public interface ICsvService
     {

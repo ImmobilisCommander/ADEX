@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Adex.WebApi.Import
+namespace Adex.Application.Import
 {
 
     public enum ImportState

@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Adex.WebApi.Import
+namespace Adex.Application.Import
 {
     internal sealed class Releaser(SemaphoreSlim semaphore) : IDisposable
     {

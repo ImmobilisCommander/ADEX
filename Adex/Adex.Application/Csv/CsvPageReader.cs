@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Adex.WebApi.Csv
+namespace Adex.Application.Csv
 {
     /// <summary>
     /// Reads a page of records from a semicolon-separated, double-quote-escaped CSV file whose

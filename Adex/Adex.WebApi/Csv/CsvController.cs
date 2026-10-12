@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Application.Csv;
 using Adex.Contracts.Csv;
-using Adex.WebApi.Csv;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.WebApi.Csv
