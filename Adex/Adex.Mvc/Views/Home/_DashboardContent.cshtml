@@ -6,6 +6,7 @@
 }
     @if (string.IsNullOrEmpty(Model.ErrorMessage))
     {
+    <div class="dashboard-grid">
     <section class="summary-register" aria-label="Indicateurs généraux">
         <div class="summary-item">
             <span class="summary-label">Entités recensées</span>
@@ -21,7 +22,6 @@
         </div>
     </section>
 
-    <div class="dashboard-grid">
         <section class="register-section monthly-chart" data-chart-motion="bars" aria-labelledby="monthly-title">
             <div class="section-heading">
                 <h2 id="monthly-title">Déclarations par mois</h2>

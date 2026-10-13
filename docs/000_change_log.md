@@ -18,10 +18,17 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Carte des contreparties : chaque niveau affiche les contreparties les plus élevées (`Treemap:MaxNodesPerLevel` - 1 blocs) puis un unique « Autres » pour le reste, y compris pour les entités ayant des milliers de contreparties. Le découpage en plusieurs groupes « Autres » est abandonné. La chaîne est construite de façon itérative et sa profondeur est plafonnée à 1000 niveaux (le nombre de contreparties par niveau augmente au besoin) ; la profondeur JSON autorisée est relevée en conséquence.
+
+- Tableau de bord : le texte des trois indicateurs est centré.
+
+- Tableau de bord : à partir de 1600 px de large, première ligne = les trois indicateurs empilés (colonne de gauche) + « Déclarations par mois » ; deuxième ligne = « Concentration des montants », « Distribution des montants » et, empilés, « Entités par typologie » et « Liens financiers par typologie ». Les indicateurs sont désormais dans `.dashboard-grid` (vue réelle et squelette de chargement) ; le padding haut de la grille est supprimé (espacement inchangé via le `gap`). En dessous de 1600 px, la disposition est inchangée. Sur grand écran, les deux classements « Top 10 » sont côte à côte sur une seule ligne.
+
 - Treemap : fil d'Ariane remplacé par une pagination de niveaux au-dessus de la carte (`Nom › 1 › 2 › … › n-2 › n-1 › n`) ; chaque numéro ramène au niveau correspondant avec l'animation de zoom arrière en repassant par chaque niveau intermédiaire (et non plus un saut direct ; vitesse constante, chaque étape démarrant avant la fin de la précédente pour supprimer l'arrêt entre deux niveaux ; les clics sont ignorés pendant la remontée), le niveau courant est mis en évidence. L'en-tête de la carte n'affiche plus que le niveau courant (« ‹ Autres (niveau n) »).
 
 - Treemap : le bloc « Autres » n'est plus proportionnel à son montant ; sa surface correspond à celle d'une contrepartie moyenne du niveau (son montant réel reste affiché, et ses descendants gardent leurs proportions).
 
+- Correctif treemap : le regroupement « Autres » est désormais un arbre équilibré (au plus `Treemap:MaxNodesPerLevel` nœuds par niveau, profondeur logarithmique) au lieu d'une chaîne, ce qui évite l'exception `JsonException` (cycle / profondeur > 64) pour les entités ayant de nombreuses contreparties.
 - Carte des contreparties : le filtre sur les 20 % de contreparties les plus élevées est supprimé ; toutes les contreparties (montant cumulé > 0) sont affichées, les niveaux de 20 (Treemap:MaxNodesPerLevel) étant regroupés sous « Autres » et explorables par zoom. Le libellé de périmètre n'indique plus que le nombre de contreparties.
 
 - Disposition de la fiche entité sur grand écran : « Montants par année », « Répartition par typologie » et la carte des contreparties sont regroupés dans `.entity-overview`. À partir de 1600 px de large, les deux graphiques sont empilés dans la colonne de gauche et la carte occupe la colonne de droite (5fr/7fr) ; en dessous, les deux graphiques restent côte à côte et la carte passe en dessous sur toute la largeur ; sous 900 px, tout est empilé.

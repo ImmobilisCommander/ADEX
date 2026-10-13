@@ -454,7 +454,14 @@ input:focus-visible {
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     gap: 24px;
-    padding-top: 28px;
+}
+
+.dashboard-grid > .summary-register {
+    grid-column: 1 / -1;
+}
+
+.dashboard-grid > .summary-register .summary-item {
+    text-align: center;
 }
 
 .register-section {
@@ -468,6 +475,64 @@ input:focus-visible {
 
 .monthly-chart {
     grid-column: 1 / -1;
+}
+
+/* Grand écran (grille de 6 colonnes) :
+   ligne 1 : indicateurs empilés + déclarations par mois ;
+   ligne 2 : concentration, distribution, puis les deux typologies empilées. */
+@media (min-width: 1600px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .dashboard-grid > .summary-register {
+        grid-column: 1 / span 2;
+        grid-row: 1;
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-grid > .summary-register .summary-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 0;
+        border-bottom: 1px solid var(--line-light);
+    }
+
+    .dashboard-grid > .summary-register .summary-item:last-child {
+        border-bottom: 0;
+    }
+
+    .dashboard-grid > .monthly-chart {
+        grid-column: 3 / span 4;
+        grid-row: 1;
+    }
+
+    .dashboard-grid > .concentration-chart,
+    .dashboard-grid > .dashboard-loading-concentration {
+        grid-column: 1 / span 2;
+        grid-row: 2 / span 2;
+    }
+
+    .dashboard-grid > .amount-histogram,
+    .dashboard-grid > .dashboard-loading-histogram {
+        grid-column: 3 / span 2;
+        grid-row: 2 / span 2;
+    }
+
+    .dashboard-grid > .entity-types {
+        grid-column: 5 / span 2;
+        grid-row: 2;
+    }
+
+    .dashboard-grid > .link-types {
+        grid-column: 5 / span 2;
+        grid-row: 3;
+    }
+
+    .dashboard-grid > .top-entities {
+        grid-column: span 3;
+    }
 }
 
 .chart-svg {

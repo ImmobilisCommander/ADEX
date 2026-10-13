@@ -17,7 +17,10 @@ namespace Adex.Mvc.Entities
     {
         private static readonly CultureInfo FrenchCulture = new("fr-FR");
 
-        private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+        // Profondeur maximale de la chaîne d'« Autres » ; la sérialisation JSON l'autorise explicitement.
+        private const int MaxLevels = 1000;
+
+        private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { MaxDepth = MaxLevels * 2 + 16 };
 
         private readonly List<EntityCounterpartySummary> _items = SelectCounterparties(result);
 
@@ -54,7 +57,8 @@ namespace Adex.Mvc.Entities
 
         private List<CounterpartyTreemapNodeViewModel> BuildLeaves() => BuildLevel(_items);
 
-        // Au-delà de maxNodesPerLevel, les contreparties restantes sont regroupées dans « Autres », récursivement.
+        // Chaque niveau affiche les contreparties les plus élevées puis un unique « Autres » pour le reste.
+        // Construction itérative (du niveau le plus profond vers la racine) : pas de récursion sur des milliers de niveaux.
         private List<CounterpartyTreemapNodeViewModel> BuildLevel(List<EntityCounterpartySummary> items)
         {
             if (items.Count <= maxNodesPerLevel)
@@ -62,17 +66,36 @@ namespace Adex.Mvc.Entities
                 return items.Select(ToLeaf).ToList();
             }
 
-            var nodes = items.Take(maxNodesPerLevel).Select(ToLeaf).ToList();
-            var rest = items.Skip(maxNodesPerLevel).ToList();
-            var total = rest.Sum(item => item.TotalAmount);
-            nodes.Add(new CounterpartyTreemapNodeViewModel
+            // Le nombre de contreparties par niveau garantit une profondeur au plus égale à MaxLevels.
+            var visible = Math.Max(Math.Max(1, maxNodesPerLevel - 1), (int)Math.Ceiling(items.Count / (double)MaxLevels));
+
+            var offsets = new List<int>();
+            for (var offset = 0; items.Count - offset > maxNodesPerLevel; offset += visible)
             {
-                Name = "Autres",
-                AmountDisplay = total.ToString("C0", FrenchCulture),
-                Children = BuildLevel(rest),
-            });
+                offsets.Add(offset);
+            }
+
+            var lastOffset = offsets[^1] + visible;
+            var nodes = items.Skip(lastOffset).Select(ToLeaf).ToList();
+            for (var i = offsets.Count - 1; i >= 0; i--)
+            {
+                var level = items.Skip(offsets[i]).Take(visible).Select(ToLeaf).ToList();
+                var rest = items.Skip(offsets[i] + visible).ToList();
+                level.Add(ToOthers(rest, nodes));
+                nodes = level;
+            }
+
             return nodes;
         }
+
+        private static CounterpartyTreemapNodeViewModel ToOthers(
+            List<EntityCounterpartySummary> items, List<CounterpartyTreemapNodeViewModel> children) =>
+            new()
+            {
+                Name = "Autres",
+                AmountDisplay = items.Sum(item => item.TotalAmount).ToString("C0", FrenchCulture),
+                Children = children,
+            };
 
         private CounterpartyTreemapNodeViewModel ToLeaf(EntityCounterpartySummary item) =>
             new()
