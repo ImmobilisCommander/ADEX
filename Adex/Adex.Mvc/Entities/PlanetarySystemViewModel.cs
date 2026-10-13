@@ -27,6 +27,8 @@ namespace Adex.Mvc.Entities
 
         public bool IsGlobalScope => isGlobalScope;
 
+        public CounterpartyLimitSliderViewModel Slider { get; set; }
+
         public int TotalCounterpartiesCount => totalCount;
 
         public int Limit => totalCount > 0

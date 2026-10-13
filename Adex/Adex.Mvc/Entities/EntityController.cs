@@ -1,7 +1,11 @@
+using Adex.Contracts.Explorer;
 using Adex.Mvc.Api;
+using Adex.Mvc.Configuration;
 using Adex.WebApi.Client;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 using System;
 using System.Threading;
@@ -9,28 +13,48 @@ using System.Threading.Tasks;
 
 namespace Adex.Mvc.Entities
 {
-    public sealed class EntityController(IAdexWebApiClient apiClient) : Controller
+    public sealed class EntityController(
+        IAdexWebApiClient apiClient,
+        IMemoryCache cache,
+        IOptionsMonitor<MvcCacheOptions> cacheOptions
+    ) : Controller
     {
         [HttpGet("/{id:guid}")]
         public async Task<IActionResult> Details(
             Guid id,
             CancellationToken cancellationToken,
             [FromQuery] string fromQuery = null,
-            [FromQuery] int? limit = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
             [FromQuery] string sort = "date",
             [FromQuery] bool descending = true
         )
         {
-            var entity = await apiClient.GetEntityAsync(
-                id,
-                page,
-                pageSize,
-                sort ?? "date",
-                descending,
-                cancellationToken
-            );
+            var duration = cacheOptions.CurrentValue.Entity;
+            var cacheKey = $"mvc_entity:{id}:{page}:{pageSize}:{sort}:{descending}";
+            EntityDetails entity = null;
+
+            if (duration > TimeSpan.Zero && cache.TryGetValue(cacheKey, out EntityDetails cached))
+            {
+                entity = cached;
+            }
+            else
+            {
+                entity = await apiClient.GetEntityAsync(
+                    id,
+                    page,
+                    pageSize,
+                    sort ?? "date",
+                    descending,
+                    cancellationToken
+                );
+
+                if (entity is not null && duration > TimeSpan.Zero)
+                {
+                    cache.Set(cacheKey, entity, duration);
+                }
+            }
+
             if (entity is null)
             {
                 ViewData["Title"] = "Entité introuvable";
@@ -50,17 +74,6 @@ namespace Adex.Mvc.Entities
                 }
             }
 
-            var requestedLimit = limit is > 0
-                ? limit.Value
-                : EntityDetailsViewModel.DefaultPlanetaryLimit;
-
-            var counterparties = await apiClient.GetEntityCounterpartiesAsync(
-                id,
-                limit: requestedLimit,
-                cancellationToken: cancellationToken
-            );
-            model.BuildPlanetarySystem(counterparties, requestedLimit);
-
             ViewData["Title"] = model.Name;
             return View(model);
         }
@@ -75,28 +88,51 @@ namespace Adex.Mvc.Entities
         {
             var requestedLimit = limit is > 0
                 ? limit.Value
-                : EntityDetailsViewModel.DefaultPlanetaryLimit;
+                : EntityDetailsViewModel.DefaultCounterpartyLimit;
 
-            var counterparties = await apiClient.GetEntityCounterpartiesAsync(
-                id,
-                limit: requestedLimit,
-                cancellationToken: cancellationToken
-            );
+            var counterparties = await GetCachedCounterpartiesAsync(id, requestedLimit, cancellationToken);
             if (counterparties is null)
             {
                 return NotFound();
             }
 
-            fromQuery = fromQuery?.Trim();
             var viewModel = PlanetarySystemViewModel.Create(
                 id,
                 counterparties.EntityName,
                 counterparties,
                 requestedLimit,
-                fromQuery
+                fromQuery?.Trim()
             );
 
-            return PartialView("_PlanetaryViewport", viewModel);
+            return PartialView("~/Views/Shared/Components/PlanetarySystem/_Viewport.cshtml", viewModel);
+        }
+
+        private async Task<EntityCounterpartiesResult> GetCachedCounterpartiesAsync(
+            Guid id,
+            int limit,
+            CancellationToken cancellationToken
+        )
+        {
+            var duration = cacheOptions.CurrentValue.Counterparties;
+            var cacheKey = $"mvc_counterparties:{id}:{limit}";
+
+            if (duration > TimeSpan.Zero && cache.TryGetValue(cacheKey, out EntityCounterpartiesResult cached))
+            {
+                return cached;
+            }
+
+            var counterparties = await apiClient.GetEntityCounterpartiesAsync(
+                id,
+                limit: limit,
+                cancellationToken: cancellationToken
+            );
+
+            if (counterparties is not null && duration > TimeSpan.Zero)
+            {
+                cache.Set(cacheKey, counterparties, duration);
+            }
+
+            return counterparties;
         }
     }
 }

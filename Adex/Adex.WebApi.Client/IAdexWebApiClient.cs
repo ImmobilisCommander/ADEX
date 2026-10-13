@@ -44,5 +44,7 @@ namespace Adex.WebApi.Client
             IReadOnlyDictionary<string, string> filters,
             CancellationToken cancellationToken = default
         );
+
+        Task<SitemapModel> GetSitemapAsync(CancellationToken cancellationToken = default);
     }
 }

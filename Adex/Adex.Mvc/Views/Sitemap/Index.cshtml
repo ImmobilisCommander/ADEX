@@ -1,0 +1,43 @@
+@model Adex.Mvc.Sitemap.SitemapPageViewModel
+
+<main class="sitemap-page">
+    <header class="sitemap-intro">
+        <h1>@Model.Title</h1>
+        <p>Retrouvez l’ensemble des rubriques statiques et les principaux acteurs du secteur de la santé répertoriés dans ADEX.</p>
+        <p class="sitemap-xml-callout">
+            <a href="@Model.XmlSitemapUrl" target="_blank" rel="noopener noreferrer">Consulter le plan du site au format XML standard (sitemap.xml)</a>
+        </p>
+    </header>
+
+    <section class="register-section sitemap-section" aria-labelledby="static-links-title">
+        <h2 id="static-links-title">Rubriques principales</h2>
+        <ul class="sitemap-list">
+            @foreach (var link in Model.StaticLinks)
+            {
+                <li><a href="@link.Url">@link.Title</a></li>
+            }
+        </ul>
+    </section>
+
+    <section class="register-section sitemap-section" aria-labelledby="contributors-title">
+        <h2 id="contributors-title">Principaux contributeurs (entreprises)</h2>
+        <p class="sitemap-count">Les @Model.TopContributors.Count plus importantes entreprises selon les montants versés :</p>
+        <ul class="sitemap-list sitemap-columns">
+            @foreach (var link in Model.TopContributors)
+            {
+                <li><a href="@link.Url">@link.Title</a></li>
+            }
+        </ul>
+    </section>
+
+    <section class="register-section sitemap-section" aria-labelledby="beneficiaries-title">
+        <h2 id="beneficiaries-title">Principaux bénéficiaires</h2>
+        <p class="sitemap-count">Les @Model.TopBeneficiaries.Count principaux bénéficiaires selon les montants reçus :</p>
+        <ul class="sitemap-list sitemap-columns">
+            @foreach (var link in Model.TopBeneficiaries)
+            {
+                <li><a href="@link.Url">@link.Title</a></li>
+            }
+        </ul>
+    </section>
+</main>

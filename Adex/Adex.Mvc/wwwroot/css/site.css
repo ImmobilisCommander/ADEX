@@ -1680,6 +1680,70 @@ input:focus-visible {
     margin-top: 14px;
 }
 
+.sitemap-page {
+    min-height: 58vh;
+    padding-block: 48px 80px;
+}
+
+.sitemap-intro {
+    margin-bottom: 28px;
+}
+
+.sitemap-intro h1 {
+    margin: 0;
+    font-size: 2rem;
+    line-height: 1.15;
+    letter-spacing: -0.035em;
+}
+
+.sitemap-intro p {
+    color: var(--ink-muted);
+    margin: 10px 0 0;
+}
+
+.sitemap-xml-callout {
+    font-size: 0.9rem;
+}
+
+.sitemap-section h2 {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+}
+
+.sitemap-count {
+    color: var(--ink-muted);
+    font-size: 0.88rem;
+    margin: 0 0 12px;
+}
+
+.sitemap-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sitemap-list li a {
+    color: var(--teal);
+    text-decoration: none;
+    font-size: 0.92rem;
+}
+
+.sitemap-list li a:hover {
+    text-decoration: underline;
+}
+
+.sitemap-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 8px 16px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
 .site-footer {
     border-top: 1px solid var(--line);
     background: var(--paper);
@@ -1888,13 +1952,94 @@ input:focus-visible {
     border-radius: 50%;
 }
 
-.planetary-container {
+.planetary-legend-dot.planetary-satellite-outgoing {
+    background: var(--teal);
+}
+
+.planetary-legend-dot.planetary-satellite-incoming {
+    background: var(--focus);
+}
+
+.planetary-legend-dot.planetary-satellite-mixed {
+    background: var(--accent);
+}
+
+.planetary-container,
+.treemap-container {
     position: relative;
     transition: opacity 0.15s ease-out;
 }
 
-.planetary-container.is-loading {
+.planetary-container.is-loading,
+.treemap-container.is-loading {
     opacity: 0.55;
+}
+
+.treemap-viewport {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+}
+
+.treemap-svg {
+    display: block;
+    width: min(100%, 960px);
+    min-width: 680px;
+    height: auto;
+    margin-inline: auto;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.treemap-node {
+    cursor: pointer;
+}
+
+.treemap-node-static {
+    cursor: default;
+}
+
+.treemap-node:focus {
+    outline: none;
+}
+
+.treemap-cell {
+    stroke: var(--paper);
+    stroke-width: 1.5;
+}
+
+.treemap-header {
+    fill: var(--paper-cool);
+    stroke: var(--line);
+}
+
+.treemap-leaf {
+    fill: var(--teal);
+}
+
+.treemap-leaf:hover,
+.treemap-node:focus-visible .treemap-leaf {
+    stroke: var(--ink);
+    stroke-width: 3;
+}
+
+.treemap-node:focus-visible .treemap-cell {
+    stroke: var(--ink);
+    stroke-width: 3;
+}
+
+.treemap-header-text,
+.treemap-group-text {
+    fill: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.treemap-leaf-text {
+    fill: var(--button-ink);
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
 }
 
 .planetary-viewport {

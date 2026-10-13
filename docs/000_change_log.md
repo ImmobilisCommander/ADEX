@@ -18,6 +18,32 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Carte des contreparties simplifiée (fiche entité) :
+  - `CounterpartyTreemap` n'affiche plus que le treemap : onglets, curseur, barre de détail au survol, légende des sens et zoom par sens supprimés. Les montants des deux sens sont cumulés (`TotalAmount`) et seules les 20 % de contreparties regroupées aux montants les plus élevés sont affichées (cliquer sur un bloc ouvre la fiche).
+  - Le composant `PlanetarySystem` (ViewComponent, ViewModels, JS, route `GET /{id}/planetary`) est conservé mais n'est plus affiché ; `RelationshipViews`, la route `GET /{id}/treemap` et les paramètres `view`/`limit` de la fiche sont supprimés.
+
+- Mise en cache fine et section de configuration dédiée `Cache` :
+  - Ajout d'une section `Cache` dans les `appsettings.json` de l'API et du MVC (`CacheOptions` / `MvcCacheOptions`) avec durées `TimeSpan` non nullables et sans valeur par défaut, déclarées avec le mot-clé C# `required` (`Dashboard`, `Entity`, `Counterparties`, `Search`, `Sitemap`).
+  - Validation stricte au démarrage via `.ValidateDataAnnotations()`, contrôle d'exhaustivité et `.ValidateOnStart()` : l'application refuse de démarrer si une des valeurs de la section `Cache` n'est pas fournie ou est invalide.
+  - Côté MVC : mise en cache mémoire (`IMemoryCache`) du tableau de bord (`HomeController.DashboardContent`), des fiches d'entité (`EntityController.Details`), des contreparties (`PlanetarySystemViewComponent`, `CounterpartyTreemapViewComponent`), de la recherche (`HomeController.Search`) et du plan du site (`SitemapController`).
+  - Côté API : mise en cache mémoire (`IMemoryCache`) du tableau de bord (`DashboardController`), des fiches d'entité, contreparties et recherche (`EntityController`), et du plan du site (`SitemapController`).
+
+- Plan du site (Sitemap) et indexation : ajout de la route de plan du site exposant les rubriques statiques de l'application ainsi que les 10 000 plus gros contributeurs et 10 000 plus gros bénéficiaires :
+  - Exposition de la route MVC `/sitemap` (vue HTML dédiée avec son ViewModel `SitemapPageViewModel` et rendu en colonnes fluide) et `/sitemap.xml` (génération XML standardisée sitemaps.org via `SitemapXmlBuilder`).
+  - Ajout de la route `/robots.txt` déclarant l'autorisation de crawl `User-agent: *`, `Allow: /` et la directive `Sitemap: <base>/sitemap.xml` dynamique.
+  - Ajout du lien « Plan du site » dans le pied de page de l'application (`_Layout.cshtml`).
+  - Côté API, création de la route `GET /api/sitemap` (`SitemapController`) et enrichissement de `DataExplorerService` avec extraction des 10 000 plus gros contributeurs et bénéficiaires classés par montants financiers.
+  - Mise en cache mémoire côté MVC (`IMemoryCache`) du XML généré et du modèle de données (évitant tout appel HTTP redondant vers l'API lors des requêtes successives), et persistance snapshot PostgreSQL côté API (`DashboardSnapshots`, clé `adex-sitemap`) selon la durée par défaut du tableau de bord (`DashboardOptions.TimeToLive`). Entête HTTP `Cache-Control` positionné dynamiquement selon cette durée.
+  - Ajout des contrats applicatifs `SitemapModel` et `SitemapEntityItem` dans `Adex.Contracts.Explorer` et intégration dans `IAdexWebApiClient` / `AdexWebApiClient`.
+
+- Fiche entité : visualisations des contreparties isolées en composants Razor (View Components) interchangeables :
+  - `PlanetarySystemViewComponent` (système planétaire) et `CounterpartyTreemapViewComponent` (nouveau treemap D3 zoomable : racine entité → sens « depuis / vers cette entité » → contreparties, surface proportionnelle au montant). Chacun récupère lui-même ses données via `IAdexWebApiClient` (route `GET /api/entity/{id}/counterparties`) et porte son propre ViewModel ; vues dans `Views/Shared/Components/<Nom>/`.
+  - Éléments partagés : `CounterpartyLimitSliderViewModel`, partiels `_CounterpartyLimitSlider` et `_CounterpartyActiveBar`, `wwwroot/js/counterparty-limit.js` (curseur AJAX, antirebond, mise à jour de l'URL et des liens de pagination).
+  - Actions MVC de rafraîchissement : `GET /{id}/planetary` (partiel SVG) et `GET /{id}/treemap` (JSON).
+  - `Details.cshtml` choisit le composant via `?view=treemap|planetary` (défaut : treemap) et propose deux onglets ; le choix est conservé par la pagination et le tri. Pour n'inclure qu'un des deux, il suffit de conserver un seul `Component.InvokeAsync` et son script.
+  - `EntityDetailsViewModel` ne porte plus la logique planétaire (`BuildPlanetarySystem` supprimé, repli sur les liens paginés abandonné) ; `PlanetaryLimit` devient `CounterpartyLimit`.
+  - D3 v7.9.0 (licence ISC) ajouté localement dans `wwwroot/lib/d3`. Correction de la couleur des pastilles de légende.
+
 - Système planétaire interactif sans rechargement de page :
   - Le déplacement du curseur de sélection des contreparties (`limit`) actualise désormais uniquement la visualisation SVG et son libellé de périmètre sans rechargement complet de la page.
   - Création de la vue partielle `_PlanetaryViewport.cshtml` et de son ViewModel dédié `PlanetarySystemViewModel`, associés à l'action MVC dédiée `GET /{id}/planetary?limit=...`.

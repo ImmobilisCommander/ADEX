@@ -173,6 +173,11 @@ namespace Adex.WebApi.Client
                 ?? throw new InvalidOperationException("The API returned an empty CSV response.");
         }
 
+        public Task<SitemapModel> GetSitemapAsync(CancellationToken cancellationToken = default)
+        {
+            return GetModelAsync<SitemapModel>("api/sitemap", cancellationToken);
+        }
+
         private async Task<T> GetModelAsync<T>(
             string relativeUri,
             CancellationToken cancellationToken

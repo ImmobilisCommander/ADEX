@@ -1,0 +1,17 @@
+@model Adex.Mvc.Entities.CounterpartyTreemapViewModel
+
+<section class="register-section treemap-section" aria-labelledby="treemap-title" data-treemap-section>
+    <div class="section-heading">
+        <div>
+            <h2 id="treemap-title">Carte des contreparties</h2>
+            <span class="section-unit">@Model.ScopeDisplay</span>
+        </div>
+    </div>
+    <div class="treemap-container" data-treemap-container data-treemap="@Model.DataJson">
+        <div class="treemap-viewport" data-treemap-viewport></div>
+        <noscript>
+            <p class="table-note">Cette visualisation nécessite JavaScript. Les liens financiers restent consultables dans le tableau ci-dessous.</p>
+        </noscript>
+    </div>
+    <p class="table-note">La surface de chaque bloc est proportionnelle au montant cumulé des liens, tous sens confondus. Seules les contreparties aux montants les plus élevés (20 %) sont affichées.</p>
+</section>

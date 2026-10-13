@@ -17,6 +17,7 @@ namespace Adex.Data.ReadModel.Explorer
     )
     {
         private const string DashboardSnapshotKey = "adex-dashboard";
+        private const string SitemapSnapshotKey = "adex-sitemap";
 
         private const int SearchResultLimit = 100;
         private const int SearchMinimumLength = 3;
@@ -34,6 +35,7 @@ namespace Adex.Data.ReadModel.Explorer
 
         private static readonly SemaphoreSlim DashboardLock = new(1, 1);
         private static readonly SemaphoreSlim DashboardBuildGate = new(1, 1);
+        private static readonly SemaphoreSlim SitemapLock = new(1, 1);
         private static Task<DashboardModel> _dashboardBuildTask;
 
         private TimeSpan DashboardTimeToLive => dashboardOptions.CurrentValue.TimeToLive;
@@ -111,6 +113,132 @@ namespace Adex.Data.ReadModel.Explorer
             {
                 DashboardLock.Release();
             }
+        }
+
+        /// <summary>
+        /// Récupère les données du plan du site, incluant les liens des 10 000 plus gros contributeurs et bénéficiaires,
+        /// avec mise en cache selon la durée par défaut du tableau de bord.
+        /// </summary>
+        public async Task<SitemapModel> GetSitemapAsync(CancellationToken cancellationToken)
+        {
+            var stored = await ReadSitemapSnapshotAsync(cancellationToken);
+            if (stored is not null)
+            {
+                return stored;
+            }
+
+            await SitemapLock.WaitAsync(cancellationToken);
+            try
+            {
+                stored = await ReadSitemapSnapshotAsync(cancellationToken);
+                if (stored is not null)
+                {
+                    return stored;
+                }
+
+                var sitemap = await BuildSitemapAsync(cancellationToken);
+                await SaveSitemapSnapshotAsync(sitemap, cancellationToken);
+                return sitemap;
+            }
+            finally
+            {
+                SitemapLock.Release();
+            }
+        }
+
+        private async Task<SitemapModel> ReadSitemapSnapshotAsync(CancellationToken cancellationToken)
+        {
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+            var snapshot = await db
+                .DashboardSnapshots.AsNoTracking()
+                .FirstOrDefaultAsync(item => item.Key == SitemapSnapshotKey, cancellationToken);
+            if (snapshot is null || snapshot.ComputedAtUtc + DashboardTimeToLive <= DateTime.UtcNow)
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<SitemapModel>(snapshot.Json);
+        }
+
+        private async Task SaveSitemapSnapshotAsync(
+            SitemapModel sitemap,
+            CancellationToken cancellationToken
+        )
+        {
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+            var json = JsonSerializer.Serialize(sitemap);
+            var computedAtUtc = DateTime.UtcNow;
+            var updated = await db
+                .DashboardSnapshots.Where(item => item.Key == SitemapSnapshotKey)
+                .ExecuteUpdateAsync(
+                    setters =>
+                        setters
+                            .SetProperty(item => item.Json, json)
+                            .SetProperty(item => item.ComputedAtUtc, computedAtUtc),
+                    cancellationToken
+                );
+            if (updated == 0)
+            {
+                db.DashboardSnapshots.Add(
+                    new DashboardSnapshot
+                    {
+                        Key = SitemapSnapshotKey,
+                        Json = json,
+                        ComputedAtUtc = computedAtUtc,
+                    }
+                );
+                await db.SaveChangesAsync(cancellationToken);
+            }
+        }
+
+        private async Task<SitemapModel> BuildSitemapAsync(CancellationToken cancellationToken)
+        {
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+            db.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
+
+            var topContributors = await (
+                from total in db.EntityTotals
+                join company in db.Companies on total.EntityId equals company.Id
+                where total.OutgoingAmount > 0
+                orderby total.OutgoingAmount descending
+                select new SitemapEntityItem
+                {
+                    Id = company.Id,
+                    Name = company.Designation ?? "(sans nom)",
+                }
+            )
+                .Take(10000)
+                .ToListAsync(cancellationToken);
+
+            var beneficiaryRows = await (
+                from total in db.EntityTotals
+                join person in db.Persons on total.EntityId equals person.Id
+                where total.IncomingAmount > 0
+                orderby total.IncomingAmount descending
+                select new
+                {
+                    person.Id,
+                    person.FirstName,
+                    person.LastName,
+                }
+            )
+                .Take(10000)
+                .ToListAsync(cancellationToken);
+
+            var topBeneficiaries = beneficiaryRows
+                .Select(person => new SitemapEntityItem
+                {
+                    Id = person.Id,
+                    Name = JoinName(person.FirstName, person.LastName),
+                })
+                .ToList();
+
+            return new SitemapModel
+            {
+                Contributors = topContributors,
+                Beneficiaries = topBeneficiaries,
+                CacheDuration = DashboardTimeToLive,
+            };
         }
 
         private async Task<DashboardModel> ReadSnapshotAsync(CancellationToken cancellationToken)

@@ -1,0 +1,32 @@
+@model Adex.Mvc.Entities.CounterpartyLimitSliderViewModel
+
+@if (Model.IsVisible)
+{
+    <form method="get" action="@Model.FormAction" class="planetary-limit-form" data-counterparty-form>
+        @foreach (var field in Model.HiddenFields)
+        {
+            <input type="hidden" name="@field.Key" value="@field.Value" />
+        }
+        <div class="planetary-slider-wrap">
+            <label for="@Model.Id" class="planetary-slider-label">
+                <span>Contreparties :</span>
+                <strong data-counterparty-limit-value>@Model.Limit</strong>
+                <span class="planetary-slider-max">/ @Model.Maximum</span>
+            </label>
+            <input type="range"
+                   id="@Model.Id"
+                   name="limit"
+                   min="1"
+                   max="@Model.Maximum"
+                   value="@Model.Limit"
+                   step="1"
+                   class="planetary-slider"
+                   data-counterparty-slider
+                   data-counterparty-url="@Model.EndpointUrl"
+                   aria-label="Nombre de contreparties à afficher" />
+            <noscript>
+                <button type="submit" class="button button-small">OK</button>
+            </noscript>
+        </div>
+    </form>
+}

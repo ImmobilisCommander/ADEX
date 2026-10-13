@@ -2,12 +2,14 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Adex.Application.Configuration;
 using Adex.Application.Csv;
 using Adex.Application.Import;
 using Adex.Application.Search;
 using Adex.Data.Import;
 using Adex.Data.ReadModel.Explorer;
 using Adex.WebApi.Dashboard;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Adex.WebApi.Hosting
@@ -56,6 +58,21 @@ namespace Adex.WebApi.Hosting
                 .AddOptions<DashboardOptions>()
                 .BindConfiguration(DashboardOptions.SectionName)
                 .ValidateDataAnnotations()
+                .ValidateOnStart();
+            services
+                .AddOptions<CacheOptions>()
+                .BindConfiguration(CacheOptions.SectionName)
+                .ValidateDataAnnotations()
+                .Validate<IConfiguration>((options, configuration) =>
+                {
+                    var section = configuration.GetSection(CacheOptions.SectionName);
+                    return section.Exists()
+                        && !string.IsNullOrWhiteSpace(section[nameof(CacheOptions.Dashboard)])
+                        && !string.IsNullOrWhiteSpace(section[nameof(CacheOptions.Entity)])
+                        && !string.IsNullOrWhiteSpace(section[nameof(CacheOptions.Counterparties)])
+                        && !string.IsNullOrWhiteSpace(section[nameof(CacheOptions.Search)])
+                        && !string.IsNullOrWhiteSpace(section[nameof(CacheOptions.Sitemap)]);
+                }, "Tous les paramètres de la section « Cache » (Dashboard, Entity, Counterparties, Search, Sitemap) sont obligatoires.")
                 .ValidateOnStart();
             services
                 .AddOptions<CsvOptions>()

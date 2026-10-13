@@ -36,79 +36,11 @@
 
     <partial name="_EntityCharts" model="Model.EntityCharts" />
 
-    @if (Model.PlanetaryCounterparties.Count > 0)
+    @await Component.InvokeAsync("CounterpartyTreemap", new
     {
-        <section class="register-section planetary-section" aria-labelledby="planetary-title">
-            <div class="section-heading planetary-heading">
-                <div>
-                    <h2 id="planetary-title">Système relationnel</h2>
-                    <span class="section-unit" data-planetary-count-display>@Model.PlanetaryLinkScopeDisplay</span>
-                </div>
-                @if (Model.TotalCounterpartiesCount > 1)
-                {
-                    <form method="get" action="@Model.PageAction" class="planetary-limit-form" data-planetary-form>
-                        @if (!string.IsNullOrEmpty(Model.SearchQuery))
-                        {
-                            <input type="hidden" name="fromQuery" value="@Model.SearchQuery" />
-                        }
-                        @if (Model.Page > 1)
-                        {
-                            <input type="hidden" name="page" value="@Model.Page" />
-                        }
-                        @if (Model.PageSize != 20)
-                        {
-                            <input type="hidden" name="pageSize" value="@Model.PageSize" />
-                        }
-                        @if (Model.Sort != "date")
-                        {
-                            <input type="hidden" name="sort" value="@Model.Sort" />
-                        }
-                        @if (!Model.Descending)
-                        {
-                            <input type="hidden" name="descending" value="false" />
-                        }
-                        <div class="planetary-slider-wrap">
-                            <label for="planetary-limit-slider" class="planetary-slider-label">
-                                <span>Contreparties :</span>
-                                <strong data-planetary-limit-value>@Model.PlanetaryLimit</strong>
-                                <span class="planetary-slider-max">/ @Model.TotalCounterpartiesCount</span>
-                            </label>
-                            <input type="range"
-                                   id="planetary-limit-slider"
-                                   name="limit"
-                                   min="1"
-                                   max="@Model.TotalCounterpartiesCount"
-                                   value="@Model.PlanetaryLimit"
-                                   step="1"
-                                   class="planetary-slider"
-                                   data-planetary-slider
-                                   data-planetary-url="/@Model.Id/planetary"
-                                   aria-label="Nombre de contreparties à afficher" />
-                            <noscript>
-                                <button type="submit" class="button button-small">OK</button>
-                            </noscript>
-                        </div>
-                    </form>
-                }
-            </div>
-            <div class="planetary-legend" aria-label="Sens des liens">
-                <span><i class="planetary-legend-dot planetary-satellite-outgoing" aria-hidden="true"></i>Depuis cette entité</span>
-                <span><i class="planetary-legend-dot planetary-satellite-incoming" aria-hidden="true"></i>Vers cette entité</span>
-                <span><i class="planetary-legend-dot planetary-satellite-mixed" aria-hidden="true"></i>Dans les deux sens</span>
-                <span class="planetary-legend-orbits"><i class="planetary-legend-dash" aria-hidden="true"></i>Orbite extérieure : montants majeurs · Orbites intérieures : survoler</span>
-            </div>
-            <div class="planetary-active-bar" data-planetary-active-bar aria-live="polite">
-                <span data-planetary-active-default class="planetary-active-default">Survolez ou cliquez sur une contrepartie pour afficher ses détails</span>
-                <strong data-planetary-active-name class="planetary-active-name"></strong>
-                <span data-planetary-active-amount class="planetary-active-amount"></span>
-            </div>
-            <div class="planetary-container" data-planetary-container>
-                @await Html.PartialAsync("_PlanetaryViewport", Model.PlanetarySystem)
-            </div>
-            <p class="planetary-mobile-hint">Faites défiler horizontalement pour explorer toutes les contreparties.</p>
-            <p class="table-note">La taille des satellites reflète le montant cumulé des liens affichés. Les montants les plus élevés gravitent sur l'orbite extérieure avec libellé permanent ; les orbites intérieures affichent le libellé au survol.</p>
-        </section>
-    }
+        entityId = Model.Id,
+        searchQuery = Model.SearchQuery
+    })
 
     <section class="register-section" aria-labelledby="attributes-title">
         <div class="section-heading">
@@ -255,6 +187,6 @@
 @section Scripts {
     <script src="~/js/justification.js" asp-append-version="true"></script>
     <script src="~/js/entity-sort.js" asp-append-version="true"></script>
-    <script src="~/js/entity-planetary.js" asp-append-version="true"></script>
-
+    <script src="~/lib/d3/d3.min.js"></script>
+    <script src="~/js/entity-treemap.js" asp-append-version="true"></script>
 }

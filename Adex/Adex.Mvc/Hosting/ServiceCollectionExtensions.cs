@@ -1,4 +1,6 @@
+using Adex.Mvc.Configuration;
 using Adex.WebApi.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Adex.Mvc.Hosting
@@ -8,6 +10,22 @@ namespace Adex.Mvc.Hosting
         public static IServiceCollection AddAdexMvc(this IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddMemoryCache();
+            services
+                .AddOptions<MvcCacheOptions>()
+                .BindConfiguration(MvcCacheOptions.SectionName)
+                .ValidateDataAnnotations()
+                .Validate<IConfiguration>((options, configuration) =>
+                {
+                    var section = configuration.GetSection(MvcCacheOptions.SectionName);
+                    return section.Exists()
+                        && !string.IsNullOrWhiteSpace(section[nameof(MvcCacheOptions.Dashboard)])
+                        && !string.IsNullOrWhiteSpace(section[nameof(MvcCacheOptions.Entity)])
+                        && !string.IsNullOrWhiteSpace(section[nameof(MvcCacheOptions.Counterparties)])
+                        && !string.IsNullOrWhiteSpace(section[nameof(MvcCacheOptions.Search)])
+                        && !string.IsNullOrWhiteSpace(section[nameof(MvcCacheOptions.Sitemap)]);
+                }, "Tous les paramètres de la section « Cache » (Dashboard, Entity, Counterparties, Search, Sitemap) sont obligatoires.")
+                .ValidateOnStart();
             services.AddProblemDetails();
             services.AddExceptionHandler<MvcExceptionHandler>();
             return services;

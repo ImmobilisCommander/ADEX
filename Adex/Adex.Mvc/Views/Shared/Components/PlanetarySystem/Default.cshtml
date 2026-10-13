@@ -1,0 +1,23 @@
+@model Adex.Mvc.Entities.PlanetarySystemViewModel
+
+<section class="register-section planetary-section" aria-labelledby="planetary-title" data-planetary-section data-counterparty-section>
+    <div class="section-heading planetary-heading">
+        <div>
+            <h2 id="planetary-title">Système relationnel</h2>
+            <span class="section-unit" data-counterparty-count-display>@Model.LinkScopeDisplay</span>
+        </div>
+        <partial name="_CounterpartyLimitSlider" model="Model.Slider" />
+    </div>
+    <div class="planetary-legend" aria-label="Sens des liens">
+        <span><i class="planetary-legend-dot planetary-satellite-outgoing" aria-hidden="true"></i>Depuis cette entité</span>
+        <span><i class="planetary-legend-dot planetary-satellite-incoming" aria-hidden="true"></i>Vers cette entité</span>
+        <span><i class="planetary-legend-dot planetary-satellite-mixed" aria-hidden="true"></i>Dans les deux sens</span>
+        <span class="planetary-legend-orbits"><i class="planetary-legend-dash" aria-hidden="true"></i>Orbite extérieure : montants majeurs · Orbites intérieures : survoler</span>
+    </div>
+    <partial name="_CounterpartyActiveBar" />
+    <div class="planetary-container" data-counterparty-container data-planetary-container>
+        @await Html.PartialAsync("~/Views/Shared/Components/PlanetarySystem/_Viewport.cshtml", Model)
+    </div>
+    <p class="planetary-mobile-hint">Faites défiler horizontalement pour explorer toutes les contreparties.</p>
+    <p class="table-note">La taille des satellites reflète le montant cumulé des liens affichés. Les montants les plus élevés gravitent sur l'orbite extérieure avec libellé permanent ; les orbites intérieures affichent le libellé au survol.</p>
+</section>

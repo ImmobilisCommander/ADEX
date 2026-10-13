@@ -1,11 +1,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Application.Configuration;
 using Adex.Contracts.Explorer;
 using Adex.Data.ReadModel.Explorer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Adex.WebApi.Dashboard
 {
@@ -14,8 +17,14 @@ namespace Adex.WebApi.Dashboard
     /// </summary>
     [ApiController]
     [Route("api/dashboard")]
-    public sealed class DashboardController(DataExplorerService explorer) : ControllerBase
+    public sealed class DashboardController(
+        DataExplorerService explorer,
+        IMemoryCache cache,
+        IOptionsMonitor<CacheOptions> cacheOptions
+    ) : ControllerBase
     {
+        private const string CacheKey = "api_dashboard";
+
         /// <summary>
         /// Récupère le snapshot complet des indicateurs et graphiques du tableau de bord.
         /// </summary>
@@ -31,7 +40,19 @@ namespace Adex.WebApi.Dashboard
         [ProducesResponseType(StatusCodes.Status503ServiceUnavailable)]
         public async Task<ActionResult<DashboardModel>> Get(CancellationToken cancellationToken)
         {
-            return await explorer.GetDashboardAsync(cancellationToken);
+            var duration = cacheOptions.CurrentValue.Dashboard;
+            if (duration > TimeSpan.Zero && cache.TryGetValue(CacheKey, out DashboardModel cached))
+            {
+                return cached;
+            }
+
+            var dashboard = await explorer.GetDashboardAsync(cancellationToken);
+            if (dashboard is not null && duration > TimeSpan.Zero)
+            {
+                cache.Set(CacheKey, dashboard, duration);
+            }
+
+            return dashboard;
         }
 
         /// <summary>
@@ -54,8 +75,24 @@ namespace Adex.WebApi.Dashboard
             CancellationToken cancellationToken
         )
         {
+            var duration = cacheOptions.CurrentValue.Dashboard;
+            if (duration > TimeSpan.Zero && cache.TryGetValue(CacheKey, out DashboardModel cached))
+            {
+                return cached;
+            }
+
             var dashboard = await explorer.TryGetDashboardAsync(cancellationToken);
-            return dashboard is null ? Accepted() : dashboard;
+            if (dashboard is null)
+            {
+                return Accepted();
+            }
+
+            if (duration > TimeSpan.Zero)
+            {
+                cache.Set(CacheKey, dashboard, duration);
+            }
+
+            return dashboard;
         }
     }
 }

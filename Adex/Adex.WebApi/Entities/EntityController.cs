@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Adex.Application.Search;
+using Adex.Application.Configuration;
 using Adex.Contracts.Explorer;
 using Adex.Data.ReadModel.Explorer;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +20,7 @@ namespace Adex.WebApi.Entities
     public sealed class EntityController(
         DataExplorerService explorer,
         IMemoryCache cache,
-        IOptionsMonitor<SearchOptions> searchOptions
+        IOptionsMonitor<CacheOptions> cacheOptions
     ) : ControllerBase
     {
         /// <summary>
@@ -43,8 +43,8 @@ namespace Adex.WebApi.Entities
                 return new List<EntitySearchResult>();
             }
 
-            var duration = searchOptions.CurrentValue.CacheDurationSeconds;
-            if (duration <= 0)
+            var duration = cacheOptions.CurrentValue.Search;
+            if (duration <= TimeSpan.Zero)
             {
                 return await explorer.SearchEntitiesAsync(trimmed, cancellationToken);
             }
@@ -56,7 +56,7 @@ namespace Adex.WebApi.Entities
             }
 
             var results = await explorer.SearchEntitiesAsync(trimmed, cancellationToken);
-            cache.Set(cacheKey, results, TimeSpan.FromSeconds(duration));
+            cache.Set(cacheKey, results, duration);
             return results;
         }
 
@@ -84,6 +84,14 @@ namespace Adex.WebApi.Entities
             [FromQuery] bool descending = true
         )
         {
+            var duration = cacheOptions.CurrentValue.Entity;
+            var cacheKey = $"api_entity:{id}:{page}:{pageSize}:{sort}:{descending}";
+
+            if (duration > TimeSpan.Zero && cache.TryGetValue(cacheKey, out EntityDetails cached))
+            {
+                return Ok(cached);
+            }
+
             var entity = await explorer.GetEntityAsync(
                 id,
                 page,
@@ -92,7 +100,18 @@ namespace Adex.WebApi.Entities
                 descending,
                 cancellationToken
             );
-            return entity is null ? NotFound() : Ok(entity);
+
+            if (entity is null)
+            {
+                return NotFound();
+            }
+
+            if (duration > TimeSpan.Zero)
+            {
+                cache.Set(cacheKey, entity, duration);
+            }
+
+            return Ok(entity);
         }
 
         /// <summary>
@@ -113,12 +132,31 @@ namespace Adex.WebApi.Entities
             [FromQuery] int? limit = null
         )
         {
+            var duration = cacheOptions.CurrentValue.Counterparties;
+            var cacheKey = $"api_counterparties:{id}:{limit}";
+
+            if (duration > TimeSpan.Zero && cache.TryGetValue(cacheKey, out EntityCounterpartiesResult cached))
+            {
+                return Ok(cached);
+            }
+
             var counterparties = await explorer.GetEntityCounterpartiesAsync(
                 id,
                 limit,
                 cancellationToken
             );
-            return counterparties is null ? NotFound() : Ok(counterparties);
+
+            if (counterparties is null)
+            {
+                return NotFound();
+            }
+
+            if (duration > TimeSpan.Zero)
+            {
+                cache.Set(cacheKey, counterparties, duration);
+            }
+
+            return Ok(counterparties);
         }
     }
 }

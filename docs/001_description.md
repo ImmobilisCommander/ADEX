@@ -29,7 +29,8 @@ Les constantes des colonnes de données décrivent des champs relatifs aux entre
 | Recherche et fiche | La recherche d’entités appelle l’API ; une référence ouvre une fiche à l’adresse `/<référence>`, avec ses attributs et ses liens financiers navigables. |
 | Visualisation | Les indicateurs et fiches sont chargés depuis l’API. |
 | Interrogation du CSV | La page `/Csv` affiche le fichier `declarations.csv` par pages de 10 lignes. Elle s’affiche tout de suite avec un tableau fictif, puis charge les lignes. L’utilisateur peut masquer des colonnes (choix mémorisé dans le navigateur), trier la page affichée, filtrer sur tout le fichier avec un opérateur « contient » (colonnes texte et identifiants seulement, indiquées par un entonnoir) et ouvrir une ligne dans une modale libellé/valeur. |
-| Navigation | Un menu burger en haut à droite donne accès aux paramètres, à l’interrogation du CSV et à la page « Source et avertissement ». Le site occupe toute la largeur de la fenêtre. |
+| Plan du site | La route `/sitemap` (HTML) et `/sitemap.xml` (XML standard) expose l’ensemble des rubriques statiques ainsi que les 10 000 plus gros contributeurs et bénéficiaires de la base. Accessible depuis le lien en pied de page. |
+| Navigation | Un menu burger en haut à droite donne accès aux paramètres, à l’interrogation du CSV et à la page « Source et avertissement ». Le site occupe toute la largeur de la fenêtre. Un lien en pied de page permet d’accéder au plan du site. |
 
 Voir [Conception](002_design.md) pour les rôles des composants, [Architecture](003_architecture.md) pour les applications et [Règles métier](004_business_rules.md) pour les conditions précises observées.
 
