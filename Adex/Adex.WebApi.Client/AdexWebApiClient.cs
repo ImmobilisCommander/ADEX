@@ -76,6 +76,30 @@ namespace Adex.WebApi.Client
                 );
         }
 
+        public async Task<EntityCounterpartiesResult> GetEntityCounterpartiesAsync(
+            Guid id,
+            int? limit = null,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var uri = limit is > 0
+                ? $"api/entity/{id}/counterparties?limit={limit.Value}"
+                : $"api/entity/{id}/counterparties";
+
+            using var response = await httpClient.GetAsync(uri, cancellationToken);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<EntityCounterpartiesResult>(
+                cancellationToken
+            ) ?? throw new InvalidOperationException(
+                "The API returned an empty counterparties response."
+            );
+        }
+
         public async Task<JsonElement> GetEntityJsonAsync(
             Guid id,
             CancellationToken cancellationToken = default

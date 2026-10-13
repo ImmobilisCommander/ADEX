@@ -827,6 +827,184 @@ namespace Adex.Data.ReadModel.Explorer
             };
         }
 
+        public async Task<EntityCounterpartiesResult> GetEntityCounterpartiesAsync(
+            Guid entityId,
+            int? limit,
+            CancellationToken cancellationToken
+        )
+        {
+            await using var db = await contextFactory.CreateDbContextAsync(cancellationToken);
+
+            var companyName = await db.Companies
+                .Where(c => c.Id == entityId)
+                .Select(c => c.Designation)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            string entityName = companyName;
+            if (string.IsNullOrWhiteSpace(entityName))
+            {
+                var person = await db.Persons
+                    .Where(p => p.Id == entityId)
+                    .Select(p => new { p.FirstName, p.LastName })
+                    .FirstOrDefaultAsync(cancellationToken);
+                if (person is not null)
+                {
+                    entityName = JoinName(person.FirstName, person.LastName);
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(entityName))
+            {
+                var exists = await db.Entities.AnyAsync(e => e.Id == entityId, cancellationToken);
+                if (!exists)
+                {
+                    return null;
+                }
+                entityName = "(sans nom)";
+            }
+
+            var outgoingAggregates = await db.FinancialLinks
+                .Where(link => link.From_Id == entityId)
+                .GroupBy(link => link.To_Id)
+                .Select(group => new
+                {
+                    CounterpartyId = group.Key,
+                    OutgoingAmount = group.Sum(link => link.Amount),
+                    IncomingAmount = 0m,
+                    LinkCount = group.Count(),
+                })
+                .ToListAsync(cancellationToken);
+
+            var incomingAggregates = await db.FinancialLinks
+                .Where(link => link.To_Id == entityId)
+                .GroupBy(link => link.From_Id)
+                .Select(group => new
+                {
+                    CounterpartyId = group.Key,
+                    OutgoingAmount = 0m,
+                    IncomingAmount = group.Sum(link => link.Amount),
+                    LinkCount = group.Count(),
+                })
+                .ToListAsync(cancellationToken);
+
+            var merged = new Dictionary<Guid, (decimal Outgoing, decimal Incoming, int Count)>();
+            foreach (var row in outgoingAggregates)
+            {
+                merged[row.CounterpartyId] = (row.OutgoingAmount, 0m, row.LinkCount);
+            }
+
+            foreach (var row in incomingAggregates)
+            {
+                if (merged.TryGetValue(row.CounterpartyId, out var existing))
+                {
+                    merged[row.CounterpartyId] = (
+                        existing.Outgoing,
+                        existing.Incoming + row.IncomingAmount,
+                        existing.Count + row.LinkCount
+                    );
+                }
+                else
+                {
+                    merged[row.CounterpartyId] = (0m, row.IncomingAmount, row.LinkCount);
+                }
+            }
+
+            if (merged.Count == 0)
+            {
+                return new EntityCounterpartiesResult
+                {
+                    EntityId = entityId,
+                    EntityName = entityName,
+                    TotalCount = 0,
+                    Items = new List<EntityCounterpartySummary>()
+                };
+            }
+
+            var totalCount = merged.Count;
+            var sorted = merged
+                .Select(entry => new
+                {
+                    CounterpartyId = entry.Key,
+                    entry.Value.Outgoing,
+                    entry.Value.Incoming,
+                    TotalAmount = entry.Value.Outgoing + entry.Value.Incoming,
+                    entry.Value.Count,
+                })
+                .OrderByDescending(item => item.TotalAmount)
+                .ThenByDescending(item => item.Count);
+
+            var candidates = (limit is > 0 ? sorted.Take(limit.Value) : sorted).ToList();
+            var candidateIds = candidates.Select(c => c.CounterpartyId).ToList();
+
+            var companyNames = await db.Companies
+                .Where(candidate => candidateIds.Contains(candidate.Id))
+                .Select(candidate => new
+                {
+                    candidate.Id,
+                    Name = candidate.Designation ?? "(sans nom)",
+                })
+                .ToDictionaryAsync(
+                    candidate => candidate.Id,
+                    candidate => candidate.Name,
+                    cancellationToken
+                );
+
+            var personNameRows = await db.Persons
+                .Where(candidate => candidateIds.Contains(candidate.Id))
+                .Select(candidate => new
+                {
+                    candidate.Id,
+                    candidate.FirstName,
+                    candidate.LastName,
+                })
+                .ToListAsync(cancellationToken);
+
+            var personNames = personNameRows.ToDictionary(
+                candidate => candidate.Id,
+                candidate => JoinName(candidate.FirstName, candidate.LastName)
+            );
+
+            var items = candidates.Select(candidate =>
+            {
+                string name;
+                string type;
+                if (companyNames.TryGetValue(candidate.CounterpartyId, out var companyName))
+                {
+                    name = companyName;
+                    type = "Entreprise";
+                }
+                else if (personNames.TryGetValue(candidate.CounterpartyId, out var personName))
+                {
+                    name = personName;
+                    type = "Bénéficiaire";
+                }
+                else
+                {
+                    name = "(inconnu)";
+                    type = "Entité";
+                }
+
+                return new EntityCounterpartySummary
+                {
+                    CounterpartyId = candidate.CounterpartyId,
+                    Name = name,
+                    Type = type,
+                    TotalAmount = candidate.TotalAmount,
+                    IncomingAmount = candidate.Incoming,
+                    OutgoingAmount = candidate.Outgoing,
+                    LinkCount = candidate.Count,
+                };
+            }).ToList();
+
+            return new EntityCounterpartiesResult
+            {
+                EntityId = entityId,
+                EntityName = entityName,
+                TotalCount = totalCount,
+                Items = items,
+            };
+        }
+
         // One index-friendly query per direction (instead of an OR over both columns), merged by UNION ALL
         // so that sorting and paging happen in the database.
         private static async Task<List<FinancialLinkDetails>> LoadLinksPageAsync(

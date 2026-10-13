@@ -1,3 +1,5 @@
+using Adex.Contracts.Explorer;
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -38,6 +40,30 @@ namespace Adex.Mvc.Entities
         public List<EntityAttributeViewModel> Attributes { get; set; } = new();
 
         public List<FinancialLinkViewModel> FinancialLinks { get; set; } = new();
+
+        public PlanetarySystemViewModel PlanetarySystem { get; set; }
+
+        public List<PlanetaryCounterpartyViewModel> PlanetaryCounterparties => PlanetarySystem?.Counterparties.ToList() ?? new();
+
+        public List<PlanetaryOrbitViewModel> PlanetaryOrbits => PlanetarySystem?.Orbits.ToList() ?? new();
+
+        public IReadOnlyList<EntityCounterpartySummary> TopCounterparties { get; private set; } = new List<EntityCounterpartySummary>();
+
+        public const int DefaultPlanetaryLimit = 12;
+
+        public int PlanetaryLimit { get; set; } = DefaultPlanetaryLimit;
+
+        public int TotalCounterpartiesCount { get; set; }
+
+        public string PlanetarySystemViewBox => PlanetarySystem?.ViewBox ?? "0 0 960 640";
+
+        public bool PlanetaryIsGlobalScope { get; private set; }
+
+        public string PlanetaryLinkScopeDisplay => PlanetarySystem?.LinkScopeDisplay ?? string.Empty;
+
+        public IReadOnlyList<string> PlanetaryCoreNameLines => PlanetarySystem?.CoreNameLines ?? new List<string>();
+
+        public string PlanetaryCoreFirstLineOffset => PlanetarySystem?.CoreFirstLineOffset ?? "0";
 
         public string SearchQuery { get; set; }
 
@@ -116,6 +142,64 @@ namespace Adex.Mvc.Entities
 
         public IReadOnlyList<int> PageSizeOptions { get; } = new[] { 10, 20, 50 };
 
+        public void BuildPlanetarySystem(
+            EntityCounterpartiesResult counterpartiesResult = null,
+            int? limit = null
+        )
+        {
+            var requestedLimit = limit is > 0
+                ? limit.Value
+                : DefaultPlanetaryLimit;
+
+            if (counterpartiesResult is { Items: { Count: > 0 } })
+            {
+                PlanetarySystem = PlanetarySystemViewModel.Create(
+                    Id,
+                    Name,
+                    counterpartiesResult,
+                    requestedLimit,
+                    SearchQuery
+                );
+                PlanetaryIsGlobalScope = true;
+                TotalCounterpartiesCount = PlanetarySystem.TotalCounterpartiesCount;
+                PlanetaryLimit = PlanetarySystem.Limit;
+                TopCounterparties = counterpartiesResult.Items.Take(PlanetaryLimit).ToList();
+                return;
+            }
+
+            PlanetaryIsGlobalScope = false;
+            var groups = FinancialLinks
+                .GroupBy(link => link.CounterpartyId)
+                .Select(group => new EntityCounterpartySummary
+                {
+                    CounterpartyId = group.Key,
+                    Name = group.First().CounterpartyName,
+                    TotalAmount = group.Sum(link => link.Amount),
+                    IncomingAmount = group.Where(link => !link.Outgoing).Sum(link => link.Amount),
+                    OutgoingAmount = group.Where(link => link.Outgoing).Sum(link => link.Amount),
+                    LinkCount = group.Count(),
+                })
+                .OrderByDescending(group => group.TotalAmount)
+                .ThenBy(group => group.Name, StringComparer.CurrentCulture)
+                .ToList();
+
+            TotalCounterpartiesCount = groups.Count;
+            PlanetaryLimit = limit is > 0
+                ? Math.Clamp(limit.Value, 1, Math.Max(1, TotalCounterpartiesCount))
+                : Math.Min(DefaultPlanetaryLimit, Math.Max(1, TotalCounterpartiesCount));
+            TopCounterparties = groups.Take(PlanetaryLimit).ToList();
+
+            PlanetarySystem = new PlanetarySystemViewModel(
+                Id,
+                Name,
+                TopCounterparties,
+                TotalCounterpartiesCount,
+                PlanetaryLimit,
+                isGlobalScope: false,
+                searchQuery: SearchQuery
+            );
+        }
+
         private static CultureInfo FrenchCulture => CultureInfo.GetCultureInfo("fr-FR");
 
         private (string State, string Url) SortLink(string key)
@@ -123,15 +207,17 @@ namespace Adex.Mvc.Entities
             var state = Sort == key ? (Descending ? "descending" : "ascending") : null;
             var descending = Sort == key ? !Descending : key is "date" or "amount";
             var queryParam = HasSearchQuery ? $"&fromQuery={Uri.EscapeDataString(SearchQuery)}" : string.Empty;
+            var limitParam = PlanetaryLimit != DefaultPlanetaryLimit ? $"&limit={PlanetaryLimit}" : string.Empty;
             var url =
-                $"/{Id}?page=1&pageSize={PageSize}&sort={key}&descending={descending.ToString().ToLowerInvariant()}{queryParam}#links-title";
+                $"/{Id}?page=1&pageSize={PageSize}&sort={key}&descending={descending.ToString().ToLowerInvariant()}{queryParam}{limitParam}#links-title";
             return (state, url);
         }
 
         private string PageUrl(int number)
         {
             var queryParam = HasSearchQuery ? $"&fromQuery={Uri.EscapeDataString(SearchQuery)}" : string.Empty;
-            return $"/{Id}?page={number}&pageSize={PageSize}&sort={Sort}&descending={DescendingDisplay}{queryParam}#links-title";
+            var limitParam = PlanetaryLimit != DefaultPlanetaryLimit ? $"&limit={PlanetaryLimit}" : string.Empty;
+            return $"/{Id}?page={number}&pageSize={PageSize}&sort={Sort}&descending={DescendingDisplay}{queryParam}{limitParam}#links-title";
         }
     }
 }

@@ -94,5 +94,31 @@ namespace Adex.WebApi.Entities
             );
             return entity is null ? NotFound() : Ok(entity);
         }
+
+        /// <summary>
+        /// Récupère la liste des contreparties d'une entité regroupées avec la somme des montants.
+        /// </summary>
+        /// <param name="id">Identifiant unique (GUID) de l'entité.</param>
+        /// <param name="cancellationToken">Jeton d'annulation de la requête HTTP.</param>
+        /// <param name="limit">Nombre maximal de contreparties à retourner (optionnel, classées par montant décroissant).</param>
+        /// <returns>Résultat contenant le nombre total de contreparties et la liste des contreparties avec montants totaux, entrants, sortants et nombre de liens.</returns>
+        /// <response code="200">Résultat des contreparties de l'entité retourné.</response>
+        /// <response code="404">Aucune entité trouvée pour cet identifiant.</response>
+        [HttpGet("{id:guid}/counterparties")]
+        [ProducesResponseType(typeof(EntityCounterpartiesResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<EntityCounterpartiesResult>> GetCounterparties(
+            Guid id,
+            CancellationToken cancellationToken,
+            [FromQuery] int? limit = null
+        )
+        {
+            var counterparties = await explorer.GetEntityCounterpartiesAsync(
+                id,
+                limit,
+                cancellationToken
+            );
+            return counterparties is null ? NotFound() : Ok(counterparties);
+        }
     }
 }

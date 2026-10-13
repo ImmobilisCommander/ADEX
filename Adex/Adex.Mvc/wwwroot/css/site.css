@@ -1768,6 +1768,243 @@ input:focus-visible {
     margin-top: 34px;
 }
 
+.planetary-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.25rem;
+}
+
+.planetary-limit-form {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+}
+
+.planetary-slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper-cool);
+    font-size: 0.82rem;
+}
+
+.planetary-slider-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.planetary-slider-label strong {
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
+.planetary-slider-max {
+    color: var(--ink-muted);
+    font-size: 0.76rem;
+}
+
+.planetary-slider {
+    width: 130px;
+    height: 6px;
+    margin: 0;
+    accent-color: var(--focus);
+    cursor: pointer;
+    background: var(--line);
+    border-radius: 3px;
+}
+
+.planetary-active-bar {
+    min-height: 1.85rem;
+    margin: 0.35rem 0 0.5rem;
+    padding: 0.35rem 0.75rem;
+    background: var(--paper-cool);
+    border: 1px solid var(--line-light);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.planetary-active-default {
+    color: var(--ink-muted);
+    font-style: italic;
+}
+
+.planetary-active-name {
+    display: none;
+    color: var(--ink);
+    font-weight: 650;
+}
+
+.planetary-active-amount {
+    display: none;
+    color: var(--focus);
+    font-weight: 600;
+}
+
+.planetary-legend-orbits {
+    margin-left: auto;
+    font-style: italic;
+    opacity: 0.85;
+}
+
+.planetary-legend-dash {
+    display: inline-block;
+    width: 0.85rem;
+    height: 1px;
+    border-top: 2px dashed var(--ink-muted);
+    vertical-align: middle;
+}
+
+.planetary-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
+    margin: 0.25rem 0 0.5rem;
+    color: var(--ink-muted);
+    font-size: 0.82rem;
+}
+
+.planetary-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.planetary-legend-dot {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+}
+
+.planetary-container {
+    position: relative;
+    transition: opacity 0.15s ease-out;
+}
+
+.planetary-container.is-loading {
+    opacity: 0.55;
+}
+
+.planetary-viewport {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+}
+
+.planetary-system {
+    display: block;
+    width: min(100%, 960px);
+    min-width: 680px;
+    height: auto;
+    margin-inline: auto;
+}
+
+.planetary-orbit {
+    fill: none;
+    stroke: var(--line);
+    stroke-width: 1.5;
+}
+
+.planetary-orbit-secondary {
+    stroke-dasharray: 4 7;
+    opacity: 0.65;
+}
+
+.planetary-satellite-outgoing,
+.planetary-satellite.planetary-satellite-outgoing {
+    fill: var(--teal);
+}
+
+.planetary-satellite-incoming,
+.planetary-satellite.planetary-satellite-incoming {
+    fill: var(--focus);
+}
+
+.planetary-satellite-mixed,
+.planetary-satellite.planetary-satellite-mixed {
+    fill: var(--accent);
+}
+
+.planetary-satellite {
+    stroke: var(--paper);
+    stroke-width: 2.5;
+}
+
+.planetary-link {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.planetary-link:hover .planetary-satellite,
+.planetary-link:focus-visible .planetary-satellite {
+    stroke: var(--ink);
+    stroke-width: 4;
+}
+
+.planetary-link:focus-visible {
+    outline: none;
+}
+
+.planetary-label {
+    fill: var(--ink);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 650;
+    paint-order: stroke;
+    stroke: var(--paper);
+    stroke-linejoin: round;
+    stroke-width: 5px;
+    text-anchor: middle;
+    pointer-events: none;
+}
+
+.planetary-label-permanent {
+    opacity: 1;
+}
+
+.planetary-label-hover {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.planetary-link:hover .planetary-label-hover,
+.planetary-link:focus-visible .planetary-label-hover {
+    opacity: 1;
+}
+
+.planetary-core {
+    fill: var(--accent-soft);
+    stroke: var(--accent);
+    stroke-width: 2;
+}
+
+.planetary-core-label {
+    fill: var(--ink);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.planetary-mobile-hint {
+    display: none;
+    margin: 0.25rem 0 0;
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+}
+
 .attribute-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1832,6 +2069,26 @@ input:focus-visible {
 }
 
 @media (max-width: 800px) {
+    .planetary-mobile-hint {
+        display: block;
+    }
+
+    .planetary-heading {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .planetary-slider-wrap {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .planetary-legend-orbits {
+        margin-left: 0;
+        width: 100%;
+    }
+
     .site-shell {
         width: calc(100% - 32px);
     }
@@ -2108,4 +2365,25 @@ input:focus-visible {
     align-items: center;
     gap: 0.5rem;
     margin-top: 1rem;
+}
+
+.pager-size select {
+    min-height: 40px;
+    padding: 0.45rem 2.25rem 0.45rem 0.75rem;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    background-color: var(--input-bg);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+}
+
+.pager-size select:hover {
+    border-color: var(--focus);
+}
+
+.pager-size select:focus-visible {
+    border-color: var(--focus);
+    outline: 3px solid color-mix(in srgb, var(--focus) 24%, transparent);
+    outline-offset: 2px;
 }

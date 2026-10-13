@@ -1,10 +1,11 @@
+using Adex.Mvc.Api;
+using Adex.WebApi.Client;
+
+using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Adex.Mvc.Api;
-using Adex.Mvc.Entities;
-using Adex.WebApi.Client;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Adex.Mvc.Entities
 {
@@ -15,6 +16,7 @@ namespace Adex.Mvc.Entities
             Guid id,
             CancellationToken cancellationToken,
             [FromQuery] string fromQuery = null,
+            [FromQuery] int? limit = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
             [FromQuery] string sort = "date",
@@ -48,8 +50,53 @@ namespace Adex.Mvc.Entities
                 }
             }
 
+            var requestedLimit = limit is > 0
+                ? limit.Value
+                : EntityDetailsViewModel.DefaultPlanetaryLimit;
+
+            var counterparties = await apiClient.GetEntityCounterpartiesAsync(
+                id,
+                limit: requestedLimit,
+                cancellationToken: cancellationToken
+            );
+            model.BuildPlanetarySystem(counterparties, requestedLimit);
+
             ViewData["Title"] = model.Name;
             return View(model);
+        }
+
+        [HttpGet("/{id:guid}/planetary")]
+        public async Task<IActionResult> Planetary(
+            Guid id,
+            CancellationToken cancellationToken,
+            [FromQuery] int? limit = null,
+            [FromQuery] string fromQuery = null
+        )
+        {
+            var requestedLimit = limit is > 0
+                ? limit.Value
+                : EntityDetailsViewModel.DefaultPlanetaryLimit;
+
+            var counterparties = await apiClient.GetEntityCounterpartiesAsync(
+                id,
+                limit: requestedLimit,
+                cancellationToken: cancellationToken
+            );
+            if (counterparties is null)
+            {
+                return NotFound();
+            }
+
+            fromQuery = fromQuery?.Trim();
+            var viewModel = PlanetarySystemViewModel.Create(
+                id,
+                counterparties.EntityName,
+                counterparties,
+                requestedLimit,
+                fromQuery
+            );
+
+            return PartialView("_PlanetaryViewport", viewModel);
         }
     }
 }

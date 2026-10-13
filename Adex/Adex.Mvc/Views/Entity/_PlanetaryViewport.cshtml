@@ -1,0 +1,36 @@
+@model Adex.Mvc.Entities.PlanetarySystemViewModel
+
+<div class="planetary-viewport" data-planetary-viewport data-planetary-scope="@Model.LinkScopeDisplay">
+    <svg class="planetary-system" viewBox="@Model.ViewBox"
+         role="group" aria-labelledby="planetary-title"
+         xmlns="http://www.w3.org/2000/svg">
+        @foreach (var orbit in Model.Orbits)
+        {
+            <ellipse class="@orbit.CssClass" cx="480" cy="320" rx="@orbit.RadiusXDisplay" ry="@orbit.RadiusYDisplay" />
+        }
+        @foreach (var planet in Model.Counterparties)
+        {
+            <a class="planetary-link" href="@planet.CounterpartyUrl" aria-label="@planet.AccessibleLabel"
+               data-counterparty-name="@planet.Name" data-counterparty-amount="@planet.AmountDisplay">
+                <title>@planet.AccessibleLabel</title>
+                <circle class="planetary-satellite @planet.Tone"
+                        cx="@planet.XDisplay" cy="@planet.YDisplay" r="@planet.RadiusDisplay" />
+                <text class="@planet.LabelCssClass"
+                      x="@planet.XDisplay" y="@planet.LabelYDisplay">
+                    @for (var lineIndex = 0; lineIndex < planet.TextLines.Count; lineIndex++)
+                    {
+                        <tspan x="@planet.XDisplay"
+                               dy="@(lineIndex == 0 ? planet.FirstLineOffset : "16")">@planet.TextLines[lineIndex]</tspan>
+                    }
+                </text>
+            </a>
+        }
+        <circle class="planetary-core" cx="480" cy="320" r="68" />
+        <text class="planetary-core-label" text-anchor="middle" x="480" y="320">
+            @for (var lineIndex = 0; lineIndex < Model.CoreNameLines.Count; lineIndex++)
+            {
+                <tspan x="480" dy="@(lineIndex == 0 ? Model.CoreFirstLineOffset : "18")">@Model.CoreNameLines[lineIndex]</tspan>
+            }
+        </text>
+    </svg>
+</div>

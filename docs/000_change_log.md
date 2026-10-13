@@ -18,6 +18,20 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Système planétaire interactif sans rechargement de page :
+  - Le déplacement du curseur de sélection des contreparties (`limit`) actualise désormais uniquement la visualisation SVG et son libellé de périmètre sans rechargement complet de la page.
+  - Création de la vue partielle `_PlanetaryViewport.cshtml` et de son ViewModel dédié `PlanetarySystemViewModel`, associés à l'action MVC dédiée `GET /{id}/planetary?limit=...`.
+  - Côté client, l'ajustement du curseur déclenche une requête asynchrone déboguée/temporisée (`fetch`) avec gestion de l'annulation (`AbortController`), mise à jour fluide de l'image SVG, réinitialisation de la barre d'information contextuelle et synchronisation de l'URL du navigateur via `history.replaceState`.
+  - Préservation du comportement sans JavaScript grâce au formulaire standard avec repli `noscript`.
+- Système planétaire multi-orbites et contrôle interactif :
+  - Répartition dynamique sur 1 à 3 orbites concentriques (1 orbite pour ≤ 8 contreparties, 2 orbites pour 9-18, 3 orbites pour ≥ 19).
+  - L'orbite extérieure regroupe les montants les plus élevés avec étiquettes permanentes textuelles au-dessus des satellites. Les orbites médiane et intérieure accueillent les montants intermédiaires et mineurs avec étiquettes activées au survol et au focus clavier pour préserver la lisibilité visuelle.
+  - Ajout d'un curseur (slider) de sélection du nombre de contreparties affichées (`limit`), plafonné au nombre total réel de contreparties distinctes retourné par l'API (`EntityCounterpartiesResult`), avec persistance dans l'URL et synchronisation lors des tris et paginations.
+  - Ajout d'une barre d'information contextuelle au survol/focus d'une contrepartie affichant son nom et montant cumulé.
+  - La méthode `BuildPlanetarySystem` et la propriété `TopCounterparties` de `EntityDetailsViewModel` s'appuient dynamiquement sur la limite sélectionnée, sans valeur codée en dur.
+- API et fiche entité : ajout de la route dédiée `GET /api/entity/{id}/counterparties` regroupant l'ensemble des contreparties d'une entité avec le total distinct (`totalCount`) et la somme des montants totaux, entrants et sortants ainsi que le nombre de liens, avec paramètre optionnel `limit` (tri par montant décroissant). Le client HTTP `IAdexWebApiClient` et le système relationnel planétaire de la fiche entité s'appuient sur cette route pour afficher les principales contreparties calculées sur l'intégralité des déclarations de l'entité.
+- Prototype de système planétaire sur la fiche entité : l'entité occupe le noyau, les contreparties agrégées s'affichent en satellites avec taille proportionnelle au montant, couleur selon le sens, infobulle et navigation vers la fiche ; le diagramme se centre sur le noyau et reste explorable horizontalement sur mobile.
+- Fiche entité : harmonisation de la liste « Par page » avec les couleurs, la typographie et les états de focus du thème ADEX.
 - Recherche d'entités : mise en cache mémoire (`IMemoryCache`) des résultats de recherche API par mot-clé avec durée configurable (`Search:CacheDurationSeconds`, 600 secondes par défaut dans `appsettings.json`, désactivable avec 0) via la classe d'options validée `SearchOptions`.
 - Recherche d'entités : transmission sans état ni session du terme de recherche précédent via le paramètre d'URL `fromQuery`. Le lien « Rechercher une autre entité » n'est affiché sur la fiche que si le paramètre `fromQuery` est présent dans l'URL ; il pointe alors vers `/Search?query=...`, réaffichant instantanément les résultats mis en cache, sans aucune variable de session côté client ni serveur.
 - Recherche d'entités : ajout du formulaire de recherche avec autocomplétion dynamique directement sur la page `/Search`. Lorsque la page est appelée sans terme de recherche (par exemple via le lien « Rechercher une autre entité » depuis une fiche d'entité), le formulaire reçoit le focus et affiche une invitation à saisir un terme, sans exécuter de requête API inutile ni afficher de message trompeur d'absence de résultat.
