@@ -14,7 +14,8 @@ namespace Adex.Mvc.Entities
     public sealed class CounterpartyTreemapViewComponent(
         IAdexWebApiClient apiClient,
         IMemoryCache cache,
-        IOptionsMonitor<MvcCacheOptions> cacheOptions
+        IOptionsMonitor<MvcCacheOptions> cacheOptions,
+        IOptionsMonitor<MvcTreemapOptions> treemapOptions
     ) : ViewComponent
     {
         public async Task<IViewComponentResult> InvokeAsync(Guid entityId, string searchQuery = null)
@@ -40,7 +41,12 @@ namespace Adex.Mvc.Entities
                 }
             }
 
-            var model = new CounterpartyTreemapViewModel(null, result, searchQuery);
+            var model = new CounterpartyTreemapViewModel(
+                null,
+                result,
+                treemapOptions.CurrentValue.MaxNodesPerLevel,
+                searchQuery
+            );
             return model.HasCounterparties ? View(model) : Content(string.Empty);
         }
     }

@@ -18,6 +18,11 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Treemap zoomable et adaptatif :
+  - Au plus `Treemap:MaxNodesPerLevel` (20 par défaut, `appsettings.json` du MVC, obligatoire, entre 2 et 100) contreparties par niveau ; au-delà, les suivantes sont regroupées dans un bloc « Autres » (récursivement). Cliquer sur « Autres » plonge dans son contenu, l'en-tête permet de remonter (principe du treemap zoomable D3).
+  - Transitions de zoom reprises de la démo D3 « zoomable treemap » : hiérarchie disposée une seule fois, échelles x/y interpolées pendant 750 ms, fondu entre l'ancien et le nouveau niveau (désactivé avec `prefers-reduced-motion`).
+  - Le SVG est dimensionné d'après la largeur disponible (format portrait sur mobile < 600 px, sans largeur minimale ni défilement horizontal) et se redessine au redimensionnement en conservant le niveau de zoom.
+
 - Carte des contreparties simplifiée (fiche entité) :
   - `CounterpartyTreemap` n'affiche plus que le treemap : onglets, curseur, barre de détail au survol, légende des sens et zoom par sens supprimés. Les montants des deux sens sont cumulés (`TotalAmount`) et seules les 20 % de contreparties regroupées aux montants les plus élevés sont affichées (cliquer sur un bloc ouvre la fiche).
   - Le composant `PlanetarySystem` (ViewComponent, ViewModels, JS, route `GET /{id}/planetary`) est conservé mais n'est plus affiché ; `RelationshipViews`, la route `GET /{id}/treemap` et les paramètres `view`/`limit` de la fiche sont supprimés.

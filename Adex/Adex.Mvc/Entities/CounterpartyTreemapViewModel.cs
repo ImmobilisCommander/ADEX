@@ -11,6 +11,7 @@ namespace Adex.Mvc.Entities
     public sealed class CounterpartyTreemapViewModel(
         string entityName,
         EntityCounterpartiesResult result,
+        int maxNodesPerLevel,
         string searchQuery = null
     )
     {
@@ -56,17 +57,37 @@ namespace Adex.Mvc.Entities
             return items.Take(Math.Max(count, 1)).ToList();
         }
 
-        private List<CounterpartyTreemapNodeViewModel> BuildLeaves() =>
-            _items
-                .Select(item => new CounterpartyTreemapNodeViewModel
-                {
-                    Name = item.Name,
-                    Value = item.TotalAmount,
-                    AmountDisplay = item.TotalAmount.ToString("C0", FrenchCulture),
-                    Url = string.IsNullOrWhiteSpace(searchQuery)
-                        ? $"/{item.CounterpartyId}"
-                        : $"/{item.CounterpartyId}?fromQuery={Uri.EscapeDataString(searchQuery)}",
-                })
-                .ToList();
+        private List<CounterpartyTreemapNodeViewModel> BuildLeaves() => BuildLevel(_items);
+
+        // Au-delà de maxNodesPerLevel, les contreparties restantes sont regroupées dans « Autres », récursivement.
+        private List<CounterpartyTreemapNodeViewModel> BuildLevel(List<EntityCounterpartySummary> items)
+        {
+            if (items.Count <= maxNodesPerLevel)
+            {
+                return items.Select(ToLeaf).ToList();
+            }
+
+            var nodes = items.Take(maxNodesPerLevel).Select(ToLeaf).ToList();
+            var rest = items.Skip(maxNodesPerLevel).ToList();
+            var total = rest.Sum(item => item.TotalAmount);
+            nodes.Add(new CounterpartyTreemapNodeViewModel
+            {
+                Name = "Autres",
+                AmountDisplay = total.ToString("C0", FrenchCulture),
+                Children = BuildLevel(rest),
+            });
+            return nodes;
+        }
+
+        private CounterpartyTreemapNodeViewModel ToLeaf(EntityCounterpartySummary item) =>
+            new()
+            {
+                Name = item.Name,
+                Value = item.TotalAmount,
+                AmountDisplay = item.TotalAmount.ToString("C0", FrenchCulture),
+                Url = string.IsNullOrWhiteSpace(searchQuery)
+                    ? $"/{item.CounterpartyId}"
+                    : $"/{item.CounterpartyId}?fromQuery={Uri.EscapeDataString(searchQuery)}",
+            };
     }
 }

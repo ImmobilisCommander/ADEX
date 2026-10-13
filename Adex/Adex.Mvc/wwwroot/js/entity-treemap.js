@@ -7,58 +7,169 @@
     const data = JSON.parse(container.getAttribute("data-treemap") || "null");
     if (!data) return;
 
-    const width = 960;
-    const height = 560;
+    const headerHeight = 30;
+    const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 750;
 
-    const root = d3.treemap().size([width, height]).paddingInner(1.5)(
-        d3.hierarchy(data.root)
-            .sum((d) => d.value || 0)
-            .sort((a, b) => b.value - a.value)
-    );
+    // Chemin de zoom exprimé en indices d'enfants pour survivre au redimensionnement.
+    let focusPath = [];
+    let renderedWidth = 0;
 
-    const open = (d) => window.location.assign(d.data.url);
+    const dimensions = () => {
+        const width = Math.max(240, Math.floor(viewport.clientWidth || 320));
+        const height = Math.round(width < 600 ? width * 1.5 : width * 0.58);
+        return { width, height };
+    };
 
-    const svg = d3.select(viewport)
-        .append("svg")
-        .attr("class", "treemap-svg")
-        .attr("viewBox", [0, 0, width, height])
-        .attr("role", "group")
-        .attr("aria-labelledby", "treemap-title");
+    const isOthers = (d) => d.data.name === "Autres" && !!d.children;
 
-    const node = svg.selectAll("g")
-        .data(root.leaves())
-        .join("g")
-        .attr("class", "treemap-node")
-        .attr("transform", (d) => `translate(${d.x0},${d.y0})`)
-        .attr("tabindex", 0)
-        .attr("role", "link")
-        .attr("aria-label", (d) => `${d.data.name} : ${d.data.amountDisplay}`)
-        .on("click", (event, d) => open(d))
-        .on("keydown", (event, d) => {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                open(d);
+    const pathOf = (node) =>
+        node.ancestors().reverse().slice(1).map((d) => d.parent.children.indexOf(d));
+
+    const label = (node) =>
+        node.ancestors().reverse().map((d) => d.data.name).join(" › ");
+
+    const draw = () => {
+        const { width, height } = dimensions();
+        renderedWidth = width;
+        viewport.replaceChildren();
+
+        // Les enfants sont disposés aux proportions de la zone affichée : le zoom ne déforme jamais les cellules.
+        const tile = (node, x0, y0, x1, y1) => {
+            d3.treemapBinary(node, 0, 0, width, height);
+            for (const child of node.children) {
+                child.x0 = x0 + (child.x0 / width) * (x1 - x0);
+                child.x1 = x0 + (child.x1 / width) * (x1 - x0);
+                child.y0 = y0 + (child.y0 / height) * (y1 - y0);
+                child.y1 = y0 + (child.y1 / height) * (y1 - y0);
             }
-        });
+        };
 
-    node.append("clipPath")
-        .attr("id", (d, i) => `treemap-clip-${i}`)
-        .append("rect")
-        .attr("width", (d) => d.x1 - d.x0)
-        .attr("height", (d) => d.y1 - d.y0);
+        // « Autres » reste toujours en dernier, les autres blocs sont triés par montant.
+        const hierarchy = d3.treemap().tile(tile)(
+            d3.hierarchy(data.root)
+                .sum((d) => d.value || 0)
+                .sort((a, b) => (isOthers(a) ? 1 : isOthers(b) ? -1 : b.value - a.value))
+        );
 
-    node.append("rect")
-        .attr("class", "treemap-cell treemap-leaf")
-        .attr("width", (d) => d.x1 - d.x0)
-        .attr("height", (d) => d.y1 - d.y0);
+        const x = d3.scaleLinear().rangeRound([0, width]);
+        const y = d3.scaleLinear().rangeRound([0, height]);
+        let clipSequence = 0;
 
-    node.append("text")
-        .attr("class", "treemap-leaf-text")
-        .attr("clip-path", (d, i) => `url(#treemap-clip-${i})`)
-        .selectAll("tspan")
-        .data((d) => [d.data.name, d.data.amountDisplay])
-        .join("tspan")
-        .attr("x", 8)
-        .attr("y", (d, i) => 16 + i * 15)
-        .text((d) => d);
+        const svg = d3.select(viewport)
+            .append("svg")
+            .attr("class", "treemap-svg")
+            .attr("viewBox", [0, -headerHeight, width, height + headerHeight])
+            .attr("role", "group")
+            .attr("aria-labelledby", "treemap-title");
+
+        const position = (group, root) => {
+            group.selectAll("g")
+                .attr("transform", (d) =>
+                    d === root ? `translate(0,${-headerHeight})` : `translate(${x(d.x0)},${y(d.y0)})`)
+                .select("rect")
+                .attr("width", (d) => (d === root ? width : x(d.x1) - x(d.x0)))
+                .attr("height", (d) => (d === root ? headerHeight : y(d.y1) - y(d.y0)));
+        };
+
+        const activate = (d, root) => {
+            if (d === root) {
+                if (d.parent) zoomOut(d);
+            } else if (d.children) {
+                zoomIn(d);
+            } else if (d.data.url) {
+                window.location.assign(d.data.url);
+            }
+        };
+
+        const render = (group, root) => {
+            const node = group.selectAll("g")
+                .data([root, ...root.children])
+                .join("g")
+                .attr("class", (d) => (d === root && !d.parent ? "treemap-node treemap-node-static" : "treemap-node"))
+                .attr("tabindex", (d) => (d === root && !d.parent ? null : 0))
+                .attr("role", (d) => (d !== root && !d.children ? "link" : d === root && !d.parent ? null : "button"))
+                .attr("aria-label", (d) =>
+                    d === root
+                        ? `${label(d)}${d.parent ? " : revenir au niveau supérieur" : ""}`
+                        : `${d.data.name} : ${d.data.amountDisplay}`)
+                .on("click", (event, d) => activate(d, root))
+                .on("keydown", (event, d) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        activate(d, root);
+                    }
+                });
+
+            node.append("rect")
+                .attr("id", (d) => (d.clipId = `treemap-clip-${++clipSequence}`) + "-rect")
+                .attr("class", (d) => {
+                    if (d === root) return "treemap-cell treemap-header";
+                    return `treemap-cell ${d.children ? "treemap-group" : "treemap-leaf"}`;
+                });
+
+            node.append("clipPath")
+                .attr("id", (d) => d.clipId)
+                .append("use")
+                .attr("href", (d) => `#${d.clipId}-rect`);
+
+            node.append("text")
+                .attr("class", (d) => (d === root ? "treemap-header-text" : "treemap-leaf-text"))
+                .attr("clip-path", (d) => `url(#${d.clipId})`)
+                .selectAll("tspan")
+                .data((d) =>
+                    d === root
+                        ? [`${d.parent ? "‹ " : ""}${label(d)}`]
+                        : [d.data.name, d.data.amountDisplay])
+                .join("tspan")
+                .attr("x", 8)
+                .attr("y", (d, i, nodes) =>
+                    d3.select(nodes[i].parentNode).datum() === root ? headerHeight / 2 + 5 : 16 + i * 15)
+                .text((d) => d);
+
+            group.call(position, root);
+        };
+
+        const focus = focusPath.reduce((node, index) => node.children?.[index] ?? node, hierarchy);
+        x.domain([focus.x0, focus.x1]);
+        y.domain([focus.y0, focus.y1]);
+        let group = svg.append("g").call(render, focus);
+
+        const zoomIn = (d) => {
+            focusPath = pathOf(d);
+            const group0 = group.attr("pointer-events", "none");
+            const group1 = (group = svg.append("g").call(render, d));
+
+            x.domain([d.x0, d.x1]);
+            y.domain([d.y0, d.y1]);
+
+            svg.transition()
+                .duration(duration)
+                .call((t) => group0.transition(t).remove().call(position, d.parent))
+                .call((t) => group1.transition(t).attrTween("opacity", () => d3.interpolate(0, 1)).call(position, d));
+        };
+
+        const zoomOut = (d) => {
+            focusPath = pathOf(d.parent);
+            const group0 = group.attr("pointer-events", "none");
+            const group1 = (group = svg.insert("g", "*").call(render, d.parent));
+
+            x.domain([d.parent.x0, d.parent.x1]);
+            y.domain([d.parent.y0, d.parent.y1]);
+
+            svg.transition()
+                .duration(duration)
+                .call((t) => group0.transition(t).remove().attrTween("opacity", () => d3.interpolate(1, 0)).call(position, d))
+                .call((t) => group1.transition(t).call(position, d.parent));
+        };
+    };
+
+    draw();
+
+    let timer;
+    window.addEventListener("resize", () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            if (dimensions().width !== renderedWidth) draw();
+        }, 150);
+    });
 })();

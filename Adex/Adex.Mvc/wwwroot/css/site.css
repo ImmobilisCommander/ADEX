@@ -1977,16 +1977,12 @@ input:focus-visible {
 
 .treemap-viewport {
     max-width: 100%;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
 }
 
 .treemap-svg {
     display: block;
-    width: min(100%, 960px);
-    min-width: 680px;
+    width: 100%;
     height: auto;
-    margin-inline: auto;
     font-family: "Segoe UI", Arial, sans-serif;
 }
 
@@ -2016,7 +2012,11 @@ input:focus-visible {
     fill: var(--teal);
 }
 
-.treemap-leaf:hover,
+.treemap-group {
+    fill: var(--ink-muted);
+}
+
+.treemap-leaf:hover,.treemap-group:hover,
 .treemap-node:focus-visible .treemap-leaf {
     stroke: var(--ink);
     stroke-width: 3;
@@ -2050,10 +2050,8 @@ input:focus-visible {
 
 .planetary-system {
     display: block;
-    width: min(100%, 960px);
-    min-width: 680px;
+    width: 100%;
     height: auto;
-    margin-inline: auto;
 }
 
 .planetary-orbit {

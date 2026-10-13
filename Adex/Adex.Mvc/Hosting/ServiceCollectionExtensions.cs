@@ -26,6 +26,18 @@ namespace Adex.Mvc.Hosting
                         && !string.IsNullOrWhiteSpace(section[nameof(MvcCacheOptions.Sitemap)]);
                 }, "Tous les paramètres de la section « Cache » (Dashboard, Entity, Counterparties, Search, Sitemap) sont obligatoires.")
                 .ValidateOnStart();
+            services
+                .AddOptions<MvcTreemapOptions>()
+                .BindConfiguration(MvcTreemapOptions.SectionName)
+                .ValidateDataAnnotations()
+                .Validate<IConfiguration>(
+                    (options, configuration) =>
+                        !string.IsNullOrWhiteSpace(
+                            configuration.GetSection(MvcTreemapOptions.SectionName)[nameof(MvcTreemapOptions.MaxNodesPerLevel)]
+                        ),
+                    "Le paramètre « Treemap:MaxNodesPerLevel » est obligatoire."
+                )
+                .ValidateOnStart();
             services.AddProblemDetails();
             services.AddExceptionHandler<MvcExceptionHandler>();
             return services;
