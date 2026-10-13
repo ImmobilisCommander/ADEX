@@ -18,7 +18,7 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
-- Treemap : fil d'Ariane remplacé par une pagination de niveaux au-dessus de la carte (`Nom › 1 › 2 › … › n-2 › n-1 › n`) ; chaque numéro ramène directement au niveau correspondant, le niveau courant est mis en évidence. L'en-tête de la carte n'affiche plus que le niveau courant (« ‹ Autres (niveau n) »).
+- Treemap : fil d'Ariane remplacé par une pagination de niveaux au-dessus de la carte (`Nom › 1 › 2 › … › n-2 › n-1 › n`) ; chaque numéro ramène au niveau correspondant avec l'animation de zoom arrière en repassant par chaque niveau intermédiaire (et non plus un saut direct ; vitesse constante, chaque étape démarrant avant la fin de la précédente pour supprimer l'arrêt entre deux niveaux ; les clics sont ignorés pendant la remontée), le niveau courant est mis en évidence. L'en-tête de la carte n'affiche plus que le niveau courant (« ‹ Autres (niveau n) »).
 
 - Treemap : le bloc « Autres » n'est plus proportionnel à son montant ; sa surface correspond à celle d'une contrepartie moyenne du niveau (son montant réel reste affiché, et ses descendants gardent leurs proportions).
 

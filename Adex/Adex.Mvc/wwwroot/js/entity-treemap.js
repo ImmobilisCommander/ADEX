@@ -86,6 +86,7 @@
         const x = d3.scaleLinear().rangeRound([0, width]);
         const y = d3.scaleLinear().rangeRound([0, height]);
         let clipSequence = 0;
+        let climbing = false;
 
         const svg = d3.select(viewport)
             .append("svg")
@@ -104,6 +105,7 @@
         };
 
         const activate = (d, root) => {
+            if (climbing) return;
             if (d === root) {
                 if (d.parent) zoomOut(d);
             } else if (d.children) {
@@ -186,9 +188,7 @@
                     .attr("title", label(target))
                     .text(item === 0 ? target.data.name : item)
                     .on("click", () => {
-                        if (current) return;
-                        focusPath = pathOf(target);
-                        draw();
+                        if (!current) zoomOut(node, target);
                     });
             });
         };
@@ -209,20 +209,52 @@
                 .call((t) => group1.transition(t).attrTween("opacity", () => d3.interpolate(0, 1)).call(position, d));
         };
 
-        const zoomOut = (d) => {
-            focusPath = pathOf(d.parent);
-            updateLevels(d.parent);
+        // Remonte d'un niveau ; la promesse se résout à la fin de la transition.
+        const zoomOutStep = (d, stepDuration, ease) => {
+            const target = d.parent;
+            focusPath = pathOf(target);
+            updateLevels(target);
             const group0 = group.attr("pointer-events", "none");
-            const group1 = (group = svg.insert("g", "*").call(render, d.parent));
+            const group1 = (group = svg.insert("g", "*").call(render, target));
 
-            x.domain([d.parent.x0, d.parent.x1]);
-            y.domain([d.parent.y0, d.parent.y1]);
+            x.domain([target.x0, target.x1]);
+            y.domain([target.y0, target.y1]);
 
-            svg.transition()
-                .duration(duration)
+            const transition = svg.transition()
+                .duration(stepDuration)
+                .ease(ease)
                 .call((t) => group0.transition(t).remove().attrTween("opacity", () => d3.interpolate(1, 0)).call(position, d))
-                .call((t) => group1.transition(t).call(position, d.parent));
+                .call((t) => group1.transition(t).call(position, target));
+            return transition;
         };
+
+        // Vers un niveau précédent, on repasse par chaque niveau intermédiaire.
+        const zoomOut = async (d, target = d.parent) => {
+            if (climbing) return;
+            climbing = true;
+            const steps = d.depth - target.depth;
+            const stepDuration = steps > 1 ? Math.max(250, duration / 2) : duration;
+            // Vitesse constante pendant la remontée, arrivée progressive sur la dernière étape seulement.
+            const easeFor = (index) =>
+                steps === 1 ? d3.easeCubicInOut
+                    : index === steps - 1 ? d3.easeCubicOut
+                        : d3.easeLinear;
+            try {
+                let index = 0;
+                for (let node = d; node !== target; node = node.parent) {
+                    const transition = zoomOutStep(node, stepDuration, easeFor(index));
+                    const last = index === steps - 1;
+                    index++;
+                    // L'étape suivante démarre avant la fin de celle-ci (elle reprend la position courante) : aucun arrêt entre deux niveaux.
+                    await (last
+                        ? transition.end().catch(() => {})
+                        : new Promise((resolve) => setTimeout(resolve, stepDuration * 0.8)));
+                }
+            } finally {
+                climbing = false;
+            }
+        };
+
     };
 
     draw();
