@@ -15,13 +15,11 @@ namespace Adex.Mvc.Entities
         string searchQuery = null
     )
     {
-        public const double DisplayedShare = 0.2;
-
         private static readonly CultureInfo FrenchCulture = new("fr-FR");
 
         private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-        private readonly List<EntityCounterpartySummary> _items = SelectTopShare(result);
+        private readonly List<EntityCounterpartySummary> _items = SelectCounterparties(result);
 
         public string EntityName =>
             !string.IsNullOrWhiteSpace(result?.EntityName) ? result.EntityName
@@ -35,7 +33,7 @@ namespace Adex.Mvc.Entities
         public bool HasCounterparties => _items.Count > 0;
 
         public string ScopeDisplay =>
-            $"{DisplayedCount.ToString("N0", FrenchCulture)} contrepartie{(DisplayedCount > 1 ? "s" : "")} les plus élevées sur {TotalCounterpartiesCount.ToString("N0", FrenchCulture)}";
+            $"{DisplayedCount.ToString("N0", FrenchCulture)} contrepartie{(DisplayedCount > 1 ? "s" : "")}";
 
         public CounterpartyTreemapDataViewModel Data =>
             new()
@@ -46,15 +44,12 @@ namespace Adex.Mvc.Entities
 
         public string DataJson => JsonSerializer.Serialize(Data, JsonOptions);
 
-        private static List<EntityCounterpartySummary> SelectTopShare(EntityCounterpartiesResult result)
+        private static List<EntityCounterpartySummary> SelectCounterparties(EntityCounterpartiesResult result)
         {
-            var items = (result?.Items ?? new List<EntityCounterpartySummary>())
+            return (result?.Items ?? new List<EntityCounterpartySummary>())
                 .Where(item => item.TotalAmount > 0)
                 .OrderByDescending(item => item.TotalAmount)
                 .ToList();
-
-            var count = (int)Math.Ceiling(Math.Max(result?.TotalCount ?? 0, items.Count) * DisplayedShare);
-            return items.Take(Math.Max(count, 1)).ToList();
         }
 
         private List<CounterpartyTreemapNodeViewModel> BuildLeaves() => BuildLevel(_items);

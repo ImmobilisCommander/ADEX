@@ -2002,6 +2002,38 @@ input:focus-visible {
     max-width: 100%;
 }
 
+.treemap-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+    font: 13px "Segoe UI", Arial, sans-serif;
+    color: var(--ink-muted);
+}
+
+.treemap-pager-item {
+    min-width: 28px;
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper-cool);
+    font: 600 13px "Segoe UI", Arial, sans-serif;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.treemap-pager-item:hover {
+    background: #fff;
+}
+
+.treemap-pager-item[aria-current="page"] {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: var(--button-ink);
+    cursor: default;
+}
+
 .treemap-svg {
     display: block;
     width: 100%;

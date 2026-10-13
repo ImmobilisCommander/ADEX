@@ -18,6 +18,12 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Treemap : fil d'Ariane remplacé par une pagination de niveaux au-dessus de la carte (`Nom › 1 › 2 › … › n-2 › n-1 › n`) ; chaque numéro ramène directement au niveau correspondant, le niveau courant est mis en évidence. L'en-tête de la carte n'affiche plus que le niveau courant (« ‹ Autres (niveau n) »).
+
+- Treemap : le bloc « Autres » n'est plus proportionnel à son montant ; sa surface correspond à celle d'une contrepartie moyenne du niveau (son montant réel reste affiché, et ses descendants gardent leurs proportions).
+
+- Carte des contreparties : le filtre sur les 20 % de contreparties les plus élevées est supprimé ; toutes les contreparties (montant cumulé > 0) sont affichées, les niveaux de 20 (Treemap:MaxNodesPerLevel) étant regroupés sous « Autres » et explorables par zoom. Le libellé de périmètre n'indique plus que le nombre de contreparties.
+
 - Disposition de la fiche entité sur grand écran : « Montants par année », « Répartition par typologie » et la carte des contreparties sont regroupés dans `.entity-overview`. À partir de 1600 px de large, les deux graphiques sont empilés dans la colonne de gauche et la carte occupe la colonne de droite (5fr/7fr) ; en dessous, les deux graphiques restent côte à côte et la carte passe en dessous sur toute la largeur ; sous 900 px, tout est empilé.
 
 - Treemap zoomable et adaptatif :
@@ -26,7 +32,7 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
   - Le SVG est dimensionné d'après la largeur disponible (format portrait sur mobile < 600 px, sans largeur minimale ni défilement horizontal) et se redessine au redimensionnement en conservant le niveau de zoom.
 
 - Carte des contreparties simplifiée (fiche entité) :
-  - `CounterpartyTreemap` n'affiche plus que le treemap : onglets, curseur, barre de détail au survol, légende des sens et zoom par sens supprimés. Les montants des deux sens sont cumulés (`TotalAmount`) et seules les 20 % de contreparties regroupées aux montants les plus élevés sont affichées (cliquer sur un bloc ouvre la fiche).
+  - `CounterpartyTreemap` n'affiche plus que le treemap : onglets, curseur, barre de détail au survol, légende des sens et zoom par sens supprimés. Les montants des deux sens sont cumulés (`TotalAmount`) (cliquer sur un bloc ouvre la fiche).
   - Le composant `PlanetarySystem` (ViewComponent, ViewModels, JS, route `GET /{id}/planetary`) est conservé mais n'est plus affiché ; `RelationshipViews`, la route `GET /{id}/treemap` et les paramètres `view`/`limit` de la fiche sont supprimés.
 
 - Mise en cache fine et section de configuration dédiée `Cache` :

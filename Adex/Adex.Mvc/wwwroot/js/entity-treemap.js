@@ -25,16 +25,38 @@
     const pathOf = (node) =>
         node.ancestors().reverse().slice(1).map((d) => d.parent.children.indexOf(d));
 
-    const label = (node) =>
-        node.ancestors().reverse().map((d) => d.data.name).join(" › ");
+    const isOthersName = (d) => d.data.name === "Autres";
+
+    const label = (node) => {
+        const depth = node.depth;
+        return depth === 0 ? node.data.name : isOthersName(node) ? `Autres (niveau ${depth})` : node.data.name;
+    };
+
+    // Pagination : racine, niveaux 1 et 2, « … », puis les deux niveaux précédant le niveau courant.
+    const pageItems = (current) => {
+        const items = [];
+        for (let i = 0; i <= current; i++) {
+            if (i <= 2 || i >= current - 2) {
+                items.push(i);
+            } else if (items[items.length - 1] !== "…") {
+                items.push("…");
+            }
+        }
+        return items;
+    };
 
     const draw = () => {
         const { width, height } = dimensions();
         renderedWidth = width;
         viewport.replaceChildren();
+        const pager = d3.select(viewport).append("nav")
+            .attr("class", "treemap-pager")
+            .attr("aria-label", "Niveaux de la carte");
 
         // Les enfants sont disposés aux proportions de la zone affichée : le zoom ne déforme jamais les cellules.
         const tile = (node, x0, y0, x1, y1) => {
+            // Le poids d'« Autres » est artificiel : le total du nœud doit être recalculé à partir du poids de ses enfants.
+            node.value = node.children.reduce((sum, child) => sum + child.value, 0);
             d3.treemapBinary(node, 0, 0, width, height);
             for (const child of node.children) {
                 child.x0 = x0 + (child.x0 / width) * (x1 - x0);
@@ -44,11 +66,21 @@
             }
         };
 
+        // « Autres » ne suit pas la proportionnalité : il pèse autant qu'une contrepartie moyenne de son niveau.
+        // Seul son propre poids change, ses descendants gardent leurs montants réels.
+        const weighted = d3.hierarchy(data.root).sum((d) => d.value || 0);
+        weighted.each((node) => {
+            if (!node.children) return;
+            const others = node.children.filter(isOthers);
+            const regular = node.children.filter((child) => !isOthers(child));
+            if (others.length === 0 || regular.length === 0) return;
+            const mean = regular.reduce((sum, child) => sum + child.value, 0) / regular.length;
+            others.forEach((child) => { child.value = mean; });
+        });
+
         // « Autres » reste toujours en dernier, les autres blocs sont triés par montant.
         const hierarchy = d3.treemap().tile(tile)(
-            d3.hierarchy(data.root)
-                .sum((d) => d.value || 0)
-                .sort((a, b) => (isOthers(a) ? 1 : isOthers(b) ? -1 : b.value - a.value))
+            weighted.sort((a, b) => (isOthers(a) ? 1 : isOthers(b) ? -1 : b.value - a.value))
         );
 
         const x = d3.scaleLinear().rangeRound([0, width]);
@@ -134,8 +166,37 @@
         y.domain([focus.y0, focus.y1]);
         let group = svg.append("g").call(render, focus);
 
+        // Pagination des niveaux : accès direct à n'importe quel niveau parcouru.
+        const updateLevels = (node) => {
+            pager.style("display", node.depth > 0 ? null : "none");
+            const trail = node.ancestors().reverse();
+            pager.selectAll("*").remove();
+            pageItems(node.depth).forEach((item, index) => {
+                if (index > 0) pager.append("span").attr("class", "treemap-pager-sep").text("›");
+                if (item === "…") {
+                    pager.append("span").attr("class", "treemap-pager-gap").text("…");
+                    return;
+                }
+                const target = trail[item];
+                const current = target === node;
+                pager.append("button")
+                    .attr("type", "button")
+                    .attr("class", "treemap-pager-item")
+                    .attr("aria-current", current ? "page" : null)
+                    .attr("title", label(target))
+                    .text(item === 0 ? target.data.name : item)
+                    .on("click", () => {
+                        if (current) return;
+                        focusPath = pathOf(target);
+                        draw();
+                    });
+            });
+        };
+        updateLevels(focus);
+
         const zoomIn = (d) => {
             focusPath = pathOf(d);
+            updateLevels(d);
             const group0 = group.attr("pointer-events", "none");
             const group1 = (group = svg.append("g").call(render, d));
 
@@ -150,6 +211,7 @@
 
         const zoomOut = (d) => {
             focusPath = pathOf(d.parent);
+            updateLevels(d.parent);
             const group0 = group.attr("pointer-events", "none");
             const group1 = (group = svg.insert("g", "*").call(render, d.parent));
 
