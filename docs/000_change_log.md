@@ -18,6 +18,12 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Treemap : le fil de niveaux affiche désormais aussi le nom du client au niveau racine, ce qui réserve sa place et évite le décalage de la carte au premier clic.
+
+- Treemap : le bandeau de niveau « Autres (niveau N) » est supprimé ; les cellules occupent désormais toute la hauteur de la carte et les boutons de niveaux restent le moyen de navigation.
+
+- Fiche entité : le texte des trois indicateurs de synthèse est désormais centré.
+
 - Carte des contreparties : chaque niveau affiche les contreparties les plus élevées (`Treemap:MaxNodesPerLevel` - 1 blocs) puis un unique « Autres » pour le reste, y compris pour les entités ayant des milliers de contreparties. Le découpage en plusieurs groupes « Autres » est abandonné. La chaîne est construite de façon itérative et sa profondeur est plafonnée à 1000 niveaux (le nombre de contreparties par niveau augmente au besoin) ; la profondeur JSON autorisée est relevée en conséquence.
 
 - Tableau de bord : le texte des trois indicateurs est centré.

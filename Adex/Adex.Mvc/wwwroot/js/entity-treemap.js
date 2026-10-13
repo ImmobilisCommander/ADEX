@@ -7,7 +7,6 @@
     const data = JSON.parse(container.getAttribute("data-treemap") || "null");
     if (!data) return;
 
-    const headerHeight = 30;
     const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 750;
 
     // Chemin de zoom exprimé en indices d'enfants pour survivre au redimensionnement.
@@ -91,24 +90,21 @@
         const svg = d3.select(viewport)
             .append("svg")
             .attr("class", "treemap-svg")
-            .attr("viewBox", [0, -headerHeight, width, height + headerHeight])
+            .attr("viewBox", [0, 0, width, height])
             .attr("role", "group")
             .attr("aria-labelledby", "treemap-title");
 
-        const position = (group, root) => {
+        const position = (group) => {
             group.selectAll("g")
-                .attr("transform", (d) =>
-                    d === root ? `translate(0,${-headerHeight})` : `translate(${x(d.x0)},${y(d.y0)})`)
+                .attr("transform", (d) => `translate(${x(d.x0)},${y(d.y0)})`)
                 .select("rect")
-                .attr("width", (d) => (d === root ? width : x(d.x1) - x(d.x0)))
-                .attr("height", (d) => (d === root ? headerHeight : y(d.y1) - y(d.y0)));
+                .attr("width", (d) => x(d.x1) - x(d.x0))
+                .attr("height", (d) => y(d.y1) - y(d.y0));
         };
 
-        const activate = (d, root) => {
+        const activate = (d) => {
             if (climbing) return;
-            if (d === root) {
-                if (d.parent) zoomOut(d);
-            } else if (d.children) {
+            if (d.children) {
                 zoomIn(d);
             } else if (d.data.url) {
                 window.location.assign(d.data.url);
@@ -117,29 +113,23 @@
 
         const render = (group, root) => {
             const node = group.selectAll("g")
-                .data([root, ...root.children])
+                .data(root.children)
                 .join("g")
-                .attr("class", (d) => (d === root && !d.parent ? "treemap-node treemap-node-static" : "treemap-node"))
-                .attr("tabindex", (d) => (d === root && !d.parent ? null : 0))
-                .attr("role", (d) => (d !== root && !d.children ? "link" : d === root && !d.parent ? null : "button"))
-                .attr("aria-label", (d) =>
-                    d === root
-                        ? `${label(d)}${d.parent ? " : revenir au niveau supérieur" : ""}`
-                        : `${d.data.name} : ${d.data.amountDisplay}`)
-                .on("click", (event, d) => activate(d, root))
+                .attr("class", "treemap-node")
+                .attr("tabindex", 0)
+                .attr("role", (d) => d.children ? "button" : "link")
+                .attr("aria-label", (d) => `${d.data.name} : ${d.data.amountDisplay}`)
+                .on("click", (event, d) => activate(d))
                 .on("keydown", (event, d) => {
                     if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        activate(d, root);
+                        activate(d);
                     }
                 });
 
             node.append("rect")
                 .attr("id", (d) => (d.clipId = `treemap-clip-${++clipSequence}`) + "-rect")
-                .attr("class", (d) => {
-                    if (d === root) return "treemap-cell treemap-header";
-                    return `treemap-cell ${d.children ? "treemap-group" : "treemap-leaf"}`;
-                });
+                .attr("class", (d) => `treemap-cell ${d.children ? "treemap-group" : "treemap-leaf"}`);
 
             node.append("clipPath")
                 .attr("id", (d) => d.clipId)
@@ -147,20 +137,16 @@
                 .attr("href", (d) => `#${d.clipId}-rect`);
 
             node.append("text")
-                .attr("class", (d) => (d === root ? "treemap-header-text" : "treemap-leaf-text"))
+                .attr("class", "treemap-leaf-text")
                 .attr("clip-path", (d) => `url(#${d.clipId})`)
                 .selectAll("tspan")
-                .data((d) =>
-                    d === root
-                        ? [`${d.parent ? "‹ " : ""}${label(d)}`]
-                        : [d.data.name, d.data.amountDisplay])
+                .data((d) => [d.data.name, d.data.amountDisplay])
                 .join("tspan")
                 .attr("x", 8)
-                .attr("y", (d, i, nodes) =>
-                    d3.select(nodes[i].parentNode).datum() === root ? headerHeight / 2 + 5 : 16 + i * 15)
+                .attr("y", (d, i) => 16 + i * 15)
                 .text((d) => d);
 
-            group.call(position, root);
+            group.call(position);
         };
 
         const focus = focusPath.reduce((node, index) => node.children?.[index] ?? node, hierarchy);
@@ -170,7 +156,6 @@
 
         // Pagination des niveaux : accès direct à n'importe quel niveau parcouru.
         const updateLevels = (node) => {
-            pager.style("display", node.depth > 0 ? null : "none");
             const trail = node.ancestors().reverse();
             pager.selectAll("*").remove();
             pageItems(node.depth).forEach((item, index) => {
@@ -205,8 +190,8 @@
 
             svg.transition()
                 .duration(duration)
-                .call((t) => group0.transition(t).remove().call(position, d.parent))
-                .call((t) => group1.transition(t).attrTween("opacity", () => d3.interpolate(0, 1)).call(position, d));
+                .call((t) => group0.transition(t).remove().call(position))
+                .call((t) => group1.transition(t).attrTween("opacity", () => d3.interpolate(0, 1)).call(position));
         };
 
         // Remonte d'un niveau ; la promesse se résout à la fin de la transition.
@@ -223,8 +208,8 @@
             const transition = svg.transition()
                 .duration(stepDuration)
                 .ease(ease)
-                .call((t) => group0.transition(t).remove().attrTween("opacity", () => d3.interpolate(1, 0)).call(position, d))
-                .call((t) => group1.transition(t).call(position, target));
+                .call((t) => group0.transition(t).remove().attrTween("opacity", () => d3.interpolate(1, 0)).call(position))
+                .call((t) => group1.transition(t).call(position));
             return transition;
         };
 

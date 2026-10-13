@@ -1916,6 +1916,10 @@ input:focus-visible {
     margin-bottom: 34px;
 }
 
+.entity-totals .summary-item {
+    text-align: center;
+}
+
 .entity-page > .register-section {
     margin-top: 34px;
 }
@@ -2110,10 +2114,6 @@ input:focus-visible {
     cursor: pointer;
 }
 
-.treemap-node-static {
-    cursor: default;
-}
-
 .treemap-node:focus {
     outline: none;
 }
@@ -2121,11 +2121,6 @@ input:focus-visible {
 .treemap-cell {
     stroke: var(--paper);
     stroke-width: 1.5;
-}
-
-.treemap-header {
-    fill: var(--paper-cool);
-    stroke: var(--line);
 }
 
 .treemap-leaf {
@@ -2147,7 +2142,6 @@ input:focus-visible {
     stroke-width: 3;
 }
 
-.treemap-header-text,
 .treemap-group-text {
     fill: var(--ink);
     font-size: 13px;
