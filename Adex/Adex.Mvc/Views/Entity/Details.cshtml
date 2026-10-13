@@ -34,6 +34,7 @@
         </div>
     </section>
 
+    <div class="entity-overview">
     <partial name="_EntityCharts" model="Model.EntityCharts" />
 
     @await Component.InvokeAsync("CounterpartyTreemap", new
@@ -41,6 +42,7 @@
         entityId = Model.Id,
         searchQuery = Model.SearchQuery
     })
+    </div>
 
     <section class="register-section" aria-labelledby="attributes-title">
         <div class="section-heading">

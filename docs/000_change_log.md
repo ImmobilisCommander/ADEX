@@ -18,6 +18,8 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Disposition de la fiche entité sur grand écran : « Montants par année », « Répartition par typologie » et la carte des contreparties sont regroupés dans `.entity-overview`. À partir de 1600 px de large, les deux graphiques sont empilés dans la colonne de gauche et la carte occupe la colonne de droite (5fr/7fr) ; en dessous, les deux graphiques restent côte à côte et la carte passe en dessous sur toute la largeur ; sous 900 px, tout est empilé.
+
 - Treemap zoomable et adaptatif :
   - Au plus `Treemap:MaxNodesPerLevel` (20 par défaut, `appsettings.json` du MVC, obligatoire, entre 2 et 100) contreparties par niveau ; au-delà, les suivantes sont regroupées dans un bloc « Autres » (récursivement). Cliquer sur « Autres » plonge dans son contenu, l'en-tête permet de remonter (principe du treemap zoomable D3).
   - Transitions de zoom reprises de la démo D3 « zoomable treemap » : hiérarchie disposée une seule fois, échelles x/y interpolées pendant 750 ms, fondu entre l'ancien et le nouveau niveau (désactivé avec `prefers-reduced-motion`).

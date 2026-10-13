@@ -899,15 +899,38 @@ input:focus-visible {
 .segment-2 { background: var(--focus); }
 .segment-3 { background: var(--ink-muted); }
 
-.entity-charts {
+.entity-overview {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
     margin-top: 34px;
 }
 
+.entity-charts {
+    display: contents;
+}
+
+.entity-overview > .treemap-section {
+    grid-column: 1 / -1;
+}
+
+@media (min-width: 1600px) {
+    .entity-overview {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+
+    .entity-overview > .register-section:not(.treemap-section) {
+        grid-column: 1;
+    }
+
+    .entity-overview > .treemap-section {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+    }
+}
+
 @media (max-width: 900px) {
-    .entity-charts {
+    .entity-overview {
         grid-template-columns: minmax(0, 1fr);
     }
 }
