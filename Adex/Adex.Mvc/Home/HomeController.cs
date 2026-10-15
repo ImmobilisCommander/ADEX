@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Adex.Contracts.Explorer;
 using Adex.Mvc.Api;
 using Adex.Mvc.Configuration;
+using Adex.Mvc.Discovery;
 using Adex.Mvc.Entities;
 using Adex.Mvc.Home;
 using Adex.Mvc.Hosting;
@@ -29,6 +30,15 @@ namespace Adex.Mvc.Home
         public IActionResult Index()
         {
             ViewData["Title"] = "Explorer les liens d’intérêt";
+            Response.Headers.Append(
+                "Link",
+                new[]
+                {
+                    $"<{ApiCatalogController.ApiCatalogPath}>; rel=\"api-catalog\"",
+                    $"<{ApiCatalogController.ServiceDocPath}>; rel=\"service-doc\"; type=\"text/html\"",
+                    "</sitemap.xml>; rel=\"describedby\"; type=\"application/xml\"",
+                }
+            );
             return View(new DashboardViewModel());
         }
 

@@ -18,6 +18,10 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Découverte par agents : ajout de `/auth.md`, qui déclare explicitement qu'ADEX n'a ni authentification, ni enregistrement d'agent, ni métadonnées OAuth.
+
+- Découverte par agents : l’accueil renvoie des en-têtes `Link` (RFC 8288) `api-catalog`, `service-doc` et `describedby`, et `/.well-known/api-catalog` publie un linkset (RFC 9727) limité à `/data/entities/`.
+
 - Négociation de contenu « Markdown for Agents » : `MarkdownNegotiationMiddleware` (Adex.Mvc, paquet ReverseMarkdown) convertit les pages HTML en Markdown (`Content-Type: text/markdown`, en-tête `x-markdown-tokens`, `Vary: Accept`) lorsque la requête GET/HEAD contient `Accept: text/markdown`; le HTML reste le défaut.
 
 - `robots.txt` : ajout de la directive `Content-Signal: search=yes, ai-input=yes, ai-train=no` (indexation et usage en réponse IA autorisés, entraînement de modèles refusé).
