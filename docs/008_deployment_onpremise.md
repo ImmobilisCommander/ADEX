@@ -8,6 +8,7 @@ Le MVC est le seul composant publié. `cloudflared` (service Windows, tunnel gé
 |---|---|---|
 | MVC | `https://localhost:5001` | Oui, via le tunnel |
 | API | `https://localhost:5002` | Non |
+| Serveur MCP | `https://localhost:5003` | Non |
 | PostgreSQL | `localhost` | Non |
 
 Dans Cloudflare (Zero Trust → Tunnels → route publiée) : type `HTTPS`, URL `localhost:5001`, **No TLS Verify** activé (certificat auto-signé).
@@ -28,8 +29,8 @@ Le socle commun reste dans `appsettings.json` (Serilog, journaux sous `D:\Logs`,
 
 | Paramètre | Development | Production |
 |---|---|---|
-| Écoute (`Urls`) | profils `launchSettings.json` | `https://localhost:5001` (MVC), `https://localhost:5002` (API) |
-| `AdexApi:BaseAddress` (MVC) | `https://localhost:44330/` | `https://localhost:5002/` |
+| Écoute (`Urls`) | profils `launchSettings.json` | `https://localhost:5001` (MVC), `https://localhost:5002` (API), `https://localhost:5003` (MCP) |
+| `AdexApi:BaseAddress` (MVC, MCP) | `https://localhost:44330/` (MVC) ; `https://localhost:7002/` (MCP) | `https://localhost:5002/` |
 | `Import:DataDirectory`, `Csv:FilePath` | `D:\publish\adex\data` | `D:\publish\adex\data` |
 | `AllowedHosts` | `*` | MVC : `adex.laboratoires.dev;localhost` ; API : `127.0.0.1;localhost` |
 | Niveau `Adex.Application.Csv` | `Debug` | `Information` |

@@ -21,6 +21,7 @@
   <Project Path="Adex.Data.Model/Adex.Data.Model.csproj" />
   <Project Path="Adex.Data.ReadModel/Adex.Data.ReadModel.csproj" />
   <Project Path="Adex.Importer/Adex.Importer.csproj" />
+  <Project Path="Adex.Mcp/Adex.Mcp.csproj" />
   <Project Path="Adex.Mvc/Adex.Mvc.csproj" />
   <Project Path="Adex.WebApi.Client/Adex.WebApi.Client.csproj" />
   <Project Path="Adex.WebApi/Adex.WebApi.csproj" />

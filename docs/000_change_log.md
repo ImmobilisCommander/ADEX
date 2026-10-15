@@ -18,6 +18,14 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Serveur MCP : enregistrement explicite des outils et prompts dans `Program.cs` (`WithTools<EntityTools>()`, `WithTools<DashboardTools>()`, `WithPrompts<AdexPrompts>()`) à la place de la découverte par réflexion (`WithToolsFromAssembly`, `WithPromptsFromAssembly`). Toute nouvelle classe d'outils ou de prompts doit être ajoutée à cet enregistrement.
+
+- Serveur MCP : ajout de trois prompts (`Prompts/AdexPrompts.cs`, `WithPromptsFromAssembly`) : `analyser_entite` (nom), `comparer_entites` (nom1, nom2) et `synthese_globale`. Ils guident le chaînage des outils existants ; dans VS Code, ils sont disponibles en commandes `/mcp.adex.<nom>`. Correctifs d'outils : `lister_liens_financiers` n'accepte que les tailles de page 10, 20 ou 50 (comme l'API) et ses clés de tri sont documentées.
+
+- Serveur MCP : configuration Serilog reprise de l'API (`appsettings.json` : niveaux, enrichissement, gabarits console/fichier, rotation journalière, 20 Mio, 10 fichiers) avec en plus les niveaux `System.Net.Http.HttpClient` (Warning) et `ModelContextProtocol` (Information) ; chemins de fichier dans `appsettings.Development.json` (`D:\Logs\DEV\Adex.Mcp-.log`) et `appsettings.Production.json`.
+- Serveur MCP : ajout de `appsettings.Production.json` (écoute sur `https://localhost:5003`, API en `https://localhost:5002/`, journaux sous `D:\Logs\PROD`, `AllowedHosts` restreint) et documentation du port dans le déploiement on premise.
+- Serveur MCP : nouveau projet `Adex.Mcp` (SDK `ModelContextProtocol.AspNetCore` 2.2.0, transport HTTP sur `/mcp`) qui s'appuie sur `Adex.WebApi.Client`. Outils en lecture seule : `rechercher_entites`, `obtenir_fiche_entite`, `lister_liens_financiers`, `obtenir_statistiques`, `top_entites_par_montant`.
+
 - Découverte par agents : ajout de `/auth.md`, qui déclare explicitement qu'ADEX n'a ni authentification, ni enregistrement d'agent, ni métadonnées OAuth.
 
 - Découverte par agents : l’accueil renvoie des en-têtes `Link` (RFC 8288) `api-catalog`, `service-doc` et `describedby`, et `/.well-known/api-catalog` publie un linkset (RFC 9727) limité à `/data/entities/`.

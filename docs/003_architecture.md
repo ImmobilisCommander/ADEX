@@ -16,6 +16,7 @@ La solution `Adex/Adex.slnx` regroupe les projets suivants :
 | `Adex.Data.MetaModel` | Ancien modèle générique et son contexte EF Core, conservés pour le transfert temporaire des métadonnées. |
 | `Adex.WebApi` | Hôte HTTP ASP.NET Core : contrôleurs groupés par domaine, configuration et middleware de maintenance. |
 | `Adex.Mvc` | Hôte MVC/Razor : vues, contrôleurs et ViewModels organisés par domaine ; consommation de `Adex.WebApi.Client` et conversion des contrats API vers les modèles de présentation. |
+| `Adex.Mcp` | Serveur MCP (HTTP, route `/mcp`) exposant en lecture seule les outils `rechercher_entites`, `obtenir_fiche_entite`, `lister_liens_financiers`, `obtenir_statistiques` et `top_entites_par_montant`. Il expose aussi trois prompts (`analyser_entite`, `comparer_entites`, `synthese_globale`). Il consomme l’API via `Adex.WebApi.Client` (`AdexApi:BaseAddress`, `https://localhost:7002/` en développement) ; écoute sur `https://localhost:7003` en développement. Aucune authentification n’est encore appliquée. |
 
 Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuGet sont centralisées dans `Adex/Directory.Packages.props`. Les anciens projets `Adex.Common` et `Adex.Business` ont été retirés : leurs types ont été replacés dans les projets responsables. Les projets `Adex.Web` et `Adex.App` ne font pas partie de la solution.
 
