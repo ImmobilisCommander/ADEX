@@ -1,4 +1,5 @@
 using Adex.Mvc.Configuration;
+using Adex.Mvc.Entities.Json;
 using Adex.WebApi.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ namespace Adex.Mvc.Hosting
         {
             services.AddControllersWithViews();
             services.AddMemoryCache();
+            services.AddTransient<EntityDetailsCache>();
             services
                 .AddOptions<MvcCacheOptions>()
                 .BindConfiguration(MvcCacheOptions.SectionName)

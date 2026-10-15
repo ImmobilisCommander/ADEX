@@ -141,7 +141,22 @@ namespace Adex.Mvc.Sitemap
         public IActionResult Robots()
         {
             var baseUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
-            var content = $"User-agent: *\nAllow: /\n\nSitemap: {baseUrl}/sitemap.xml\n";
+            var content =
+                $"User-agent: *\n"
+                + "# Les fiches HTML (dont /{id}) et leurs representations JSON sont explorables.\n"
+                + "Content-Signal: search=yes, ai-input=yes, ai-train=no\n"
+                + "Allow: /\n"
+                + "Allow: /sitemap\n"
+                + "Allow: /sitemap.xml\n"
+                + "Allow: /data/entities/\n"
+                + "# Exclure les routes API, recherche, CSV et utilitaires du crawl.\n"
+                + "Disallow: /api/\n"
+                + "Disallow: /Search\n"
+                + "Disallow: /Csv\n"
+                + "Disallow: /Home/Settings\n"
+                + "Disallow: /Home/Error\n"
+                + "Disallow: /*/planetary\n\n"
+                + $"Sitemap: {baseUrl}/sitemap.xml\n";
             return Content(content, "text/plain", Encoding.UTF8);
         }
     }

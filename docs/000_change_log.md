@@ -18,6 +18,12 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Négociation de contenu « Markdown for Agents » : `MarkdownNegotiationMiddleware` (Adex.Mvc, paquet ReverseMarkdown) convertit les pages HTML en Markdown (`Content-Type: text/markdown`, en-tête `x-markdown-tokens`, `Vary: Accept`) lorsque la requête GET/HEAD contient `Accept: text/markdown`; le HTML reste le défaut.
+
+- `robots.txt` : ajout de la directive `Content-Signal: search=yes, ai-input=yes, ai-train=no` (indexation et usage en réponse IA autorisés, entraînement de modèles refusé).
+
+- Fiche entité : ajout d’une représentation JSON dédiée sur `/data/entities/{id}.json`, projetée vers des DTO propres au MVC et partageant le cache de la page HTML. Ajout d’un lien JSON sur la fiche et de règles `robots.txt` explicites pour les routes à explorer et à exclure.
+
 - Treemap : le fil de niveaux affiche désormais aussi le nom du client au niveau racine, ce qui réserve sa place et évite le décalage de la carte au premier clic.
 
 - Treemap : le bandeau de niveau « Autres (niveau N) » est supprimé ; les cellules occupent désormais toute la hauteur de la carte et les boutons de niveaux restent le moyen de navigation.

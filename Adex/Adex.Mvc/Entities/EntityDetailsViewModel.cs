@@ -66,6 +66,8 @@ namespace Adex.Mvc.Entities
 
         public string PageAction => $"/{Id}";
 
+        public string JsonUrl { get; set; }
+
         public int FirstDisplayedLink => (Page - 1) * PageSize + 1;
 
         public int LastDisplayedLink => FirstDisplayedLink + FinancialLinks.Count - 1;

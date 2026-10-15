@@ -1,0 +1,10 @@
+### Robots.txt
+GET https://adex.laboratoires.dev/robots.txt
+
+### Dashboard
+GET https://adex.laboratoires.dev/
+Accept: text/markdown
+
+### Institut Gustave Roussy
+GET https://adex.laboratoires.dev/01a1187d-103c-7be7-9f4c-8fee7a4280b9
+Accept: text/markdown

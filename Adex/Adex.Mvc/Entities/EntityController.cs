@@ -1,6 +1,7 @@
 using Adex.Contracts.Explorer;
 using Adex.Mvc.Api;
 using Adex.Mvc.Configuration;
+using Adex.Mvc.Entities.Json;
 using Adex.WebApi.Client;
 
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,8 @@ namespace Adex.Mvc.Entities
     public sealed class EntityController(
         IAdexWebApiClient apiClient,
         IMemoryCache cache,
-        IOptionsMonitor<MvcCacheOptions> cacheOptions
+        IOptionsMonitor<MvcCacheOptions> cacheOptions,
+        EntityDetailsCache entityDetailsCache
     ) : Controller
     {
         [HttpGet("/{id:guid}")]
@@ -30,30 +32,14 @@ namespace Adex.Mvc.Entities
             [FromQuery] bool descending = true
         )
         {
-            var duration = cacheOptions.CurrentValue.Entity;
-            var cacheKey = $"mvc_entity:{id}:{page}:{pageSize}:{sort}:{descending}";
-            EntityDetails entity = null;
-
-            if (duration > TimeSpan.Zero && cache.TryGetValue(cacheKey, out EntityDetails cached))
-            {
-                entity = cached;
-            }
-            else
-            {
-                entity = await apiClient.GetEntityAsync(
-                    id,
-                    page,
-                    pageSize,
-                    sort ?? "date",
-                    descending,
-                    cancellationToken
-                );
-
-                if (entity is not null && duration > TimeSpan.Zero)
-                {
-                    cache.Set(cacheKey, entity, duration);
-                }
-            }
+            var entity = await entityDetailsCache.GetAsync(
+                id,
+                page,
+                pageSize,
+                sort ?? "date",
+                descending,
+                cancellationToken
+            );
 
             if (entity is null)
             {
@@ -75,6 +61,8 @@ namespace Adex.Mvc.Entities
             }
 
             ViewData["Title"] = model.Name;
+            model.JsonUrl = Url.RouteUrl("entity-json", new { id, page, pageSize, sort, descending });
+            ViewData["AlternateJsonUrl"] = model.JsonUrl;
             return View(model);
         }
 

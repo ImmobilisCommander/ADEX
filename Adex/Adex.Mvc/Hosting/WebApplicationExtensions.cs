@@ -24,6 +24,7 @@ namespace Adex.Mvc.Hosting
                 }
             );
             app.UseSerilogRequestLogging();
+            app.UseMiddleware<MarkdownNegotiationMiddleware>();
             app.UseExceptionHandler("/Home/Error");
             if (!app.Environment.IsDevelopment())
             {
