@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <RootNamespace>Adex.WebApi</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -16,7 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Adex.Application\Adex.Application.csproj" />
     <ProjectReference Include="..\Adex.Contracts\Adex.Contracts.csproj" />
-    <ProjectReference Include="..\Adex.Data.Import\Adex.Data.Import.csproj" />
     <ProjectReference Include="..\Adex.Data.ReadModel\Adex.Data.ReadModel.csproj" />
     <ProjectReference Include="..\Adex.Data.Model\Adex.Data.Model.csproj" />
   </ItemGroup>

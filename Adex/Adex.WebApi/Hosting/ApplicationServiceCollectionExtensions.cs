@@ -4,9 +4,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Adex.Application.Configuration;
 using Adex.Application.Csv;
-using Adex.Application.Import;
 using Adex.Application.Search;
-using Adex.Data.Import;
 using Adex.Data.ReadModel.Explorer;
 using Adex.WebApi.Dashboard;
 using Microsoft.Extensions.Configuration;
@@ -52,7 +50,6 @@ namespace Adex.WebApi.Hosting
         public static IServiceCollection AddAdexServices(this IServiceCollection services)
         {
             services.AddScoped<DataExplorerService>();
-            services.AddScoped<IDeclarationsImporter, DeclarationsImporter>();
 
             services
                 .AddOptions<DashboardOptions>()
@@ -87,13 +84,6 @@ namespace Adex.WebApi.Hosting
                 .BindConfiguration(SearchOptions.SectionName)
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
-
-            services
-                .AddOptions<ImportOptions>()
-                .BindConfiguration(ImportOptions.SectionName)
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
-            services.AddSingleton<ImportJobService>();
             return services;
         }
     }

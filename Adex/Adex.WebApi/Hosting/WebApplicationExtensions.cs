@@ -31,7 +31,6 @@ namespace Adex.WebApi.Hosting
             });
 
             app.UseHttpsRedirection();
-            app.UseMiddleware<ImportInProgressMiddleware>();
             app.UseAuthorization();
             app.MapControllers();
             return app;

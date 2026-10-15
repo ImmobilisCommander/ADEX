@@ -10,7 +10,7 @@ Les réponses HTTP communes au serveur API et au client MVC sont des DTO dans `A
 
 ## Parcours d’import
 
-`ImportJobService` (dans `Adex.Application.Import`) gère le cycle de vie de l’import en arrière-plan. Il utilise le port applicatif `Adex.Application.Import.IDeclarationsImporter`; l’adaptateur `Adex.Data.Import.DeclarationsImporter` lit le fichier consolidé, applique les règles de sélection et écrit les lignes avec le COPY binaire Npgsql via un `NpgsqlDataSource`.
+L’import est délégué à la console `Adex.Importer`, lancée manuellement (aucun point d’entrée dans l’API ni le MVC). Elle utilise le port applicatif `Adex.Application.Import.IDeclarationsImporter`; l’adaptateur `Adex.Data.Import.DeclarationsImporter` lit le fichier consolidé, applique les règles de sélection et écrit les lignes avec le COPY binaire Npgsql via un `NpgsqlDataSource`.
 
 Ce pipeline est volontairement spécialisé pour les volumes élevés et la base PostgreSQL. Il ne dépend plus du contexte EF Core, mais l’analyse des règles, la transformation des lignes et les opérations de persistance restent regroupées dans l’implémentation d’import. Une séparation plus fine n’est justifiée que si des consommateurs ou des variantes d’import apparaissent.
 

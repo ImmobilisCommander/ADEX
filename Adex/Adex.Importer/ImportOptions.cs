@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Adex.Application.Import
+namespace Adex.Importer
 {
     public class ImportOptions
     {
@@ -17,8 +17,5 @@ namespace Adex.Application.Import
             ErrorMessage = "Le paramètre « Import:FileName » est obligatoire."
         )]
         public string FileName { get; set; } = "declarations.csv";
-
-        // Une clé vide désactive volontairement l'API d'import.
-        public string ApiKey { get; set; } = string.Empty;
     }
 }

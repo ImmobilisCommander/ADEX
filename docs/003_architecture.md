@@ -6,7 +6,8 @@ La solution `Adex/Adex.slnx` regroupe les projets suivants :
 
 | Projet | Responsabilité |
 |---|---|
-| `Adex.Application` | Cas d’usage, moteur de lecture CSV paginé (`CsvService`, `CsvPageReader`), gestionnaire des tâches d’import (`ImportJobService`) et contrats applicatifs. |
+| `Adex.Application` | Cas d’usage, moteur de lecture CSV paginé (`CsvService`, `CsvPageReader`) et contrats applicatifs (port `IDeclarationsImporter`). |
+| `Adex.Importer` | Application console lancée manuellement : exécute l’import complet de `declarations.csv` via `Adex.Data.Import`. Configuration `ConnectionStrings:Adex` et `Import:DataDirectory`/`Import:FileName` dans son `appsettings.json`. Codes de sortie : 0 succès, 2 lignes ignorées, 1 échec, 130 annulé (Ctrl+C). |
 | `Adex.Contracts` | DTO de transport JSON partagés entre l’API et les clients (`Explorer`, `Csv`). |
 | `Adex.WebApi.Client` | Client HTTP typé et résilient (`IAdexWebApiClient`, `AdexWebApiClient`) consommant les contrats de l’API WebApi. |
 | `Adex.Data.Model` | Modèle relationnel normalisé canonique, contexte EF Core, entités et migrations PostgreSQL. |
@@ -22,7 +23,7 @@ Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuG
 
 - `Adex.Mvc` référence `Adex.Contracts` et `Adex.WebApi.Client` ; l’accès aux données passe par HTTP vers `Adex.WebApi`.
 - `Adex.WebApi.Client` référence `Adex.Contracts` et fournit un client HTTP fortement typé et découplé de tout hôte web.
-- `Adex.WebApi` orchestre les cas d’usage via `Adex.Application` et compose les adaptateurs `Data.Import`, `Data.ReadModel` et `Data.Model`, ainsi que les contrats HTTP.
+- `Adex.WebApi` orchestre les cas d’usage via `Adex.Application` et compose les adaptateurs `Data.ReadModel` et `Data.Model`, ainsi que les contrats HTTP.
 - `Adex.Data.Import` implémente le port `IDeclarationsImporter` défini par `Adex.Application.Import`; l’API ne lie son orchestrateur qu’à ce contrat.
 - `Adex.Data.ReadModel` dépend du modèle normalisé et des DTO de réponse, pas de l’hôte API.
 - `Adex.Data.Import` reçoit le `NpgsqlDataSource` configuré par l’API et n’accède pas au contexte EF Core.
@@ -34,7 +35,7 @@ Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuG
 
 - **Lecture :** les contrôleurs API délèguent les recherches, fiches et agrégats à `DataExplorerService`. Les réponses utilisent `Adex.Contracts`; `Adex.WebApi.Client` permet aux consommateurs .NET (dont `Adex.Mvc`) de récupérer ces contrats, et `ApiViewModelMapper` les convertit en ViewModels MVC. Les agrégats mensuels et l’histogramme sont calculés en SQL direct pour éviter les jointures TPT coûteuses.
 - **Représentation JSON publique d’une fiche :** le MVC expose `GET /data/entities/{id}.json` via `Adex.Mvc.Entities.Json`. Il appelle le même client API et le même cache `EntityDetailsCache` que la page HTML, puis projette le contrat API vers des DTO propres au MVC ; les paramètres `page`, `pageSize`, `sort` et `descending` sont partagés avec la fiche. Le `robots.txt` autorise explicitement ce préfixe, tout en excluant les routes API du crawl, et déclare les préférences d’usage IA via `Content-Signal: search=yes, ai-input=yes, ai-train=no`.
-- **Import :** `Adex.Application.Import.ImportJobService` vérifie l’état et le contrôle d’accès, puis appelle le port applicatif `Adex.Application.Import.IDeclarationsImporter`. Son adaptateur `Adex.Data.Import.DeclarationsImporter` lit deux fois le CSV, conserve les lignes les plus récemment publiées, puis écrit les tables normalisées par COPY binaire Npgsql. En cas d’échec ou d’annulation, la base peut être partielle ; l’import doit être relancé depuis le début.
+- **Import :** `Adex.Importer` (console) appelle le port applicatif `Adex.Application.Import.IDeclarationsImporter`. Son adaptateur `Adex.Data.Import.DeclarationsImporter` lit deux fois le CSV, conserve les lignes les plus récemment publiées, puis écrit les tables normalisées par COPY binaire Npgsql. En cas d’échec ou d’annulation, la base peut être partielle ; l’import doit être relancé depuis le début.
 - **Visualisation des contreparties :** la fiche entité (`Adex.Mvc`) affiche le View Component `CounterpartyTreemap` (D3 local dans `wwwroot/lib/d3`) : treemap sobre de toutes les contreparties regroupées (montants cumulés tous sens), par niveaux de Treemap:MaxNodesPerLevel avec bloc « Autres » zoomable, alimenté par `GET /api/entity/{id}/counterparties`. Le composant `PlanetarySystem` est conservé dans le code (route `GET /{id}/planetary`) mais n'est plus affiché.
 - **Découverte par agents :** `GET /` ajoute des en-têtes `Link` à URI relatives (`api-catalog`, `service-doc`, `describedby`). `Adex.Mvc.Discovery.ApiCatalogController` sert `/.well-known/api-catalog` en `application/linkset+json` ; seul le périmètre public `/data/entities/` y est décrit, pas l’API interne. `AuthMdController` sert `/auth.md`, document Markdown rédigé en anglais indiquant qu'aucune authentification ni inscription d'agent n'existe.
 - **CSV à la demande :** `Adex.Application.Csv.CsvService` gère le cache et la pagination avec `CsvPageReader`; les réponses sont des contrats `CsvPage`. Le contrôleur API `CsvController` expose ce service, `AdexWebApiClient` le consomme et le MVC traduit les pages et erreurs reçues vers ses propres ViewModels.
@@ -43,7 +44,7 @@ Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuG
 
 L’API et le MVC utilisent l’hébergement minimal ASP.NET Core. L’API applique au démarrage les migrations de `AdexContext`; elle ne migre pas `AdexMetaContext`. Les fabriques de contextes, `NpgsqlDataSource`, services d’import et services de lecture sont enregistrés dans `Adex.WebApi.Hosting`. La documentation XML OpenAPI/Swagger est générée à la compilation pour `Adex.WebApi` et `Adex.Contracts`, et exposée par Swagger UI sur `/`. Le client HTTP typé du MVC utilise la bibliothèque `Adex.WebApi.Client` (`AddAdexWebApiClient`) avec une stratégie de résilience Polly (backoff exponentiel plafonné à 30 secondes).
 
-Les routes principales sont `GET /api/dashboard`, `GET /api/sitemap`, `GET /api/entity/search?query=...`, `GET /api/entity/{id}`, `GET /api/entity/{id}/counterparties` et `GET /api/csv`. MVC utilise `AdexApi:BaseAddress`. Les stratégies de mise en cache mémoire (`IMemoryCache`) sur l'API et le MVC sont pilotées par la section `Cache` (`Dashboard`, `Entity`, `Counterparties`, `Search`, `Sitemap` en `TimeSpan`) avec validation au démarrage. L’import accepte `POST`, `GET` et `DELETE /api/import`, protégés par `X-Api-Key`; le nom et le dossier du CSV viennent de la configuration `Import`.
+Les routes principales sont `GET /api/dashboard`, `GET /api/sitemap`, `GET /api/entity/search?query=...`, `GET /api/entity/{id}`, `GET /api/entity/{id}/counterparties` et `GET /api/csv`. MVC utilise `AdexApi:BaseAddress`. Les stratégies de mise en cache mémoire (`IMemoryCache`) sur l'API et le MVC sont pilotées par la section `Cache` (`Dashboard`, `Entity`, `Counterparties`, `Search`, `Sitemap` en `TimeSpan`) avec validation au démarrage. L’API n’expose plus d’endpoint d’import ; le nom et le dossier du CSV viennent de la configuration `Import` de `Adex.Importer`.
 
 La chaîne `Adex` sert à l’application normale. `AdexMeta` est conservée uniquement pour le transfert historique des métadonnées et pourra être retirée après vérification du transfert et de la sauvegarde de la base source. Les secrets doivent provenir d’une source sécurisée.
 
@@ -63,3 +64,7 @@ Les deux hôtes utilisent Serilog, sorties console et fichiers sous `D:\Logs`, j
 - Les filtres « contient » sont insensibles à la casse et aux accents, cumulés par « et ». Seules les colonnes de `Adex.Application.Csv.CsvFilterableColumns` sont autorisées ; les autres donnent 400.
 - Un `SemaphoreSlim` limite à une lecture simultanée. Les pages filtrées sont mises en cache pendant `Csv:CacheDurationSeconds` (60 secondes par défaut, 0 sans cache).
 - `Adex.Application.Csv.CsvOptions` valide `Csv:FilePath` et `Csv:CacheDurationSeconds` au démarrage. `AdexApi:BaseAddress` est également validée au démarrage côté MVC ; le délai HTTP est infini et l’annulation dépend du jeton de la requête.
+
+La console `Adex.Importer` charge `appsettings.json` puis `appsettings.{Environment}.json` (`DOTNET_ENVIRONMENT`, Production par défaut) ; le chemin du journal fichier est défini par `Serilog:WriteTo` dans ces fichiers.
+
+Au lancement, `Adex.Importer` vérifie la connexion PostgreSQL et la lecture du fichier (10 premières lignes affichées), puis demande confirmation ; `--yes` ignore la question.

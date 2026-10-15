@@ -14,7 +14,7 @@ L’import actif (`Adex/Adex.Data.Import/DeclarationsImporter.cs`) lit le fichie
 - Les colonnes complémentaires reconnues sont conservées dans `EntityAttributes` en JSONB. L’identifiant source est notamment gardé comme attribut « Référence ».
 - Chaque lien contribue aux totaux du contributeur et du bénéficiaire. Le tableau de bord est un snapshot à durée de vie configurée ; un import ne l’invalide pas immédiatement.
 
-Le pipeline remplace les données normalisées et n’utilise pas de transaction couvrant les deux passes. Une erreur ou une annulation peut donc laisser une base partielle ; l’opération doit être relancée depuis le début. Le statut d’import est en mémoire dans l’instance API.
+Le pipeline remplace les données normalisées et n’utilise pas de transaction couvrant les deux passes. Une erreur ou une annulation peut donc laisser une base partielle ; l’opération doit être relancée depuis le début. La progression est journalisée par la console `Adex.Importer`.
 
 ## Recherche et présentation
 
