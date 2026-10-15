@@ -17,6 +17,7 @@ La solution `Adex/Adex.slnx` regroupe les projets suivants :
 | `Adex.WebApi` | Hôte HTTP ASP.NET Core : contrôleurs groupés par domaine, configuration et middleware de maintenance. |
 | `Adex.Mvc` | Hôte MVC/Razor : vues, contrôleurs et ViewModels organisés par domaine ; consommation de `Adex.WebApi.Client` et conversion des contrats API vers les modèles de présentation. |
 | `Adex.Mcp` | Serveur MCP (HTTP, route `/mcp`) exposant en lecture seule les outils `rechercher_entites`, `obtenir_fiche_entite`, `lister_liens_financiers`, `obtenir_statistiques` et `top_entites_par_montant`. Il expose aussi trois prompts (`analyser_entite`, `comparer_entites`, `synthese_globale`). Il consomme l’API via `Adex.WebApi.Client` (`AdexApi:BaseAddress`, `https://localhost:7002/` en développement) ; écoute sur `https://localhost:7003` en développement. Aucune authentification n’est encore appliquée. |
+| `Adex.Yarp` | Proxy inverse minimal (YARP, sans contrôleur), écoute sur `https://localhost:7000` en développement. Routes configurées dans `ReverseProxy` (`appsettings.json`) : `/mcp` vers `Adex.Mcp` (`https://localhost:7003/`), tout le reste vers `Adex.Mvc` (`https://localhost:7001/`). Destinations de production dans `appsettings.Production.json` (écoute sur `https://localhost:5000`, destinations sur les ports 5003 et 5001 à ajuster). Journalisation Serilog configurée comme les autres applications (console + fichier `Adex.Yarp-.log` sous `D:\Logs\DEV` / `D:\Logs\PROD`). |
 
 Les projets ciblent `net10.0` via `Adex/Directory.Build.props`; les versions NuGet sont centralisées dans `Adex/Directory.Packages.props`. Les anciens projets `Adex.Common` et `Adex.Business` ont été retirés : leurs types ont été replacés dans les projets responsables. Les projets `Adex.Web` et `Adex.App` ne font pas partie de la solution.
 
@@ -69,3 +70,5 @@ Les deux hôtes utilisent Serilog, sorties console et fichiers sous `D:\Logs`, j
 La console `Adex.Importer` charge `appsettings.json` puis `appsettings.{Environment}.json` (`DOTNET_ENVIRONMENT`, Production par défaut) ; le chemin du journal fichier est défini par `Serilog:WriteTo` dans ces fichiers.
 
 Au lancement, `Adex.Importer` vérifie la connexion PostgreSQL et la lecture du fichier (10 premières lignes affichées), puis demande confirmation ; `--yes` ignore la question.
+
+

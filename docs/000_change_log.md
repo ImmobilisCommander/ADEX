@@ -18,6 +18,14 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Adex.Yarp : correctif de production — AllowedHosts inclut désormais dex.laboratoires.dev (le tunnel Cloudflare recevait un 400 Bad Request avec la restriction à 127.0.0.1;localhost).
+
+- Adex.Yarp : classe Program alignée sur celle des autres hôtes (namespace, Main asynchrone, usings explicites).
+
+- Adex.Yarp : configuration Serilog identique aux autres applications (UseSerilog, sections Serilog des ppsettings*.json, fichiers Adex.Yarp-.log) ; ppsettings.Production.json écoute sur https://localhost:5000.
+
+- Ajout du projet Adex.Yarp (YARP, sans contrôleur) : point d’entrée unique routant /mcp vers le serveur MCP et le reste vers l’application web MVC ; configuration dans ppsettings.json, ajouté à Adex.slnx et à Directory.Packages.props.
+
 - Serveur MCP : enregistrement explicite des outils et prompts dans `Program.cs` (`WithTools<EntityTools>()`, `WithTools<DashboardTools>()`, `WithPrompts<AdexPrompts>()`) à la place de la découverte par réflexion (`WithToolsFromAssembly`, `WithPromptsFromAssembly`). Toute nouvelle classe d'outils ou de prompts doit être ajoutée à cet enregistrement.
 
 - Serveur MCP : ajout de trois prompts (`Prompts/AdexPrompts.cs`, `WithPromptsFromAssembly`) : `analyser_entite` (nom), `comparer_entites` (nom1, nom2) et `synthese_globale`. Ils guident le chaînage des outils existants ; dans VS Code, ils sont disponibles en commandes `/mcp.adex.<nom>`. Correctifs d'outils : `lister_liens_financiers` n'accepte que les tailles de page 10, 20 ou 50 (comme l'API) et ses clés de tri sont documentées.
@@ -181,3 +189,7 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 - `Adex.Importer` : au lancement, affichage récapitulatif (base : hôte/port/base/utilisateur et test de connexion ; fichier : chemin, taille et 10 premières lignes) via `ImportPreflight`, puis confirmation interactive (o/N) avant l'import. Option `--yes` pour passer la confirmation ; code de sortie 1 si une vérification échoue, 0 si l'utilisateur refuse.
 
 - `Adex.Importer` : le récapitulatif affiche la taille du fichier et le nombre de lignes à importer (sauts de ligne hors en-tête).
+
+
+
+
