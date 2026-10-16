@@ -3,7 +3,6 @@
     <Project Path="Adex.Mcp/Adex.Mcp.csproj" />
     <Project Path="Adex.Mvc/Adex.Mvc.csproj" />
     <Project Path="Adex.WebApi/Adex.WebApi.csproj" />
-    <Project Path="Adex.Yarp/Adex.Yarp.csproj" />
   </Folder>
   <Folder Name="/Éléments de solution/">
     <File Path="Directory.Build.props" />
