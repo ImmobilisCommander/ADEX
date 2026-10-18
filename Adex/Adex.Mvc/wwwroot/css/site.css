@@ -2644,3 +2644,44 @@ input:focus-visible {
     outline: 3px solid color-mix(in srgb, var(--focus) 24%, transparent);
     outline-offset: 2px;
 }
+
+.page-loading {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--shadow-rgb), 0.45);
+    cursor: progress;
+}
+
+.page-loading[hidden] {
+    display: none;
+}
+
+.page-loading-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 26px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 650;
+    box-shadow: 0 10px 30px rgba(var(--shadow-rgb), 0.25);
+}
+
+.page-loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--line);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: page-loading-spin 0.8s linear infinite;
+}
+
+@keyframes page-loading-spin {
+    to { transform: rotate(360deg); }
+}

@@ -3,6 +3,8 @@
 
     const load = async (section, url, focusSelector) => {
         section.setAttribute("aria-busy", "true");
+        window.pageLoading?.begin();
+        let navigating = false;
         try {
             const response = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
             if (!response.ok) {
@@ -18,7 +20,13 @@
             section.replaceWith(fresh);
             fresh.querySelector(focusSelector)?.focus();
         } catch {
+            navigating = true;
             window.location.href = url;
+        } finally {
+            // En cas de repli par navigation, le calque reste affiché jusqu'au rechargement.
+            if (!navigating) {
+                window.pageLoading?.end();
+            }
         }
     };
 

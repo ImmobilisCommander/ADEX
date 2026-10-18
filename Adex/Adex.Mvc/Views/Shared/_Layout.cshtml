@@ -56,7 +56,14 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="page-loading" data-page-loading role="status" aria-live="polite" hidden>
+        <div class="page-loading-box">
+            <span class="page-loading-spinner" aria-hidden="true"></span>
+            <span>Chargement en cours, merci de patienter…</span>
+        </div>
+    </div>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/page-loading.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
