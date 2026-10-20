@@ -20,6 +20,7 @@ namespace Adex.Mcp
             );
 
             builder.Services.AddAdexWebApiClient();
+            builder.Services.AddHealthChecks();
             builder
                 .Services.AddMcpServer()
                 .WithHttpTransport()
@@ -29,6 +30,8 @@ namespace Adex.Mcp
 
             await using var app = builder.Build();
             app.MapMcp("/mcp");
+            app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
+            app.MapHealthChecks("/health/ready");
             await app.RunAsync();
         }
     }

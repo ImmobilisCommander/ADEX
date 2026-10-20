@@ -29,6 +29,7 @@ namespace Adex.WebApi.Hosting
                         .UseNpgsql(serviceProvider.GetRequiredService<NpgsqlDataSource>())
                         .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             );
+            services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
             return services;
         }
 

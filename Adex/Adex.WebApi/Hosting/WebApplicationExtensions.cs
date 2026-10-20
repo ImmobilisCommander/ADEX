@@ -1,14 +1,10 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Adex.Data.Model;
 using Adex.WebApi.Dashboard;
-using Microsoft.AspNetCore.Builder;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+
 using Npgsql;
+
 using Serilog;
 
 namespace Adex.WebApi.Hosting
@@ -33,6 +29,8 @@ namespace Adex.WebApi.Hosting
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
+            app.MapHealthChecks("/health/ready", new() { Predicate = r => r.Tags.Contains("ready") });
             return app;
         }
 
@@ -45,7 +43,21 @@ namespace Adex.WebApi.Hosting
                 .Services.GetRequiredService<IDbContextFactory<AdexContext>>()
                 .CreateDbContext();
             migrationContext.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
-            await migrationContext.Database.MigrateAsync(cancellationToken);
+            var migrations = await migrationContext.Database.GetPendingMigrationsAsync(cancellationToken);
+
+            if (migrations.Any())
+            {
+                foreach (var migration in migrations)
+                {
+                    app.Logger.LogInformation("Applying migration: {Migration}", migration);
+                    await migrationContext.Database.MigrateAsync(migration, cancellationToken);
+                    app.Logger.LogInformation("Migration applied: {Migration}", migration);
+                }
+            }
+            else
+            {
+                app.Logger.LogInformation("No pending database migrations.");
+            }
         }
 
         public static async Task RunAdexAsync(this WebApplication app)

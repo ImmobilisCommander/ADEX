@@ -35,6 +35,8 @@ namespace Adex.Mvc.Hosting
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
+            app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
+            app.MapHealthChecks("/health/ready");
             app.MapControllerRoute(
                 name: "entity",
                 pattern: "{id:guid}",

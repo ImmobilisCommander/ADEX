@@ -40,6 +40,7 @@ namespace Adex.Mvc.Hosting
                     "Le paramètre « Treemap:MaxNodesPerLevel » est obligatoire."
                 )
                 .ValidateOnStart();
+            services.AddHealthChecks();
             services.AddProblemDetails();
             services.AddExceptionHandler<MvcExceptionHandler>();
             return services;
