@@ -18,6 +18,10 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Fiche de détails : le tri par défaut des liens financiers devient le montant décroissant (au lieu de la date) dans le MVC, l'API, le client, l'outil MCP et le contrat `EntityDetails`.
+
+- Adex.Data.Model : `Person.FirstName` et `Person.LastName` déclarés nullables (`string?`), conformément à la colonne PostgreSQL nullable ; corrige l'`InvalidCastException: Column 'FirstName' is null` sur `GET /api/entity/{id}` (aucune migration nécessaire, le schéma est inchangé).
+
 - Adex.Mvc : calque de chargement plein écran (spinner + message « Chargement en cours ») affiché au clic sur un lien interne ou à la soumission d'un formulaire (page-loading.js, bloc dans _Layout.cshtml, styles dans site.css) ; masqué au retour via le cache du navigateur. Le calque est aussi affiché pendant les chargements AJAX du tri, de la pagination et de la taille de page des liaisons d'une fiche (API window.pageLoading.begin/end, utilisée par ntity-sort.js) et disparaît à la fin du chargement.
 
 - Adex.Yarp : correctif de production — AllowedHosts inclut désormais dex.laboratoires.dev (le tunnel Cloudflare recevait un 400 Bad Request avec la restriction à 127.0.0.1;localhost).

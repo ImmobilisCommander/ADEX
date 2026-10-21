@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading;
@@ -23,7 +23,7 @@ namespace Adex.WebApi.Client
             Guid id,
             int page = 1,
             int pageSize = 20,
-            string sort = "date",
+            string sort = "amount",
             bool descending = true,
             CancellationToken cancellationToken = default
         );

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,7 +67,7 @@ namespace Adex.WebApi.Entities
         /// <param name="cancellationToken">Jeton d'annulation de la requête HTTP.</param>
         /// <param name="page">Numéro de page pour la liste des liens d'intérêt (défaut : 1).</param>
         /// <param name="pageSize">Nombre d'éléments par page (défaut : 20).</param>
-        /// <param name="sort">Propriété de tri des liens ("date", "amount", etc., défaut : "date").</param>
+        /// <param name="sort">Propriété de tri des liens ("date", "amount", etc., défaut : "amount").</param>
         /// <param name="descending">Indique si le tri doit être décroissant (défaut : true).</param>
         /// <returns>Fiche détaillée avec répartition annuelle, répartition par typologie et liens financiers.</returns>
         /// <response code="200">Entité trouvée et retournée.</response>
@@ -80,7 +80,7 @@ namespace Adex.WebApi.Entities
             CancellationToken cancellationToken,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = DataExplorerService.DefaultPageSize,
-            [FromQuery] string sort = "date",
+            [FromQuery] string sort = "amount",
             [FromQuery] bool descending = true
         )
         {

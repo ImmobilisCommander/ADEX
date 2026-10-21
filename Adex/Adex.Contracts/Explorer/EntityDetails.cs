@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Adex.Contracts.Explorer
@@ -19,7 +19,7 @@ namespace Adex.Contracts.Explorer
 
         public int Page { get; set; } = 1;
 
-        public string Sort { get; set; } = "date";
+        public string Sort { get; set; } = "amount";
 
         public bool Descending { get; set; } = true;
 

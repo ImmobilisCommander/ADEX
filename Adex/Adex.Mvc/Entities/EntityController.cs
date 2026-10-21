@@ -1,4 +1,4 @@
-using Adex.Contracts.Explorer;
+﻿using Adex.Contracts.Explorer;
 using Adex.Mvc.Api;
 using Adex.Mvc.Configuration;
 using Adex.Mvc.Entities.Json;
@@ -28,7 +28,7 @@ namespace Adex.Mvc.Entities
             [FromQuery] string fromQuery = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
-            [FromQuery] string sort = "date",
+            [FromQuery] string sort = "amount",
             [FromQuery] bool descending = true
         )
         {
@@ -36,7 +36,7 @@ namespace Adex.Mvc.Entities
                 id,
                 page,
                 pageSize,
-                sort ?? "date",
+                sort ?? "amount",
                 descending,
                 cancellationToken
             );

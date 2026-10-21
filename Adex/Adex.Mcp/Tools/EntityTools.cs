@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
@@ -51,7 +51,7 @@ namespace Adex.Mcp.Tools
             [Description("Taille de page : 10, 20 ou 50 (toute autre valeur vaut 20).")]
                 int taillePage = 20,
             [Description("Clé de tri : date, amount, type, kind, direction ou name.")]
-                string tri = "date",
+                string tri = "amount",
             [Description("Tri décroissant si vrai.")] bool decroissant = true
         )
         {

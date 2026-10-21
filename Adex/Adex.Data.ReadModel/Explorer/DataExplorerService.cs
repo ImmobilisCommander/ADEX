@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -845,7 +845,7 @@ namespace Adex.Data.ReadModel.Explorer
                 .SingleOrDefaultAsync(cancellationToken);
 
             pageSize = Array.IndexOf(PageSizes, pageSize) >= 0 ? pageSize : DefaultPageSize;
-            sort = SortKeys.Contains(sort) ? sort : "date";
+            sort = SortKeys.Contains(sort) ? sort : "amount";
             var linkCount = totals?.LinkCount ?? 0;
             var pageCount = Math.Max(1, (linkCount + pageSize - 1) / pageSize);
             page = Math.Clamp(page, 1, pageCount);

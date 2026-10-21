@@ -15,13 +15,13 @@ namespace Adex.Data.Model
         ///
         /// </summary>
         [MaxLength(200)]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
 
         /// <summary>
         ///
         /// </summary>
         [MaxLength(200)]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
 
         public override string ToString()
         {

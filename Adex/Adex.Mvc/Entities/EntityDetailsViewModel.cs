@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace Adex.Mvc.Entities
 
         public int Page { get; set; } = 1;
 
-        public string Sort { get; set; } = "date";
+        public string Sort { get; set; } = "amount";
 
         public bool Descending { get; set; } = true;
 
