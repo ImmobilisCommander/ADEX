@@ -30,6 +30,25 @@
         </fieldset>
         <p class="settings-status" role="status" aria-live="polite"></p>
     </section>
+
+    <section class="register-section settings-section" aria-labelledby="install-title">
+        <h2 id="install-title">Application</h2>
+        <p class="settings-description">ADEX peut être installée comme application sur votre appareil. Une connexion Internet reste nécessaire : aucune donnée n’est conservée pour un usage hors ligne.</p>
+        <div data-pwa-install hidden>
+            <button class="install-button" type="button" data-pwa-install-button>Installer l’application</button>
+        </div>
+        <p class="settings-status" data-pwa-installed role="status" hidden>ADEX est déjà utilisée comme application installée.</p>
+        <div class="install-help" data-pwa-ios-help hidden>
+            <p><strong>Sur iPhone ou iPad</strong> (Safari recommandé) :</p>
+            <ol>
+                <li>Touchez le bouton Partager.</li>
+                <li>Choisissez « Sur l’écran d’accueil » (parfois sous « Plus »).</li>
+                <li>Touchez « Ajouter ».</li>
+            </ol>
+            <p>Dans Chrome, Edge ou Firefox sur iOS, la même commande se trouve dans le menu de partage selon la version.</p>
+        </div>
+        <p class="settings-description install-fallback">Si aucun bouton n’apparaît : sous Chrome ou Edge (Android, Windows, macOS), utilisez l’icône d’installation de la barre d’adresse ou le menu « Installer ADEX ». Firefox pour ordinateur et certains navigateurs n’offrent pas l’installation.</p>
+    </section>
 </main>
 
 @section Scripts {

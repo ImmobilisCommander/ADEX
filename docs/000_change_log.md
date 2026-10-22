@@ -15,8 +15,11 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 | 006 | [Recommandations](006_recommendations.md) | Améliorations proposées, classées par priorité. |
 | 007 | [Migrations PostgreSQL](007_postgresql_migrations.md) | Contextes, configuration et génération contrôlée des migrations PostgreSQL. |
 | 008 | [Déploiement on premise](008_deployment_onpremise.md) | Exécution en production sur Windows avec Cloudflare Tunnel. |
+| 009 | [Application web progressive](009_pwa.md) | Installation PWA, service worker, cache, compatibilité par plateforme. |
 
 ## Historique
+
+- Adex.Mvc : application installable (PWA) — `manifest.webmanifest`, icônes (dont maskable et Apple touch), service worker `sw.js` limité à une page hors ligne explicite (aucun cache de données), `js/pwa.js` (enregistrement, bouton « Installer l'application » conditionnel, aide iOS), métadonnées dans `_Layout.cshtml`, section « Application » dans Paramètres, styles standalone/safe-area dans `site.css`. Documentation : `009_pwa.md`, `003_architecture.md`, `008_deployment_onpremise.md`.
 
 - Fiche de détails : le tri par défaut des liens financiers devient le montant décroissant (au lieu de la date) dans le MVC, l'API, le client, l'outil MCP et le contrat `EntityDetails`.
 

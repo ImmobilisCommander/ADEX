@@ -68,6 +68,7 @@ Si le PC ou `cloudflared` est hors ligne, Cloudflare affiche son erreur 5xx (530
 
 ## Exploitation
 
+- PWA : l'installation exige HTTPS (assuré par Cloudflare) ; ne pas mettre `sw.js` en cache longue durée dans Cloudflare (voir [PWA](009_pwa.md)).
 - Publier avec `dotnet publish -c Release` selon la disposition ci-dessus, puis exécuter chaque hôte comme service Windows à démarrage automatique et reprise sur échec.
 - L'API applique les migrations `Adex` au démarrage : sauvegarder la base avant chaque mise à jour (voir [Migrations PostgreSQL](007_postgresql_migrations.md)).
 - Vérifier que `https://adex.laboratoires.dev/api/import` renvoie 404 et qu'aucun port entrant n'est ouvert sur la box.

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Hors ligne - ADEX</title>
+    <style>
+        :root { color-scheme: light dark; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            background: #ffffff;
+            color: #202b36;
+        }
+        main { max-width: 34rem; }
+        h1 { margin: 0 0 12px; font-size: 1.6rem; }
+        p { margin: 0 0 16px; line-height: 1.5; }
+        button {
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 8px;
+            background: #aa3028;
+            color: #ffffff;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background: #202b34; color: #e6edf2; }
+            button { background: #ef897f; color: #202b34; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Vous êtes hors ligne</h1>
+        <p>ADEX consulte des données en direct : l’application ne fonctionne pas sans connexion Internet. Aucune donnée n’est conservée sur cet appareil pour un usage hors ligne.</p>
+        <p>Vérifiez votre connexion, puis réessayez.</p>
+        <button type="button" onclick="location.reload()">Réessayer</button>
+    </main>
+</body>
+</html>

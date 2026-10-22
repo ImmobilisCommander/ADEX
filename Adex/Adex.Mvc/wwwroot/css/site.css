@@ -216,6 +216,53 @@ input:focus-visible {
     font-weight: 600;
 }
 
+button.nav-menu-item {
+    width: 100%;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.install-button {
+    padding: 10px 18px;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--paper);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.install-button:hover,
+.install-button:focus-visible {
+    border-color: var(--accent-dark);
+    background: var(--accent-dark);
+}
+
+.install-help {
+    max-width: 64ch;
+    font-size: 0.9rem;
+}
+
+.install-fallback {
+    margin-bottom: 0;
+}
+
+@media (display-mode: standalone) {
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .install-fallback {
+        display: none;
+    }
+}
+
 .nav-menu-item:hover,
 .nav-menu-item:focus,
 .nav-menu-item[aria-current="page"] {
