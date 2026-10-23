@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Adex.Contracts.Explorer;
@@ -14,6 +14,7 @@ namespace Adex.Mvc.Components.Entities
     public partial class CounterpartyTreemap
     {
         private CounterpartyTreemapViewModel model;
+        private bool isLoading = true;
         private string dataJson;
         private string initializedJson;
         private ElementReference section;
@@ -25,7 +26,18 @@ namespace Adex.Mvc.Components.Entities
         [Parameter]
         public string SearchQuery { get; set; }
 
-        protected override Task OnParametersSetAsync() => RunWithLoadingAsync(LoadAsync);
+        protected override async Task OnParametersSetAsync()
+        {
+            isLoading = true;
+            try
+            {
+                await RunWithLoadingAsync(LoadAsync);
+            }
+            finally
+            {
+                isLoading = false;
+            }
+        }
 
         private async Task LoadAsync(CancellationToken cancellationToken)
         {

@@ -6,7 +6,16 @@
 @inject IOptionsMonitor<MvcTreemapOptions> TreemapOptions
 @inject IJSRuntime JS
 
-@if (model is { HasCounterparties: true })
+@if (isLoading)
+{
+    <section class="register-section treemap-section" aria-labelledby="treemap-title" aria-busy="true">
+        <div class="section-heading">
+            <h2 id="treemap-title">Carte des contreparties</h2>
+        </div>
+        <LoadingBar Label="Chargement de la carte des contreparties" />
+    </section>
+}
+else if (model is { HasCounterparties: true })
 {
     <section class="register-section treemap-section" aria-labelledby="treemap-title" @ref="section">
         <div class="section-heading">

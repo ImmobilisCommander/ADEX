@@ -1,4 +1,4 @@
-# Historique et index de la documentation
+﻿# Historique et index de la documentation
 
 Cette documentation décrit le code présent dans le dépôt ; elle ne garantit pas que les composants soient tous déployés ni raccordés entre eux.
 
@@ -18,6 +18,8 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 | 009 | [Application web progressive](009_pwa.md) | Installation PWA, service worker, cache, compatibilité par plateforme. |
 
 ## Historique
+
+- Fiche de détails (Blazor) : les sections « Carte des contreparties », « Informations disponibles » et « Liens financiers » s'affichent immédiatement avec une barre de progression (LoadingBar, .loading-bar) pendant le chargement, au lieu d'apparaître tardivement.
 
 - Adex.Mvc : migration vers Blazor Server (phase 1, hybride avec MVC). Ajout de `Components/` (`App`, `Routes`, `MainLayout`, `NavMenu`), de `PageLoadingState` et de `AdexComponentBase` (`ToggleLoading`, `RunWithLoadingAsync`) qui affichent le calque de chargement en C# autour des appels d'API (`LoadingOverlay`). La fiche de détails (`EntityDetailsPage`, `EntityCharts`, `CounterpartyTreemap`, `JustificationDialog` en C#) remplace `Entity/Details.cshtml`, `CounterpartyTreemapViewComponent`, `justification.js` et `entity-sort.js` ; `entity-treemap.js` devient un module ES appelé via JS interop. Le bug du calque bloqué disparaît pour cette page. Les autres pages restent en MVC (avec `page-loading.js`) ; `NotFoundPage` force un rechargement complet pour les liens vers elles. Blazor Server requiert les WebSockets (reverse proxy / tunnel Cloudflare). Reste à migrer : accueil, recherche, paramètres, CSV, plan du site.
 

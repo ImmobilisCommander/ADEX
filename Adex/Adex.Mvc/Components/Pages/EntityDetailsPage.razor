@@ -24,6 +24,30 @@ else if (notFound)
         <h1>Entité introuvable</h1>
         <p class="empty-state">Aucune entité ne correspond à l’identifiant @Id.</p>
     }
+    else if (model is null && isLoading)
+    {
+        <h1>Chargement…</h1>
+        <div class="entity-overview">
+            <section class="register-section treemap-section" aria-labelledby="treemap-title" aria-busy="true">
+                <div class="section-heading">
+                    <h2 id="treemap-title">Carte des contreparties</h2>
+                </div>
+                <LoadingBar Label="Chargement de la carte des contreparties" />
+            </section>
+        </div>
+        <section class="register-section" aria-labelledby="attributes-title" aria-busy="true">
+            <div class="section-heading">
+                <h2 id="attributes-title">Informations disponibles</h2>
+            </div>
+            <LoadingBar Label="Chargement des informations disponibles" />
+        </section>
+        <section class="register-section entity-links" aria-labelledby="links-title" aria-busy="true">
+            <div class="section-heading">
+                <h2 id="links-title">Liens financiers</h2>
+            </div>
+            <LoadingBar Label="Chargement des liens financiers" />
+        </section>
+    }
     else if (model is not null)
     {
         <header class="entity-heading">

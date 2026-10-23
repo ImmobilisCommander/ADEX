@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +26,7 @@ namespace Adex.Mvc.Components.Pages
         private FinancialLinkViewModel selectedLink;
         private string errorMessage;
         private bool notFound;
+        private bool isLoading = true;
 
         [Parameter]
         public Guid Id { get; set; }
@@ -57,7 +58,15 @@ namespace Adex.Mvc.Components.Pages
         protected override async Task OnParametersSetAsync()
         {
             selectedLink = null;
-            await RunWithLoadingAsync(LoadAsync);
+            isLoading = true;
+            try
+            {
+                await RunWithLoadingAsync(LoadAsync);
+            }
+            finally
+            {
+                isLoading = false;
+            }
         }
 
         private async Task LoadAsync(CancellationToken cancellationToken)
