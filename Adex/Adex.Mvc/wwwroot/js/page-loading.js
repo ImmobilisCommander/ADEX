@@ -51,10 +51,21 @@
     });
 
     window.addEventListener('submit', (event) => {
-        if (!event.defaultPrevented) {
+        // Un formulaire method="dialog" ferme seulement une modale : aucune navigation.
+        const form = event.target;
+        const closesDialog = form.closest('dialog') || event.submitter?.formMethod === 'dialog'
+            || form.method === 'dialog' || form.getAttribute('method') === 'dialog';
+        if (!event.defaultPrevented && !closesDialog) {
             show();
         }
     });
+
+    // Filet de sécurité : la fermeture d'une modale ne déclenche jamais de navigation.
+    document.addEventListener('close', (event) => {
+        if (event.target instanceof HTMLDialogElement && pending === 0) {
+            hide();
+        }
+    }, true);
 
     // Retour arrière : la page restaurée du cache ne doit pas garder le calque.
     window.addEventListener('pageshow', hide);

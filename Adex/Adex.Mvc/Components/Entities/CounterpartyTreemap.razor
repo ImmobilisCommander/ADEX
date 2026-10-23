@@ -1,0 +1,26 @@
+@inherits AdexComponentBase
+@implements IAsyncDisposable
+@inject IAdexWebApiClient ApiClient
+@inject IMemoryCache Cache
+@inject IOptionsMonitor<MvcCacheOptions> CacheOptions
+@inject IOptionsMonitor<MvcTreemapOptions> TreemapOptions
+@inject IJSRuntime JS
+
+@if (model is { HasCounterparties: true })
+{
+    <section class="register-section treemap-section" aria-labelledby="treemap-title" @ref="section">
+        <div class="section-heading">
+            <div>
+                <h2 id="treemap-title">Carte des contreparties</h2>
+                <span class="section-unit">@model.ScopeDisplay</span>
+            </div>
+        </div>
+        <div class="treemap-container" data-treemap-container data-treemap="@dataJson">
+            <div class="treemap-viewport" data-treemap-viewport></div>
+            <noscript>
+                <p class="table-note">Cette visualisation nécessite JavaScript. Les liens financiers restent consultables dans le tableau ci-dessous.</p>
+            </noscript>
+        </div>
+        <p class="table-note">La surface de chaque bloc est proportionnelle au montant cumulé des liens, tous sens confondus. Les contreparties au-delà des plus élevées sont regroupées dans « Autres » (surface non proportionnelle) : cliquer dessus pour les détailler.</p>
+    </section>
+}

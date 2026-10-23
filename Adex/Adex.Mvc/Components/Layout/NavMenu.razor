@@ -1,0 +1,40 @@
+<nav class="site-nav" aria-label="Navigation principale">
+    <a class="brand-mark" href="/" aria-label="ADEX, accueil">ADEX<span>.</span></a>
+    <a class="nav-current" href="/">Explorer les données</a>
+    <span class="nav-context">Liens d’intérêt · données déclaratives</span>
+    <div class="nav-menu" @onkeydown="OnKeyDown">
+        @if (open)
+        {
+            <div class="nav-menu-backdrop" @onclick="Close"></div>
+        }
+        <button class="nav-burger" type="button" aria-expanded="@(open ? "true" : "false")" aria-controls="nav-menu-list" aria-label="Menu" @onclick="Toggle" @ref="toggleButton">
+            <span class="nav-burger-bar" aria-hidden="true"></span>
+            <span class="nav-burger-bar" aria-hidden="true"></span>
+            <span class="nav-burger-bar" aria-hidden="true"></span>
+        </button>
+        <ul class="nav-menu-list" id="nav-menu-list" hidden="@(!open)">
+            <li><a class="nav-menu-item" href="/Csv">Interroger le CSV</a></li>
+            <li data-pwa-install hidden><button class="nav-menu-item" type="button" data-pwa-install-button>Installer l’application</button></li>
+            <li><a class="nav-menu-item" href="/Home/Settings">Paramètres</a></li>
+            <li><a class="nav-menu-item" href="/Home/Disclaimer">Source et avertissement</a></li>
+        </ul>
+    </div>
+</nav>
+
+@code {
+    private bool open;
+    private ElementReference toggleButton;
+
+    private void Toggle() => open = !open;
+
+    private void Close() => open = false;
+
+    private async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape" && open)
+        {
+            open = false;
+            await toggleButton.FocusAsync();
+        }
+    }
+}

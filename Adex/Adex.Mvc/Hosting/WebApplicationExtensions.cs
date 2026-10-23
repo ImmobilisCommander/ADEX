@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Adex.Mvc.Components;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -35,13 +36,10 @@ namespace Adex.Mvc.Hosting
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
+            app.UseAntiforgery();
             app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
             app.MapHealthChecks("/health/ready");
-            app.MapControllerRoute(
-                name: "entity",
-                pattern: "{id:guid}",
-                defaults: new { controller = "Entity", action = "Details" }
-            );
+            app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}"

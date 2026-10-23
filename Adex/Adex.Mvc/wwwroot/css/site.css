@@ -1577,9 +1577,21 @@ button.nav-menu-item {
     outline-offset: 2px;
 }
 
+.justification-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(32, 43, 54, 0.45);
+    outline: none;
+}
+
 .justification-dialog {
     width: min(36rem, calc(100vw - 2rem));
     max-height: calc(100vh - 4rem);
+    overflow: auto;
     padding: 0;
     border: 1px solid var(--line);
     border-radius: 6px;
@@ -1587,8 +1599,10 @@ button.nav-menu-item {
     background: var(--paper);
 }
 
-.justification-dialog::backdrop {
-    background: rgba(32, 43, 54, 0.45);
+.nav-menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
 }
 
 .justification-head {

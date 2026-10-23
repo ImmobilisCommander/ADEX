@@ -1,0 +1,46 @@
+@if (Link is not null)
+{
+    <div class="justification-overlay" @onclick="OnClose" @onkeydown="OnKeyDown" tabindex="-1" @ref="overlay">
+        <div class="justification-dialog" role="dialog" aria-modal="true" aria-labelledby="justification-title"
+             @onclick:stopPropagation="true">
+            <div class="justification-head">
+                <h2 id="justification-title">Justification de la déclaration</h2>
+                <button type="button" class="justification-close" aria-label="Fermer" @onclick="OnClose">×</button>
+            </div>
+            <div class="justification-body">
+                <dl>
+                    @foreach (var item in Link.Justification)
+                    {
+                        <dt>@item.Name</dt>
+                        <dd>@item.Value</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private ElementReference overlay;
+    private bool focusPending;
+
+    [Parameter]
+    public FinancialLinkViewModel Link { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    protected override void OnParametersSet() => focusPending = Link is not null;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (focusPending)
+        {
+            focusPending = false;
+            await overlay.FocusAsync();
+        }
+    }
+
+    private Task OnKeyDown(KeyboardEventArgs args) =>
+        args.Key == "Escape" ? OnClose.InvokeAsync() : Task.CompletedTask;
+}

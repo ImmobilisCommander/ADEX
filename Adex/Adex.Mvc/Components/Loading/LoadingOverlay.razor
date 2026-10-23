@@ -1,0 +1,20 @@
+@implements IDisposable
+@inject PageLoadingState LoadingState
+
+@if (LoadingState.IsLoading)
+{
+    <div class="page-loading" role="status" aria-live="polite">
+        <div class="page-loading-box">
+            <span class="page-loading-spinner" aria-hidden="true"></span>
+            <span>Chargement en cours, merci de patienter…</span>
+        </div>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized() => LoadingState.Changed += OnChanged;
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => LoadingState.Changed -= OnChanged;
+}

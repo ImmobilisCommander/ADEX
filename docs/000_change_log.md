@@ -19,6 +19,10 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- Adex.Mvc : migration vers Blazor Server (phase 1, hybride avec MVC). Ajout de `Components/` (`App`, `Routes`, `MainLayout`, `NavMenu`), de `PageLoadingState` et de `AdexComponentBase` (`ToggleLoading`, `RunWithLoadingAsync`) qui affichent le calque de chargement en C# autour des appels d'API (`LoadingOverlay`). La fiche de détails (`EntityDetailsPage`, `EntityCharts`, `CounterpartyTreemap`, `JustificationDialog` en C#) remplace `Entity/Details.cshtml`, `CounterpartyTreemapViewComponent`, `justification.js` et `entity-sort.js` ; `entity-treemap.js` devient un module ES appelé via JS interop. Le bug du calque bloqué disparaît pour cette page. Les autres pages restent en MVC (avec `page-loading.js`) ; `NotFoundPage` force un rechargement complet pour les liens vers elles. Blazor Server requiert les WebSockets (reverse proxy / tunnel Cloudflare). Reste à migrer : accueil, recherche, paramètres, CSV, plan du site.
+
+- Adex.Mvc : correction du calque de chargement bloqué après fermeture de la modale de justification d'un lien financier (le formulaire `method="dialog"` de fermeture déclenchait `submit` ; `page-loading.js` l'ignore désormais).
+
 - Adex.Mvc : application installable (PWA) — `manifest.webmanifest`, icônes (dont maskable et Apple touch), service worker `sw.js` limité à une page hors ligne explicite (aucun cache de données), `js/pwa.js` (enregistrement, bouton « Installer l'application » conditionnel, aide iOS), métadonnées dans `_Layout.cshtml`, section « Application » dans Paramètres, styles standalone/safe-area dans `site.css`. Documentation : `009_pwa.md`, `003_architecture.md`, `008_deployment_onpremise.md`.
 
 - Fiche de détails : le tri par défaut des liens financiers devient le montant décroissant (au lieu de la date) dans le MVC, l'API, le client, l'outil MCP et le contrat `EntityDetails`.

@@ -1,4 +1,4 @@
-﻿using Adex.Contracts.Explorer;
+using Adex.Contracts.Explorer;
 using Adex.Mvc.Api;
 using Adex.Mvc.Configuration;
 using Adex.Mvc.Entities.Json;
@@ -17,55 +17,9 @@ namespace Adex.Mvc.Entities
     public sealed class EntityController(
         IAdexWebApiClient apiClient,
         IMemoryCache cache,
-        IOptionsMonitor<MvcCacheOptions> cacheOptions,
-        EntityDetailsCache entityDetailsCache
+        IOptionsMonitor<MvcCacheOptions> cacheOptions
     ) : Controller
     {
-        [HttpGet("/{id:guid}")]
-        public async Task<IActionResult> Details(
-            Guid id,
-            CancellationToken cancellationToken,
-            [FromQuery] string fromQuery = null,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20,
-            [FromQuery] string sort = "amount",
-            [FromQuery] bool descending = true
-        )
-        {
-            var entity = await entityDetailsCache.GetAsync(
-                id,
-                page,
-                pageSize,
-                sort ?? "amount",
-                descending,
-                cancellationToken
-            );
-
-            if (entity is null)
-            {
-                ViewData["Title"] = "Entité introuvable";
-                Response.StatusCode = 404;
-                return View("NotFound", new NotFoundViewModel { Identifier = id.ToString() });
-            }
-
-            fromQuery = fromQuery?.Trim();
-
-            var model = entity.ToViewModel();
-            if (!string.IsNullOrEmpty(fromQuery))
-            {
-                model.SearchQuery = fromQuery;
-                foreach (var link in model.FinancialLinks)
-                {
-                    link.SearchQuery = fromQuery;
-                }
-            }
-
-            ViewData["Title"] = model.Name;
-            model.JsonUrl = Url.RouteUrl("entity-json", new { id, page, pageSize, sort, descending });
-            ViewData["AlternateJsonUrl"] = model.JsonUrl;
-            return View(model);
-        }
-
         [HttpGet("/{id:guid}/planetary")]
         public async Task<IActionResult> Planetary(
             Guid id,

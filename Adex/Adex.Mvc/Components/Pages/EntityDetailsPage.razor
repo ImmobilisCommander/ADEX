@@ -1,0 +1,177 @@
+@page "/{Id:guid}"
+@inherits AdexComponentBase
+
+@if (model is not null)
+{
+    <PageTitle>@model.Name - ADEX</PageTitle>
+    <HeadContent>
+        <link rel="alternate" type="application/json" href="@model.JsonUrl" />
+    </HeadContent>
+}
+else if (notFound)
+{
+    <PageTitle>Entité introuvable - ADEX</PageTitle>
+}
+
+<main class="explorer-page entity-page">
+    <a class="back-link" href="/">← Tableau de bord</a>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="error-state" role="alert">@errorMessage</p>
+    }
+    else if (notFound)
+    {
+        <h1>Entité introuvable</h1>
+        <p class="empty-state">Aucune entité ne correspond à l’identifiant @Id.</p>
+    }
+    else if (model is not null)
+    {
+        <header class="entity-heading">
+            <div>
+                <p class="entity-type">@model.Type</p>
+                <h1>@model.Name</h1>
+            </div>
+            <a class="plain-link" href="@model.JsonUrl" data-enhance-nav="false">Données JSON</a>
+            @if (model.ShowSearchLink)
+            {
+                <a class="plain-link" href="@model.SearchUrl">Rechercher une autre entité</a>
+            }
+        </header>
+
+        <section class="summary-register entity-totals" aria-label="Synthèse des liens">
+            <div class="summary-item">
+                <span class="summary-label">Liens financiers</span>
+                <strong>@model.FinancialLinkCountDisplay</strong>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Montants vers cette entité</span>
+                <strong>@model.IncomingAmountDisplay</strong>
+            </div>
+            <div class="summary-item summary-total">
+                <span class="summary-label">Montants depuis cette entité</span>
+                <strong>@model.OutgoingAmountDisplay</strong>
+            </div>
+        </section>
+
+        <div class="entity-overview">
+            <EntityCharts Model="model.EntityCharts" />
+            <CounterpartyTreemap EntityId="model.Id" SearchQuery="model.SearchQuery" />
+        </div>
+
+        <section class="register-section" aria-labelledby="attributes-title">
+            <div class="section-heading">
+                <h2 id="attributes-title">Informations disponibles</h2>
+                <span class="section-unit">@model.AttributeCountDisplay attributs</span>
+            </div>
+            @if (model.Attributes.Count == 0)
+            {
+                <p class="empty-state">Aucune information complémentaire n’est disponible pour cette entité.</p>
+            }
+            else
+            {
+                <dl class="attribute-list">
+                    @foreach (var item in model.Attributes)
+                    {
+                        <div class="attribute-row">
+                            <dt>@item.Name</dt>
+                            <dd>@item.Value</dd>
+                        </div>
+                    }
+                </dl>
+            }
+        </section>
+
+        <section class="register-section entity-links" aria-labelledby="links-title">
+            <div class="section-heading">
+                <h2 id="links-title">Liens financiers</h2>
+                <span class="section-unit">@model.FinancialLinkCountDisplay déclarations</span>
+            </div>
+            @if (model.FinancialLinks.Count == 0)
+            {
+                <p class="empty-state">Aucun lien financier n’est associé à cette entité.</p>
+            }
+            else
+            {
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                @foreach (var (key, title, label) in SortColumns)
+                                {
+                                    <th scope="col" aria-sort="@model.SortLinks[key].State"><a class="sort-button" href="@model.SortLinks[key].Url" title="@title"><span>@label</span><i aria-hidden="true"></i></a></th>
+                                }
+                                <th scope="col">Justification</th>
+                                <th scope="col" class="numeric" aria-sort="@model.SortLinks["date"].State"><a class="sort-button" href="@model.SortLinks["date"].Url" title="Trier par date"><span>Date</span><i aria-hidden="true"></i></a></th>
+                                <th scope="col" class="numeric" aria-sort="@model.SortLinks["amount"].State"><a class="sort-button" href="@model.SortLinks["amount"].Url" title="Trier par montant"><span>Montant</span><i aria-hidden="true"></i></a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var link in model.FinancialLinks)
+                            {
+                                var current = link;
+                                <tr class="@current.RowClass" tabindex="@current.RowTabIndex"
+                                    aria-label="@current.RowLabel"
+                                    @onclick="() => Select(current)"
+                                    @onkeydown="args => OnRowKeyDown(args, current)">
+                                    <td>@current.DirectionDisplay</td>
+                                    <th scope="row"><a href="@current.CounterpartyUrl" @onclick:stopPropagation="true">@current.CounterpartyName</a></th>
+                                    <td>@current.DeclarationType</td>
+                                    <td>@current.KindDisplay</td>
+                                    <td>@current.MotifDisplay</td>
+                                    <td class="numeric">@current.DateDisplay</td>
+                                    <td class="numeric">@current.AmountDisplay</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-note">Cliquez sur une ligne pour voir sa justification.</p>
+                @if (model.FinancialLinkCount > 10)
+                {
+                    <div class="pager-bar">
+                        <nav class="pager" aria-label="Pagination des liens financiers">
+                            @if (model.Page > 1)
+                            {
+                                <a class="pager-link" rel="prev" href="@model.PreviousPageUrl">Précédent</a>
+                            }
+                            @foreach (var pageLink in model.PageLinks)
+                            {
+                                @if (pageLink.GapBefore)
+                                {
+                                    <span class="pager-gap" aria-hidden="true">…</span>
+                                }
+                                @if (pageLink.Current)
+                                {
+                                    <span class="pager-link is-current" aria-current="page">@pageLink.Number</span>
+                                }
+                                else
+                                {
+                                    <a class="pager-link" href="@pageLink.Url" aria-label="Page @pageLink.Number">@pageLink.Number</a>
+                                }
+                            }
+                            @if (model.Page < model.PageCount)
+                            {
+                                <a class="pager-link" rel="next" href="@model.NextPageUrl">Suivant</a>
+                            }
+                        </nav>
+                        <div class="pager-size">
+                            <label for="page-size">Par page</label>
+                            <select id="page-size" @onchange="OnPageSizeChanged">
+                                @foreach (var size in model.PageSizeOptions)
+                                {
+                                    <option value="@size" selected="@(size == model.PageSize)">@size</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <p class="table-note">
+                        Déclarations @model.FirstDisplayedLink à @model.LastDisplayedLink
+                        sur @model.FinancialLinkCountDisplay.
+                    </p>
+                }
+            }
+        </section>
+    }
+</main>
+
+<JustificationDialog Link="selectedLink" OnClose="CloseJustification" />

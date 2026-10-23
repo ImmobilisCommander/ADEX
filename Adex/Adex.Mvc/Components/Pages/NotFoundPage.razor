@@ -1,0 +1,23 @@
+@page "/not-found"
+@inject NavigationManager Navigation
+
+<PageTitle>Page introuvable - ADEX</PageTitle>
+
+<main class="explorer-page">
+    <a class="back-link" href="/">← Tableau de bord</a>
+    <h1>Page introuvable</h1>
+    <p class="empty-state">L’adresse demandée n’existe pas.</p>
+</main>
+
+@code {
+    // Les pages MVC ne font pas partie du routeur Blazor : une navigation interne vers l'une d'elles
+    // aboutit ici, il faut alors laisser le serveur la servir par un chargement complet.
+    protected override void OnInitialized()
+    {
+        if (RendererInfo.IsInteractive
+            && !new Uri(Navigation.Uri).AbsolutePath.Equals("/not-found", StringComparison.OrdinalIgnoreCase))
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
+    }
+}

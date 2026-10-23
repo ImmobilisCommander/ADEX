@@ -1,5 +1,13 @@
-(() => {
-    const section = document.querySelector("[data-treemap-section]");
+let disposeCurrent = null;
+
+export function dispose() {
+    disposeCurrent?.();
+    disposeCurrent = null;
+}
+
+// Appelé par le composant Blazor CounterpartyTreemap une fois la section rendue.
+export function init(section) {
+    dispose();
     if (!section || !window.d3) return;
 
     const container = section.querySelector("[data-treemap-container]");
@@ -245,10 +253,15 @@
     draw();
 
     let timer;
-    window.addEventListener("resize", () => {
+    const onResize = () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
             if (dimensions().width !== renderedWidth) draw();
         }, 150);
-    });
-})();
+    };
+    window.addEventListener("resize", onResize);
+    disposeCurrent = () => {
+        clearTimeout(timer);
+        window.removeEventListener("resize", onResize);
+    };
+}

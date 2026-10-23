@@ -1,3 +1,4 @@
+using Adex.Mvc.Components.Loading;
 using Adex.Mvc.Configuration;
 using Adex.Mvc.Entities.Json;
 using Adex.WebApi.Client;
@@ -11,6 +12,8 @@ namespace Adex.Mvc.Hosting
         public static IServiceCollection AddAdexMvc(this IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddRazorComponents().AddInteractiveServerComponents();
+            services.AddScoped<PageLoadingState>();
             services.AddMemoryCache();
             services.AddTransient<EntityDetailsCache>();
             services

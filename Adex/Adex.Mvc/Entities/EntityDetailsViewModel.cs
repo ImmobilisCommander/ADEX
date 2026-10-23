@@ -122,6 +122,12 @@ namespace Adex.Mvc.Entities
 
         private static CultureInfo FrenchCulture => CultureInfo.GetCultureInfo("fr-FR");
 
+        public string PageSizeUrl(int size)
+        {
+            var queryParam = HasSearchQuery ? $"&fromQuery={Uri.EscapeDataString(SearchQuery)}" : string.Empty;
+            return $"/{Id}?page=1&pageSize={size}&sort={Sort}&descending={DescendingDisplay}{queryParam}#links-title";
+        }
+
         private (string State, string Url) SortLink(string key)
         {
             var state = Sort == key ? (Descending ? "descending" : "ascending") : null;
