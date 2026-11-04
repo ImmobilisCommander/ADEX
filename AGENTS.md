@@ -9,8 +9,8 @@
 
 ## Journal des modifications
 
-- Mettre systématiquement à jour `docs/000_change_log.md` pour chaque modification apportée au dépôt, en décrivant brièvement les changements fonctionnels ou structurels effectués.
-- Tenir tous les documents du dépôt (dossier `docs/`, README, etc.) à jour au fur et à mesure, en fonction des modifications apportées au code : fonctionnalités, architecture, configuration, règles métier, tests.
+- Mettre systématiquement à jour `.docs/000_change_log.md` pour chaque modification apportée au dépôt, en décrivant brièvement les changements fonctionnels ou structurels effectués.
+- Tenir tous les documents du dépôt (dossier `.docs/`, README, etc.) à jour au fur et à mesure, en fonction des modifications apportées au code : fonctionnalités, architecture, configuration, règles métier, tests.
 
 ## Vues Razor MVC
 

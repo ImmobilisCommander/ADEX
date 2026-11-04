@@ -1,4 +1,4 @@
-﻿# Historique et index de la documentation
+# Historique et index de la documentation
 
 Cette documentation décrit le code présent dans le dépôt ; elle ne garantit pas que les composants soient tous déployés ni raccordés entre eux.
 
@@ -18,6 +18,9 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 | 009 | [Application web progressive](009_pwa.md) | Installation PWA, service worker, cache, compatibilité par plateforme. |
 
 ## Historique
+
+- 2026-11-04 — Documentation regroupée dans `.docs/` et référencée dans le fichier `.slnx`.
+
 
 - 2026-11-04 — Ajout des actions de conformité à [006_recommendations.md](006_recommendations.md) : annulation, options, tests et entretien de la documentation.
 - 2026-11-04 — `AGENTS.md` complété avec les conventions communes aux applications .NET.
