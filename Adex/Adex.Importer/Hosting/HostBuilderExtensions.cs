@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Serilog;
 
 namespace Adex.Importer.Hosting
 {
@@ -15,12 +14,6 @@ namespace Adex.Importer.Hosting
                 new DefaultServiceProviderFactory(
                     new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true }
                 )
-            );
-            builder.Services.AddSerilog(
-                (services, loggerConfiguration) =>
-                    loggerConfiguration
-                        .ReadFrom.Configuration(builder.Configuration)
-                        .ReadFrom.Services(services)
             );
             return builder;
         }

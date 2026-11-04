@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.Telemetry\Common.Telemetry.csproj" />
     <ProjectReference Include="..\Adex.Application\Adex.Application.csproj" />
     <ProjectReference Include="..\Adex.Contracts\Adex.Contracts.csproj" />
     <ProjectReference Include="..\Adex.Data.ReadModel\Adex.Data.ReadModel.csproj" />

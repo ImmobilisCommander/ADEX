@@ -19,6 +19,8 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- 2026-11-05 — Télémétrie : ajout de Common.Telemetry (AddTelemetry, export OTLP des logs, métriques et traces) à Adex.WebApi, Adex.Mvc, Adex.Mcp et Adex.Importer. Serilog est désormais enregistré par ClearProviders() + AddSerilog(logger) (au lieu de UseSerilog) avant AddTelemetry, avec DiagnosticContext et UseSerilogRequestLogging(options => options.Logger = ...).
+- 2026-11-05 — Correctif Serilog : enregistrer le logger sous l’interface `Serilog.ILogger` consommée par `UseSerilogRequestLogging` dans `Adex.Mvc` et `Adex.WebApi`.
 - 2026-11-04 — Documentation regroupée dans `.docs/` et référencée dans le fichier `.slnx`.
 
 
@@ -210,6 +212,5 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 - `Adex.Importer` : au lancement, affichage récapitulatif (base : hôte/port/base/utilisateur et test de connexion ; fichier : chemin, taille et 10 premières lignes) via `ImportPreflight`, puis confirmation interactive (o/N) avant l'import. Option `--yes` pour passer la confirmation ; code de sortie 1 si une vérification échoue, 0 si l'utilisateur refuse.
 
 - `Adex.Importer` : le récapitulatif affiche la taille du fichier et le nombre de lignes à importer (sauts de ligne hors en-tête).
-
 
 

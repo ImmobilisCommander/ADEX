@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Hosting;
-using Serilog;
 
 namespace Adex.WebApi.Hosting
 {
@@ -13,12 +12,6 @@ namespace Adex.WebApi.Hosting
                     options.ValidateScopes = true;
                     options.ValidateOnBuild = true;
                 }
-            );
-            host.UseSerilog(
-                (context, services, loggerConfiguration) =>
-                    loggerConfiguration
-                        .ReadFrom.Configuration(context.Configuration)
-                        .ReadFrom.Services(services)
             );
             return host;
         }

@@ -51,7 +51,7 @@ Les routes principales sont `GET /api/dashboard`, `GET /api/sitemap`, `GET /api/
 
 La chaîne `Adex` sert à l’application normale. `AdexMeta` est conservée uniquement pour le transfert historique des métadonnées et pourra être retirée après vérification du transfert et de la sauvegarde de la base source. Les secrets doivent provenir d’une source sécurisée.
 
-Les deux hôtes utilisent Serilog, sorties console et fichiers sous `D:\Logs`, journalisation des requêtes HTTP et des commandes SQL sans valeurs de paramètres. Les erreurs de l’API sont converties en `ProblemDetails`; le MVC traite globalement les erreurs HTTP et affiche sa page d’erreur ou un `ProblemDetails` selon le type de requête.
+Les hôtes (API, MVC, MCP, Importer) enregistrent Serilog par `ClearProviders()` + `AddSerilog(logger)` dans `Program.cs`, puis appellent `AddTelemetry` (`Common.Telemetry`, export OTLP des logs, métriques et traces vers `http://localhost:4317` par défaut, surchargeable par `OTEL_EXPORTER_OTLP_ENDPOINT`). Les deux hôtes web utilisent Serilog, sorties console et fichiers sous `D:\Logs`, journalisation des requêtes HTTP et des commandes SQL sans valeurs de paramètres. Les erreurs de l’API sont converties en `ProblemDetails`; le MVC traite globalement les erreurs HTTP et affiche sa page d’erreur ou un `ProblemDetails` selon le type de requête.
 
 ## Limites connues
 

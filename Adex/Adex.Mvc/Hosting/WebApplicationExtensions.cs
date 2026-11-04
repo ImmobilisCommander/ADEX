@@ -24,7 +24,7 @@ namespace Adex.Mvc.Hosting
                         | ForwardedHeaders.XForwardedHost,
                 }
             );
-            app.UseSerilogRequestLogging();
+            app.UseSerilogRequestLogging(options => options.Logger = app.Services.GetRequiredService<Serilog.ILogger>());
             app.UseMiddleware<MarkdownNegotiationMiddleware>();
             app.UseExceptionHandler("/Home/Error");
             if (!app.Environment.IsDevelopment())

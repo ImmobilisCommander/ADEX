@@ -26,7 +26,8 @@ prompts `dotnet-app-create`, `dotnet-app-maintenance` et `dotnet-apps-audit` au 
 - Identifiants de code en anglais ; textes d'interface dans la langue déjà utilisée par l'application.
 - Pas de paramètre avec valeur par défaut dans les signatures de méthodes.
 - Classes d'options liées à la configuration : propriétés `required`, sans valeur par défaut ; valider au démarrage.
-- Journalisation Serilog structurée ; ne jamais journaliser de secrets, tokens ou données personnelles inutiles.
+- Journalisation Serilog structurée ; ne jamais journaliser de secrets, tokens ou données personnelles inutiles. Enregistrement : `ClearProviders()` + `AddSerilog(logger)` (pas `UseSerilog`) ; request logging avec `DiagnosticContext` et `options.Logger`.
+- Télémétrie : utiliser `Common\Common.Telemetry` (`AddTelemetry`) ; avec Serilog, enregistrer `ClearProviders()` + `AddSerilog(logger)` avant `AddTelemetry` (pas `UseSerilog` sans `writeToProviders: true`). Voir `dotnet-apps-conventions.md`.
 - Ajouter ou mettre à jour des tests pour tout comportement modifié ; lancer les tests ciblés et rapporter le résultat.
 - Documentation : fichiers `NNN_english_snake_case.md` (`000_change_log`, `001_description`, … `006_recommendations`).
 - Ne jamais committer ni pousser sans demande explicite.

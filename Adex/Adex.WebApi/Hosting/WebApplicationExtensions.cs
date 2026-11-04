@@ -17,7 +17,7 @@ namespace Adex.WebApi.Hosting
                 app.Services.GetRequiredService<ILoggerFactory>(),
                 parameterLoggingEnabled: false
             );
-            app.UseSerilogRequestLogging();
+            app.UseSerilogRequestLogging(options => options.Logger = app.Services.GetRequiredService<Serilog.ILogger>());
             app.UseExceptionHandler();
             app.UseSwagger();
             app.UseSwaggerUI(o =>
