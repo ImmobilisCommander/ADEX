@@ -19,6 +19,8 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- 2026-11-04 — Ajout des actions de conformité à [006_recommendations.md](006_recommendations.md) : annulation, options, tests et entretien de la documentation.
+
 - Fiche de détails (Blazor) : les sections « Carte des contreparties », « Informations disponibles » et « Liens financiers » s'affichent immédiatement avec une barre de progression (LoadingBar, .loading-bar) pendant le chargement, au lieu d'apparaître tardivement.
 
 - Adex.Mvc : migration vers Blazor Server (phase 1, hybride avec MVC). Ajout de `Components/` (`App`, `Routes`, `MainLayout`, `NavMenu`), de `PageLoadingState` et de `AdexComponentBase` (`ToggleLoading`, `RunWithLoadingAsync`) qui affichent le calque de chargement en C# autour des appels d'API (`LoadingOverlay`). La fiche de détails (`EntityDetailsPage`, `EntityCharts`, `CounterpartyTreemap`, `JustificationDialog` en C#) remplace `Entity/Details.cshtml`, `CounterpartyTreemapViewComponent`, `justification.js` et `entity-sort.js` ; `entity-treemap.js` devient un module ES appelé via JS interop. Le bug du calque bloqué disparaît pour cette page. Les autres pages restent en MVC (avec `page-loading.js`) ; `NotFoundPage` force un rechargement complet pour les liens vers elles. Blazor Server requiert les WebSockets (reverse proxy / tunnel Cloudflare). Reste à migrer : accueil, recherche, paramètres, CSV, plan du site.
@@ -204,7 +206,6 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 - `Adex.Importer` : au lancement, affichage récapitulatif (base : hôte/port/base/utilisateur et test de connexion ; fichier : chemin, taille et 10 premières lignes) via `ImportPreflight`, puis confirmation interactive (o/N) avant l'import. Option `--yes` pour passer la confirmation ; code de sortie 1 si une vérification échoue, 0 si l'utilisateur refuse.
 
 - `Adex.Importer` : le récapitulatif affiche la taille du fichier et le nombre de lignes à importer (sauts de ligne hors en-tête).
-
 
 
 

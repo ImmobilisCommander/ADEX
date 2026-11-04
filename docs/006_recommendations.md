@@ -76,3 +76,12 @@ Ordre proposé : table `ImportRuns` et verrou, puis statut public, middleware et
 ## Règle de conception — synchronisation
 
 Dans toute la solution, utiliser `SemaphoreSlim` plutôt que `lock` pour la synchronisation (sections critiques asynchrones, `WaitAsync` / `Release` dans un `try/finally`). `Adex.WebApi/Import/ImportJobService.cs` applique déjà cette règle.
+
+## Actions de conformité à suivre
+
+À appliquer aux évolutions concernées, sans migration globale :
+
+- Vérifier que les nouveaux traitements I/O propagent leur `CancellationToken` jusqu'au client, stockage ou processus terminal, et respectent la convention locale `SemaphoreSlim` / `WaitAsync` / `finally`.
+- Pour toute nouvelle classe d'options liée à la configuration, employer des propriétés `required` sans valeur par défaut assignée, puis valider les valeurs obligatoires sans casser les configurations de déploiement existantes.
+- Continuer à ajouter des tests ciblés aux imports, recherches, règles métier et routes selon la priorité déjà décrite dans ce document; documenter les exceptions et les tests non exécutés.
+- Conserver la structure `docs/`, l'index de ce fichier et les conventions de contribution dans `AGENTS.md`; ne pas harmoniser les autres applications dans le cadre d'une évolution ADEX.
