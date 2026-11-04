@@ -17,3 +17,16 @@
 - Associer à chaque page ou vue partielle un ViewModel C# dédié, qui sert de code-behind dans l'architecture MVC.
 - Garder les fichiers `.cshtml` centrés sur le HTML et la liaison aux propriétés du ViewModel. Réserver Razor aux conditions et répétitions nécessaires au rendu; déplacer les calculs, le formatage, la préparation des collections et la construction des URL dans le ViewModel.
 - Ne pas ajouter de logique métier dans une vue.
+
+## Conventions communes (applications .NET)
+Complément issu du guide partagé `..\dotnet-apps-conventions.md` (local, non versionné ;
+prompts `dotnet-app-create`, `dotnet-app-maintenance` et `dotnet-apps-audit` au même endroit). Les consignes ci-dessus priment.
+
+- Lire le README, la documentation, la cible .NET et les propriétés de build avant de modifier le code.
+- Identifiants de code en anglais ; textes d'interface dans la langue déjà utilisée par l'application.
+- Pas de paramètre avec valeur par défaut dans les signatures de méthodes.
+- Classes d'options liées à la configuration : propriétés `required`, sans valeur par défaut ; valider au démarrage.
+- Journalisation Serilog structurée ; ne jamais journaliser de secrets, tokens ou données personnelles inutiles.
+- Ajouter ou mettre à jour des tests pour tout comportement modifié ; lancer les tests ciblés et rapporter le résultat.
+- Documentation : fichiers `NNN_english_snake_case.md` (`000_change_log`, `001_description`, … `006_recommendations`).
+- Ne jamais committer ni pousser sans demande explicite.

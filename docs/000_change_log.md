@@ -20,6 +20,7 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 ## Historique
 
 - 2026-11-04 — Ajout des actions de conformité à [006_recommendations.md](006_recommendations.md) : annulation, options, tests et entretien de la documentation.
+- 2026-11-04 — `AGENTS.md` complété avec les conventions communes aux applications .NET.
 
 - Fiche de détails (Blazor) : les sections « Carte des contreparties », « Informations disponibles » et « Liens financiers » s'affichent immédiatement avec une barre de progression (LoadingBar, .loading-bar) pendant le chargement, au lieu d'apparaître tardivement.
 
