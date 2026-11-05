@@ -21,7 +21,7 @@ namespace Adex.WebApi
             builder.Logging.AddSerilog(serilogLogger);
             builder.Services.AddSingleton<Serilog.ILogger>(serilogLogger);
             builder.Services.AddSingleton(new Serilog.Extensions.Hosting.DiagnosticContext(serilogLogger));
-            builder.Services.AddTelemetry(typeof(Program).Assembly.GetName().Name!, "1.0.0");
+            builder.Services.AddTelemetry(typeof(Program).Assembly.GetName().Name!, "1.0.0").WithAspNetCoreInstrumentation().WithNpgsqlInstrumentation();
             builder.Services.AddAdexWebApi().AddAdexDatabase().AddAdexServices();
 
             await using var app = builder.Build();

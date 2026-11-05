@@ -28,7 +28,7 @@ namespace Adex.Importer
             builder.Logging.AddSerilog(serilogLogger);
             builder.Services.AddSingleton(serilogLogger);
             builder.Services.AddSingleton(new Serilog.Extensions.Hosting.DiagnosticContext(serilogLogger));
-            builder.Services.AddTelemetry(typeof(Program).Assembly.GetName().Name!, "1.0.0");
+            builder.Services.AddTelemetry(typeof(Program).Assembly.GetName().Name!, "1.0.0").WithNpgsqlInstrumentation();
             builder.Services.AddAdexImporter();
 
             using var host = builder.Build();
