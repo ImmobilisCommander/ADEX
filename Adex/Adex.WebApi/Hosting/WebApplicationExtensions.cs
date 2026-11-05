@@ -17,7 +17,14 @@ namespace Adex.WebApi.Hosting
                 app.Services.GetRequiredService<ILoggerFactory>(),
                 parameterLoggingEnabled: false
             );
-            app.UseSerilogRequestLogging(options => options.Logger = app.Services.GetRequiredService<Serilog.ILogger>());
+            app.UseSerilogRequestLogging(options =>
+    {
+        options.Logger = app.Services.GetRequiredService<Serilog.ILogger>();
+        options.GetLevel = (ctx, _, ex) =>
+            ctx.Request.Path.StartsWithSegments("/health") ? Serilog.Events.LogEventLevel.Verbose
+            : ex is not null || ctx.Response.StatusCode > 499 ? Serilog.Events.LogEventLevel.Error
+            : Serilog.Events.LogEventLevel.Information;
+    });
             app.UseExceptionHandler();
             app.UseSwagger();
             app.UseSwaggerUI(o =>
