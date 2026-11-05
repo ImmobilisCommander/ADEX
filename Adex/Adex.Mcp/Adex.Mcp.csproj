@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
+    <AssemblyName>4t2.Adex.Mcp</AssemblyName>
     <RootNamespace>Adex.Mcp</RootNamespace>
   </PropertyGroup>
   <ItemGroup>

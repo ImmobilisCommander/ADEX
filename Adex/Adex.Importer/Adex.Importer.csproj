@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>4t2.Adex.Importer</AssemblyName>
     <OutputType>Exe</OutputType>
     <RootNamespace>Adex.Importer</RootNamespace>
   </PropertyGroup>
