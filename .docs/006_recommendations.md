@@ -22,7 +22,7 @@ Les propositions qui suivent distinguent les changements d’architecture déjà
 
 ## Priorité 1 — Fiabiliser les parcours actuels
 
-- **Ajouter des tests automatisés.** Tester les imports, les règles de date, le rapprochement, la persistance, les recherches et les routes (voir [Tests](005_testing.md)).
+- **Étendre les tests automatisés.** Au-delà des tests de démarrage, couvrir les imports, les règles de date, le rapprochement, la persistance, les recherches et les routes (voir [Tests](005_testing.md)).
 
 ## Priorité 2 — Préparer une exécution maintenable
 

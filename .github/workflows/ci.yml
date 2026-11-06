@@ -2,7 +2,6 @@ name: CI
 
 on:
   push:
-    branches: [master]
   pull_request:
 
 permissions:
@@ -26,6 +25,16 @@ jobs:
         with:
           global-json-file: adex/global.json
 
+      - name: Restore
+        working-directory: adex/Adex
+        run: |
+          test -f ../../Common/Common.Telemetry/Common.Telemetry.csproj
+          dotnet restore Adex.slnx
+
       - name: Build
         working-directory: adex/Adex
-        run: dotnet build Adex.slnx --configuration Release
+        run: dotnet build Adex.slnx --configuration Release --no-restore
+
+      - name: Test
+        working-directory: adex/Adex
+        run: dotnet test --solution Adex.slnx --configuration Release --no-build --filter-not-trait "Category=Integration"

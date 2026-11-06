@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <ProjectReference Include="..\Adex.Mcp\Adex.Mcp.csproj" />
+    <ProjectReference Include="..\Adex.Mvc\Adex.Mvc.csproj" />
+    <ProjectReference Include="..\Adex.WebApi\Adex.WebApi.csproj" />
+    <ProjectReference Include="..\Adex.Importer\Adex.Importer.csproj" />
+  </ItemGroup>
+</Project>
