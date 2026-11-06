@@ -10,11 +10,3 @@
         </div>
     </div>
 }
-
-@code {
-    protected override void OnInitialized() => LoadingState.Changed += OnChanged;
-
-    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
-
-    public void Dispose() => LoadingState.Changed -= OnChanged;
-}

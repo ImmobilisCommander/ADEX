@@ -20,21 +20,3 @@
         </ul>
     </div>
 </nav>
-
-@code {
-    private bool open;
-    private ElementReference toggleButton;
-
-    private void Toggle() => open = !open;
-
-    private void Close() => open = false;
-
-    private async Task OnKeyDown(KeyboardEventArgs args)
-    {
-        if (args.Key == "Escape" && open)
-        {
-            open = false;
-            await toggleButton.FocusAsync();
-        }
-    }
-}

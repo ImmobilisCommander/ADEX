@@ -19,28 +19,3 @@
         </div>
     </div>
 }
-
-@code {
-    private ElementReference overlay;
-    private bool focusPending;
-
-    [Parameter]
-    public FinancialLinkViewModel Link { get; set; }
-
-    [Parameter]
-    public EventCallback OnClose { get; set; }
-
-    protected override void OnParametersSet() => focusPending = Link is not null;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (focusPending)
-        {
-            focusPending = false;
-            await overlay.FocusAsync();
-        }
-    }
-
-    private Task OnKeyDown(KeyboardEventArgs args) =>
-        args.Key == "Escape" ? OnClose.InvokeAsync() : Task.CompletedTask;
-}

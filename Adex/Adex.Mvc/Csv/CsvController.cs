@@ -17,14 +17,14 @@ namespace Adex.Mvc.Csv
 
         [HttpGet]
         public IActionResult Index(
-            int page = 1,
-            [FromQuery(Name = "filters")] Dictionary<string, string> filters = null
+            int? page,
+            [FromQuery(Name = "filters")] Dictionary<string, string>? filters
         )
         {
             var model = new CsvIndexViewModel
             {
                 PageSize = PageSize,
-                ContentUrl = ActionUrl(nameof(Content), Math.Max(page, 1), ActiveFilters(filters)),
+                ContentUrl = ActionUrl(nameof(Content), Math.Max(page ?? 1, 1), ActiveFilters(filters)),
             };
             ViewData["Title"] = model.Title;
             return View(model);

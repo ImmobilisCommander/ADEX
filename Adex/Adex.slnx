@@ -19,6 +19,7 @@
   <Folder Name="/Éléments de solution/">
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
+    <File Path="../global.json" />
   </Folder>
   <Project Path="Adex.Application/Adex.Application.csproj" />
   <Project Path="Adex.Contracts/Adex.Contracts.csproj" />

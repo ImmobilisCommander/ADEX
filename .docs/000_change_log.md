@@ -19,6 +19,8 @@ Cette documentation décrit le code présent dans le dépôt ; elle ne garantit 
 
 ## Historique
 
+- 2026-11-06 — Packages et propriétés de build alignés sur le socle commun ; les blocs Razor passent en code-behind et les paramètres de l’action CSV n’ont plus de valeurs par défaut.
+
 - 2026-11-06 — Démarrage : extraction de l'observabilité et des routes des quatre hôtes dans des extensions ; `Main` de l'importeur conserve son code de sortie. CI : restauration et compilation explicites, tests de démarrage et contrôle de présence de `Common.Telemetry`.
 - 2026-11-05 — Télémétrie : ajout de Common.Telemetry (AddTelemetry, export OTLP des logs, métriques et traces) à Adex.WebApi, Adex.Mvc, Adex.Mcp et Adex.Importer. Serilog est désormais enregistré par ClearProviders() + AddSerilog(logger) (au lieu de UseSerilog) avant AddTelemetry, avec DiagnosticContext et UseSerilogRequestLogging(options => options.Logger = ...).
 - 2026-11-05 — Correctif Serilog : enregistrer le logger sous l’interface `Serilog.ILogger` consommée par `UseSerilogRequestLogging` dans `Adex.Mvc` et `Adex.WebApi`.

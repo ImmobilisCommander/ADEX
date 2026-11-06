@@ -35,3 +35,5 @@ prompts `dotnet-app-create`, `dotnet-app-maintenance` et `dotnet-apps-audit` au 
 - Tests : `dotnet test --solution <sln> --filter-not-trait "Category=Integration"` (hors `Category=Integration` par défaut) ; les tests de host web forcent l'environnement `Testing`. CI : `.github\workflows\ci.yml` (secret `COMMON_REPO_TOKEN`).
 - Documentation : fichiers `NNN_english_snake_case.md` (`000_change_log`, `001_description`, … `006_recommendations`).
 - Ne jamais committer ni pousser sans demande explicite.
+
+- Versions NuGet : centraliser tous les packages dans `Directory.Packages.props` (dans `Adex\Directory.Packages.props` pour ADEX, à la racine de la solution ailleurs) ; aucun `PackageReference` ne porte `Version`.
