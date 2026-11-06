@@ -526,6 +526,7 @@ namespace Adex.Data.Import
                 },
                 failure
             );
+            // Le producteur doit toujours appeler Complete() pour que l'écriture se termine : pas d'annulation avant son démarrage.
             var totalsProducer = Task.Run(() =>
             {
                 foreach (var (id, t) in totals)
@@ -534,7 +535,7 @@ namespace Adex.Data.Import
                 }
 
                 totalRows.Complete();
-            });
+            }, CancellationToken.None);
             await WhenAllRethrowRootCauseAsync(
                 new List<Task> { totalsProducer, totalRows.Completion }
             );

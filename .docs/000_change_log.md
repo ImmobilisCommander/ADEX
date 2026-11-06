@@ -213,4 +213,6 @@ Les recommandations sont des propositions, pas des travaux déjà réalisés. Le
 
 - `Adex.Importer` : le récapitulatif affiche la taille du fichier et le nombre de lignes à importer (sauts de ligne hors en-tête).
 
+- Socle de build commun : `.editorconfig` et `global.json` à la racine du dépôt, `Directory.Build.props` harmonisé (`Adex\`), CI GitHub Actions (`.github\workflows\ci.yml`, secret `COMMON_REPO_TOKEN`), voir `Common\.docs\007_build_baseline.md` ; `Task.Run` de `DeclarationsImporter` avec `CancellationToken.None` explicite (`CA2016`).
+
 
