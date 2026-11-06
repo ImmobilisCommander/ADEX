@@ -44,6 +44,11 @@ namespace Adex.Mvc.Hosting
             app.UseRouting();
             app.UseAuthorization();
             app.UseAntiforgery();
+            return app;
+        }
+
+        public static WebApplication MapAdexEndpoints(this WebApplication app)
+        {
             app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
             app.MapHealthChecks("/health/ready");
             app.MapRazorComponents<App>().AddInteractiveServerRenderMode();

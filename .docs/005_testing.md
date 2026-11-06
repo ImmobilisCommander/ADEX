@@ -2,9 +2,9 @@
 
 ## État observé dans le dépôt
 
-L’inspection de la solution actuelle (`Adex/Adex.slnx`) n’a révélé aucun projet de tests dédié. Le projet `Adex.App`, qui contenait un banc d’essai manuel, a été supprimé.
+La solution `Adex/Adex.slnx` contient `Adex.Hosting.Tests` : les tests vérifient les signatures des quatre points d'entrée, les routes configurées du MVC et de l'API, et démarrent le serveur MCP en environnement `Testing` pour contrôler ses routes, son client API et la réponse de santé. Ils ne couvrent pas les parcours métier ni l'intégration PostgreSQL. Le projet `Adex.App`, qui contenait un banc d’essai manuel, a été supprimé.
 
-Ce constat décrit le contenu actuel inspecté ; il n’affirme pas qu’aucun contrôle manuel ou externe n’existe.
+La CI `.github/workflows/ci.yml` récupère `Common` avec `COMMON_REPO_TOKEN`, utilise le SDK de `global.json`, vérifie la présence de `Common.Telemetry`, restaure puis compile en Release et exécute `dotnet test --solution Adex.slnx --configuration Release --no-build --filter-not-trait "Category=Integration"`. Les tests d'intégration sont exclus et doivent être exécutés séparément avec leurs dépendances dédiées. Le contrôle GitHub doit aussi être configuré comme obligatoire dans la protection de branche : son existence dans le workflow ne suffit pas.
 
 Après le câblage DI, `dotnet build Adex/Adex.slnx` réussit. Un démarrage local des hôtes a également été vérifié : MVC retourne `200` sur `/` et l’API répond sur une route inconnue avec `404`. Une requête réelle de recherche de liens active le contrôleur et valide le modèle EF Core, mais ne valide pas les résultats métier ni l’accès à une base.
 

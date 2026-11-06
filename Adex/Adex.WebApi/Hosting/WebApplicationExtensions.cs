@@ -35,6 +35,11 @@ namespace Adex.WebApi.Hosting
 
             app.UseHttpsRedirection();
             app.UseAuthorization();
+            return app;
+        }
+
+        public static WebApplication MapAdexEndpoints(this WebApplication app)
+        {
             app.MapControllers();
             app.MapHealthChecks("/health/live", new() { Predicate = _ => false });
             app.MapHealthChecks("/health/ready", new() { Predicate = r => r.Tags.Contains("ready") });

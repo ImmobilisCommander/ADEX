@@ -1,10 +1,6 @@
 using System.Threading.Tasks;
 using Adex.WebApi.Hosting;
-using Common.Telemetry;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Serilog;
 
 namespace Adex.WebApi
 {
@@ -14,18 +10,12 @@ namespace Adex.WebApi
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.ConfigureAdexHost();
-            var serilogLogger = new LoggerConfiguration()
-                .ReadFrom.Configuration(builder.Configuration)
-                .CreateLogger();
-            builder.Logging.ClearProviders();
-            builder.Logging.AddSerilog(serilogLogger);
-            builder.Services.AddSingleton<Serilog.ILogger>(serilogLogger);
-            builder.Services.AddSingleton(new Serilog.Extensions.Hosting.DiagnosticContext(serilogLogger));
-            builder.Services.AddTelemetry(typeof(Program).Assembly.GetName().Name!, "1.0.0").WithAspNetCoreInstrumentation().WithNpgsqlInstrumentation();
+            builder.AddAdexObservability();
             builder.Services.AddAdexWebApi().AddAdexDatabase().AddAdexServices();
 
             await using var app = builder.Build();
             app.UseAdexPipeline();
+            app.MapAdexEndpoints();
             await app.RunAdexAsync();
         }
     }
