@@ -30,5 +30,7 @@ prompts `dotnet-app-create`, `dotnet-app-maintenance` et `dotnet-apps-audit` au 
 - Journalisation Serilog structurée ; ne jamais journaliser de secrets, tokens ou données personnelles inutiles. Enregistrement : `ClearProviders()` + `AddSerilog(logger)` (pas `UseSerilog`) ; request logging avec `DiagnosticContext` et `options.Logger`.
 - Télémétrie : utiliser `Common\Common.Telemetry` (`AddTelemetry`) ; avec Serilog, enregistrer `ClearProviders()` + `AddSerilog(logger)` avant `AddTelemetry` (pas `UseSerilog` sans `writeToProviders: true`). Voir `dotnet-apps-conventions.md`.
 - Ajouter ou mettre à jour des tests pour tout comportement modifié ; lancer les tests ciblés et rapporter le résultat.
+- Socle de build : `.editorconfig`, `global.json` et `Directory.Build.props` sont des copies de la référence `Common\.docs\007_build_baseline.md` ; ne pas les faire diverger. `CancellationToken` toujours transmis (`CA2016`) ; un `CancellationToken.None` volontaire est explicite et commenté.
+- Tests : `dotnet test --solution <sln> --filter-not-trait "Category=Integration"` (hors `Category=Integration` par défaut) ; les tests de host web forcent l'environnement `Testing`. CI : `.github\workflows\ci.yml` (secret `COMMON_REPO_TOKEN`).
 - Documentation : fichiers `NNN_english_snake_case.md` (`000_change_log`, `001_description`, … `006_recommendations`).
 - Ne jamais committer ni pousser sans demande explicite.
