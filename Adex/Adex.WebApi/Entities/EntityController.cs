@@ -129,7 +129,7 @@ namespace Adex.WebApi.Entities
         public async Task<ActionResult<EntityCounterpartiesResult>> GetCounterparties(
             Guid id,
             CancellationToken cancellationToken,
-            [FromQuery] int? limit = null
+            [FromQuery] int? limit
         )
         {
             var duration = cacheOptions.CurrentValue.Counterparties;

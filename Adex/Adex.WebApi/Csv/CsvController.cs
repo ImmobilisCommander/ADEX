@@ -30,12 +30,12 @@ namespace Adex.WebApi.Csv
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CsvPage>> Get(
-            [FromQuery] int page = 1,
-            [FromQuery(Name = "filters")] Dictionary<string, string> filters = null,
-            CancellationToken cancellationToken = default
+            [FromQuery] int? page,
+            [FromQuery(Name = "filters")] Dictionary<string, string>? filters,
+            CancellationToken cancellationToken
         )
         {
-            return await csvService.GetPageAsync(page, filters, cancellationToken);
+            return await csvService.GetPageAsync(page ?? 1, filters ?? [], cancellationToken);
         }
     }
 }

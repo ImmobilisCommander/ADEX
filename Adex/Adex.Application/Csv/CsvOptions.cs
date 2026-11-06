@@ -10,13 +10,13 @@ namespace Adex.Application.Csv
             AllowEmptyStrings = false,
             ErrorMessage = "Le paramètre « Csv:FilePath » est obligatoire."
         )]
-        public string FilePath { get; set; } = string.Empty;
+        public required string FilePath { get; set; }
 
         [Range(
             0,
             86400,
             ErrorMessage = "Le paramètre « Csv:CacheDurationSeconds » doit être compris entre 0 et 86400."
         )]
-        public int CacheDurationSeconds { get; set; } = 60;
+        public required int CacheDurationSeconds { get; set; }
     }
 }

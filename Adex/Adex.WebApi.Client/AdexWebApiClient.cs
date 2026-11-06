@@ -14,13 +14,13 @@ namespace Adex.WebApi.Client
 {
     public sealed class AdexWebApiClient(HttpClient httpClient) : IAdexWebApiClient
     {
-        public Task<DashboardModel> GetDashboardAsync(CancellationToken cancellationToken = default)
+        public Task<DashboardModel> GetDashboardAsync(CancellationToken cancellationToken)
         {
             return GetModelAsync<DashboardModel>("api/dashboard", cancellationToken);
         }
 
         public async Task<DashboardModel> TryGetDashboardAsync(
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken
         )
         {
             using var response = await httpClient.GetAsync(
@@ -41,7 +41,7 @@ namespace Adex.WebApi.Client
 
         public async Task<IReadOnlyList<EntitySearchResult>> SearchEntitiesAsync(
             string query,
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken
         )
         {
             var results = await GetModelAsync<List<EntitySearchResult>>(
@@ -53,11 +53,11 @@ namespace Adex.WebApi.Client
 
         public async Task<EntityDetails> GetEntityAsync(
             Guid id,
-            int page = 1,
-            int pageSize = 20,
-            string sort = "amount",
-            bool descending = true,
-            CancellationToken cancellationToken = default
+            int page,
+            int pageSize,
+            string sort,
+            bool descending,
+            CancellationToken cancellationToken
         )
         {
             using var response = await httpClient.GetAsync(
@@ -78,8 +78,8 @@ namespace Adex.WebApi.Client
 
         public async Task<EntityCounterpartiesResult> GetEntityCounterpartiesAsync(
             Guid id,
-            int? limit = null,
-            CancellationToken cancellationToken = default
+            int? limit,
+            CancellationToken cancellationToken
         )
         {
             var uri = limit is > 0
@@ -102,7 +102,7 @@ namespace Adex.WebApi.Client
 
         public async Task<JsonElement> GetEntityJsonAsync(
             Guid id,
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken
         )
         {
             using var response = await httpClient.GetAsync($"api/entity/{id}", cancellationToken);
@@ -119,7 +119,7 @@ namespace Adex.WebApi.Client
         public async Task<CsvPage> GetCsvPageAsync(
             int page,
             IReadOnlyDictionary<string, string> filters,
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken
         )
         {
             var query = new List<string> { $"page={page}" };
@@ -173,7 +173,7 @@ namespace Adex.WebApi.Client
                 ?? throw new InvalidOperationException("The API returned an empty CSV response.");
         }
 
-        public Task<SitemapModel> GetSitemapAsync(CancellationToken cancellationToken = default)
+        public Task<SitemapModel> GetSitemapAsync(CancellationToken cancellationToken)
         {
             return GetModelAsync<SitemapModel>("api/sitemap", cancellationToken);
         }

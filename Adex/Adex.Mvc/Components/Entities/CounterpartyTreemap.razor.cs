@@ -46,7 +46,7 @@ namespace Adex.Mvc.Components.Entities
 
             if (!(duration > TimeSpan.Zero && Cache.TryGetValue(cacheKey, out EntityCounterpartiesResult result)))
             {
-                result = await ApiClient.GetEntityCounterpartiesAsync(EntityId, cancellationToken: cancellationToken);
+                result = await ApiClient.GetEntityCounterpartiesAsync(EntityId, limit: null, cancellationToken);
                 if (result is not null && duration > TimeSpan.Zero)
                 {
                     Cache.Set(cacheKey, result, duration);

@@ -11,6 +11,6 @@ namespace Adex.WebApi.Client
             ErrorMessage = "Le paramètre « AdexApi:BaseAddress » est obligatoire."
         )]
         [Url(ErrorMessage = "Le paramètre « AdexApi:BaseAddress » doit être une URL absolue.")]
-        public string BaseAddress { get; set; } = string.Empty;
+        public required string BaseAddress { get; set; }
     }
 }

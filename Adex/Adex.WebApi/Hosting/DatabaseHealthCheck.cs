@@ -11,7 +11,7 @@ namespace Adex.WebApi.Hosting
     {
         public async Task<HealthCheckResult> CheckHealthAsync(
             HealthCheckContext context,
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken
         )
         {
             await using var db = contextFactory.CreateDbContext();

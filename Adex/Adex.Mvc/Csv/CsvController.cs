@@ -32,14 +32,14 @@ namespace Adex.Mvc.Csv
 
         [HttpGet]
         public async Task<IActionResult> Content(
-            int page = 1,
-            [FromQuery(Name = "filters")] Dictionary<string, string> filters = null,
-            CancellationToken cancellationToken = default
+            int? page,
+            [FromQuery(Name = "filters")] Dictionary<string, string>? filters,
+            CancellationToken cancellationToken
         )
         {
             var model = await BuildAsync(
-                Math.Max(page, 1),
-                ActiveFilters(filters),
+                Math.Max(page ?? 1, 1),
+                ActiveFilters(filters ?? []),
                 cancellationToken
             );
             return PartialView("_CsvContent", model);

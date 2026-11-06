@@ -11,6 +11,6 @@ namespace Adex.Application.Search
             86400,
             ErrorMessage = "Le paramètre « Search:CacheDurationSeconds » doit être compris entre 0 et 86400."
         )]
-        public int CacheDurationSeconds { get; set; } = 300;
+        public required int CacheDurationSeconds { get; set; }
     }
 }

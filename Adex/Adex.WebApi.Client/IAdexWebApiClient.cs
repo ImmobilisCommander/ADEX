@@ -10,41 +10,41 @@ namespace Adex.WebApi.Client
 {
     public interface IAdexWebApiClient
     {
-        Task<DashboardModel> GetDashboardAsync(CancellationToken cancellationToken = default);
+        Task<DashboardModel> GetDashboardAsync(CancellationToken cancellationToken);
 
-        Task<DashboardModel> TryGetDashboardAsync(CancellationToken cancellationToken = default);
+        Task<DashboardModel> TryGetDashboardAsync(CancellationToken cancellationToken);
 
         Task<IReadOnlyList<EntitySearchResult>> SearchEntitiesAsync(
             string query,
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken
         );
 
         Task<EntityDetails> GetEntityAsync(
             Guid id,
-            int page = 1,
-            int pageSize = 20,
-            string sort = "amount",
-            bool descending = true,
-            CancellationToken cancellationToken = default
+            int page,
+            int pageSize,
+            string sort,
+            bool descending,
+            CancellationToken cancellationToken
         );
 
         Task<EntityCounterpartiesResult> GetEntityCounterpartiesAsync(
             Guid id,
-            int? limit = null,
-            CancellationToken cancellationToken = default
+            int? limit,
+            CancellationToken cancellationToken
         );
 
         Task<JsonElement> GetEntityJsonAsync(
             Guid id,
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken
         );
 
         Task<CsvPage> GetCsvPageAsync(
             int page,
             IReadOnlyDictionary<string, string> filters,
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken
         );
 
-        Task<SitemapModel> GetSitemapAsync(CancellationToken cancellationToken = default);
+        Task<SitemapModel> GetSitemapAsync(CancellationToken cancellationToken);
     }
 }

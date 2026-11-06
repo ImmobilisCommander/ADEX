@@ -34,6 +34,8 @@ namespace Adex.Mcp.Tools
                 id,
                 page: 1,
                 pageSize: 10,
+                sort: "amount",
+                descending: true,
                 cancellationToken: cancellationToken
             );
             details.FinancialLinks = [];

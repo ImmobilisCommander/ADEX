@@ -10,12 +10,12 @@ namespace Adex.Importer
             AllowEmptyStrings = false,
             ErrorMessage = "Le paramètre « Import:DataDirectory » est obligatoire."
         )]
-        public string DataDirectory { get; set; } = string.Empty;
+        public required string DataDirectory { get; set; }
 
         [Required(
             AllowEmptyStrings = false,
             ErrorMessage = "Le paramètre « Import:FileName » est obligatoire."
         )]
-        public string FileName { get; set; } = "declarations.csv";
+        public required string FileName { get; set; }
     }
 }
